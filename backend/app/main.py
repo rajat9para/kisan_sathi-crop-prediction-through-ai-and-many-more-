@@ -41,6 +41,27 @@ if not os.path.exists(public_dir):
 if os.path.exists(public_dir):
     app.mount("/static", StaticFiles(directory=public_dir), name="static")
 
+@app.get("/style.css")
+async def get_style():
+    f = os.path.join(public_dir, "style.css")
+    if os.path.exists(f):
+        return FileResponse(f, media_type="text/css")
+    return JSONResponse(status_code=404, content={"error": "style.css not found"})
+
+@app.get("/app.js")
+async def get_app_js():
+    f = os.path.join(public_dir, "app.js")
+    if os.path.exists(f):
+        return FileResponse(f, media_type="application/javascript")
+    return JSONResponse(status_code=404, content={"error": "app.js not found"})
+
+@app.get("/kisaan_sathi_avatar.png")
+async def get_avatar():
+    f = os.path.join(public_dir, "kisaan_sathi_avatar.png")
+    if os.path.exists(f):
+        return FileResponse(f, media_type="image/png")
+    return JSONResponse(status_code=404, content={"error": "avatar not found"})
+
 @app.get("/")
 async def root():
     index_file = os.path.join(public_dir, "index.html") if os.path.exists(public_dir) else None
