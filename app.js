@@ -587,16 +587,29 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Set initial pure language
   setLanguage(currentLang);
-
-  // Auto-detect GPS Location on Startup (Seamless Background Fetch)
-  setTimeout(() => {
-    autoDetectLocationSilent();
-  }, 800);
 });
 
 // =========================================================================
 // 1. LANGUAGE SELECTION & PERSISTENCE (CENTERED MODAL + 1-CLICK APPLY)
 // =========================================================================
+function hideLanguageModal() {
+  const modal = document.getElementById("langModalOverlay");
+  if (modal) {
+    modal.classList.add("hidden");
+    modal.style.display = "none";
+    modal.style.pointerEvents = "none";
+  }
+}
+
+function showLanguageModal() {
+  const modal = document.getElementById("langModalOverlay");
+  if (modal) {
+    modal.classList.remove("hidden");
+    modal.style.display = "flex";
+    modal.style.pointerEvents = "auto";
+  }
+}
+
 function initLanguageManager() {
   const modal = document.getElementById("langModalOverlay");
   const btnClose = document.getElementById("langModalCloseBtn");
@@ -618,15 +631,19 @@ function initLanguageManager() {
   }
 
   if (savedLang && isDefaultSaved) {
-    if (modal) modal.style.display = "none";
+    hideLanguageModal();
   } else {
     // If not set as default, show centered modal on first visit
-    if (modal && !savedLang) modal.style.display = "flex";
+    if (modal && !savedLang) {
+      showLanguageModal();
+    } else {
+      hideLanguageModal();
+    }
   }
 
   highlightModalCard(tempSelectedLang);
 
-  // 1-Click Language Selection & Dismissal
+  // 1-Click Language Selection & Instant Smooth Dismissal
   const langCards = document.querySelectorAll(".lang-card");
   langCards.forEach(card => {
     card.addEventListener("click", () => {
@@ -642,7 +659,7 @@ function initLanguageManager() {
       if (langCurrentText && I18N_DICTIONARY[tempSelectedLang]) {
         langCurrentText.textContent = `${I18N_DICTIONARY[tempSelectedLang].name} (IN)`;
       }
-      if (modal) modal.style.display = "none";
+      hideLanguageModal();
     });
   });
 
@@ -658,21 +675,21 @@ function initLanguageManager() {
       if (langCurrentText && I18N_DICTIONARY[tempSelectedLang]) {
         langCurrentText.textContent = `${I18N_DICTIONARY[tempSelectedLang].name} (IN)`;
       }
-      if (modal) modal.style.display = "none";
+      hideLanguageModal();
     });
   }
 
-  if (btnToggle && modal) {
+  if (btnToggle) {
     btnToggle.addEventListener("click", () => {
       tempSelectedLang = currentLang;
       highlightModalCard(tempSelectedLang);
-      modal.style.display = "flex";
+      showLanguageModal();
     });
   }
 
-  if (btnClose && modal) {
+  if (btnClose) {
     btnClose.addEventListener("click", () => {
-      modal.style.display = "none";
+      hideLanguageModal();
     });
   }
 
@@ -680,7 +697,7 @@ function initLanguageManager() {
   if (modal) {
     modal.addEventListener("click", (e) => {
       if (e.target === modal) {
-        modal.style.display = "none";
+        hideLanguageModal();
       }
     });
   }
