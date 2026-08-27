@@ -21,7 +21,7 @@ class DemoConstants {
       "lon": 75.8577,
       "state": "Madhya Pradesh",
       "district": "Indore",
-      "soil_type": "Deep Black Malwa Clay",
+      "soil_type": "Deep Black Malwa Vertisol Clay",
       "primary_crops": ["Chickpea", "Soybean", "Maize", "Blackgram"]
     },
     {
@@ -32,7 +32,7 @@ class DemoConstants {
       "lon": 75.8573,
       "state": "Punjab",
       "district": "Ludhiana",
-      "soil_type": "Alluvial Sandy Loam",
+      "soil_type": "Indo-Gangetic Alluvial Sandy Loam",
       "primary_crops": ["Rice", "Maize", "Cotton", "Wheat"]
     },
     {
@@ -43,8 +43,85 @@ class DemoConstants {
       "lon": 80.4365,
       "state": "Andhra Pradesh",
       "district": "Guntur",
-      "soil_type": "Red Clayey Sandy Loam",
+      "soil_type": "Coastal Red Clayey Sandy Loam",
       "primary_crops": ["Cotton", "Maize", "Rice", "Chilli"]
+    },
+    {
+      "id": "rajkot",
+      "name_en": "Rajkot / Junagadh, Gujarat",
+      "name_hi": "राजकोट / जूनागढ़, गुजरात",
+      "lat": 22.3039,
+      "lon": 70.8022,
+      "state": "Gujarat",
+      "district": "Rajkot",
+      "soil_type": "Saurashtra Medium Black Calcareous Loam",
+      "primary_crops": ["Groundnut", "Cotton", "Sesame", "Cumin"]
+    },
+    {
+      "id": "thanjavur",
+      "name_en": "Thanjavur, Tamil Nadu",
+      "name_hi": "तंजாவూర్, तमिलनाडु",
+      "lat": 10.7870,
+      "lon": 79.1378,
+      "state": "Tamil Nadu",
+      "district": "Thanjavur",
+      "soil_type": "Cauvery Deltaic Alluvial Silt Clay",
+      "primary_crops": ["Rice", "Blackgram", "Sugarcane", "Banana"]
+    },
+    {
+      "id": "bardhaman",
+      "name_en": "Bardhaman, West Bengal",
+      "name_hi": "बर्धमान, पश्चिम बंगाल",
+      "lat": 23.2324,
+      "lon": 87.8615,
+      "state": "West Bengal",
+      "district": "Bardhaman",
+      "soil_type": "Lower Gangetic Old Alluvial Clay Loam",
+      "primary_crops": ["Rice", "Jute", "Potato", "Mustard"]
+    },
+    {
+      "id": "jaipur",
+      "name_en": "Jaipur, Rajasthan",
+      "name_hi": "जयपुर, राजस्थान",
+      "lat": 26.9124,
+      "lon": 75.7873,
+      "state": "Rajasthan",
+      "district": "Jaipur",
+      "soil_type": "Semi-Arid Desert Light Sandy Loam",
+      "primary_crops": ["Mothbeans", "Bajra (Pearl Millet)", "Mustard", "Chickpea"]
+    },
+    {
+      "id": "dharwad",
+      "name_en": "Dharwad, Karnataka",
+      "name_hi": "धारवाड़, कर्नाटक",
+      "lat": 15.4589,
+      "lon": 75.0078,
+      "state": "Karnataka",
+      "district": "Dharwad",
+      "soil_type": "Western Ghats Red Laterite Loam",
+      "primary_crops": ["Maize", "Cotton", "Groundnut", "Soybean"]
+    },
+    {
+      "id": "varanasi",
+      "name_en": "Varanasi, Uttar Pradesh",
+      "name_hi": "वाराणसी, उत्तर प्रदेश",
+      "lat": 25.3176,
+      "lon": 82.9739,
+      "state": "Uttar Pradesh",
+      "district": "Varanasi",
+      "soil_type": "Eastern Gangetic Silt Alluvial",
+      "primary_crops": ["Wheat", "Rice", "Pigeonpeas", "Lentil"]
+    },
+    {
+      "id": "palakkad",
+      "name_en": "Palakkad, Kerala",
+      "name_hi": "पालक्काड, केरल",
+      "lat": 10.7867,
+      "lon": 76.6548,
+      "state": "Kerala",
+      "district": "Palakkad",
+      "soil_type": "High-Rainfall Acidic Peaty Laterite",
+      "primary_crops": ["Rice", "Coconut", "Banana", "Black Pepper"]
     }
   ];
 
@@ -52,6 +129,7 @@ class DemoConstants {
     {
       "id": "sample_1_nashik",
       "title": "Nashik MahaSoil Health Card #MH-4012",
+      "state": "Maharashtra",
       "farmer": "Ramesh Kisan Patil",
       "date": "18 May 2026",
       "n": 85.0,
@@ -59,11 +137,12 @@ class DemoConstants {
       "k": 190.0,
       "ph": 6.8,
       "oc": 0.72,
-      "texture": "Medium Black Clay Loam"
+      "texture": "Medium Black Cotton Clay Loam"
     },
     {
       "id": "sample_2_indore",
       "title": "MP Krishi Vigyan Soil Lab #MP-8830",
+      "state": "Madhya Pradesh",
       "farmer": "Vikram Singh Chouhan",
       "date": "12 June 2026",
       "n": 45.0,
@@ -71,11 +150,12 @@ class DemoConstants {
       "k": 82.0,
       "ph": 7.4,
       "oc": 0.58,
-      "texture": "Deep Black Malwa Clay"
+      "texture": "Deep Black Malwa Vertisol Clay"
     },
     {
       "id": "sample_3_ludhiana",
       "title": "PAU Ludhiana Testing Cell #PB-1049",
+      "state": "Punjab",
       "farmer": "Gurpreet Singh Dhillon",
       "date": "22 April 2026",
       "n": 92.0,
@@ -83,7 +163,111 @@ class DemoConstants {
       "k": 38.0,
       "ph": 7.2,
       "oc": 0.45,
-      "texture": "Alluvial Sandy Loam"
+      "texture": "Indo-Gangetic Alluvial Sandy Loam"
+    },
+    {
+      "id": "sample_4_guntur",
+      "title": "Andhra YSR Rythu Testing #AP-3190",
+      "state": "Andhra Pradesh",
+      "farmer": "Venkat Ramanayya",
+      "date": "04 July 2026",
+      "n": 70.0,
+      "p": 55.0,
+      "k": 140.0,
+      "ph": 6.5,
+      "oc": 0.65,
+      "texture": "Coastal Red Clayey Sandy Loam"
+    },
+    {
+      "id": "sample_5_rajkot",
+      "title": "Gujarat Krishi Mahotsav Lab #GJ-5521",
+      "state": "Gujarat",
+      "farmer": "Mansukhbhai Patel",
+      "date": "30 May 2026",
+      "n": 58.0,
+      "p": 64.0,
+      "k": 165.0,
+      "ph": 7.8,
+      "oc": 0.52,
+      "texture": "Saurashtra Medium Black Calcareous Loam"
+    },
+    {
+      "id": "sample_6_thanjavur",
+      "title": "TN Cauvery Delta Testing #TN-7204",
+      "state": "Tamil Nadu",
+      "farmer": "Muthusamy Sundaram",
+      "date": "18 June 2026",
+      "n": 88.0,
+      "p": 36.0,
+      "k": 95.0,
+      "ph": 6.7,
+      "oc": 0.81,
+      "texture": "Cauvery Deltaic Alluvial Silt Clay"
+    },
+    {
+      "id": "sample_7_bardhaman",
+      "title": "West Bengal Mati Tirtha Lab #WB-6112",
+      "state": "West Bengal",
+      "farmer": "Subrata Mukherjee",
+      "date": "25 June 2026",
+      "n": 95.0,
+      "p": 32.0,
+      "k": 88.0,
+      "ph": 6.2,
+      "oc": 0.78,
+      "texture": "Lower Gangetic Old Alluvial Clay Loam"
+    },
+    {
+      "id": "sample_8_jaipur",
+      "title": "Rajasthan Semi-Arid Survey #RJ-2041",
+      "state": "Rajasthan",
+      "farmer": "Ramkishan Gurjar",
+      "date": "10 May 2026",
+      "n": 32.0,
+      "p": 28.0,
+      "k": 120.0,
+      "ph": 8.2,
+      "oc": 0.28,
+      "texture": "Semi-Arid Desert Light Sandy Loam"
+    },
+    {
+      "id": "sample_9_dharwad",
+      "title": "Karnataka Raitha Mitra #KA-4418",
+      "state": "Karnataka",
+      "farmer": "Basavaraj Bommai Gowda",
+      "date": "08 June 2026",
+      "n": 75.0,
+      "p": 46.0,
+      "k": 115.0,
+      "ph": 6.4,
+      "oc": 0.69,
+      "texture": "Western Ghats Red Laterite Loam"
+    },
+    {
+      "id": "sample_10_varanasi",
+      "title": "UP Krishi Bhawan Soil Hub #UP-9023",
+      "state": "Uttar Pradesh",
+      "farmer": "Chandrabhan Tiwari",
+      "date": "22 May 2026",
+      "n": 82.0,
+      "p": 52.0,
+      "k": 68.0,
+      "ph": 7.1,
+      "oc": 0.61,
+      "texture": "Eastern Gangetic Silt Alluvial"
+    },
+    {
+      "id": "sample_11_palakkad",
+      "title": "Kerala Karshika Karma Sena #KL-1845",
+      "state": "Kerala",
+      "farmer": "Gopalakrishnan Nair",
+      "date": "11 July 2026",
+      "n": 68.0,
+      "p": 24.0,
+      "k": 75.0,
+      "ph": 5.4,
+      "oc": 1.15,
+      "texture": "High-Rainfall Acidic Peaty Laterite"
     }
   ];
 

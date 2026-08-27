@@ -6,7 +6,6 @@ import '../providers/market_provider.dart';
 import '../services/sync_manager.dart';
 import '../constants/app_colors.dart';
 import '../constants/app_strings.dart';
-import '../constants/demo_constants.dart';
 import '../widgets/sync_banner.dart';
 import '../widgets/weather_forecast_widget.dart';
 import '../widgets/metric_card.dart';
@@ -17,6 +16,7 @@ import 'voice_saathi_screen.dart';
 import 'disease_doctor_screen.dart';
 import 'offline_demo_screen.dart';
 import 'roadmap_schemes_screen.dart';
+import 'language_selection_screen.dart';
 
 class HomeDashboardScreen extends StatefulWidget {
   const HomeDashboardScreen({super.key});
@@ -34,10 +34,6 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     final weather = context.watch<WeatherProvider>();
     final market = context.watch<MarketProvider>();
     final syncMgr = context.watch<SyncManager>();
-
-    final locationName = AppStrings.isHindi
-        ? (advisory.selectedLocation['name_hi'] ?? 'नासिक, महाराष्ट्र')
-        : (advisory.selectedLocation['name_en'] ?? 'Nashik, Maharashtra');
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -71,7 +67,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           ],
         ),
         actions: [
-          // Language Switcher (HI / EN)
+          // Language Switcher (Opens 11-Language Selector Modal)
           IconButton(
             tooltip: "Switch Language / भाषा बदलें",
             icon: Container(
@@ -80,15 +76,25 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 color: Colors.white.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(
-                AppStrings.isHindi ? "EN" : "हिन्दी",
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.translate, color: Colors.white, size: 14),
+                  const SizedBox(width: 4),
+                  Text(
+                    AppStrings.isHindi ? "हिन्दी" : "EN",
+                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
+                ],
               ),
             ),
             onPressed: () {
-              setState(() {
-                AppStrings.isHindi = !AppStrings.isHindi;
-              });
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LanguageSelectionScreen(isModalMode: true),
+                ),
+              ).then((_) => setState(() {}));
             },
           ),
           // Airplane Mode Demo Toggle

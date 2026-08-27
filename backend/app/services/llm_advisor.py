@@ -50,9 +50,8 @@ class LLMAdvisor:
         models_to_try = [
             config.GROQ_MODEL,
             "llama-3.3-70b-versatile",
-            "llama3-8b-8192",
-            "gemma2-9b-it",
-            "mixtral-8x7b-32768"
+            "llama-3.1-8b-instant",
+            "llama-3.2-3b-preview"
         ]
         # Remove duplicates while preserving order
         models_to_try = list(dict.fromkeys([m for m in models_to_try if m]))
@@ -67,6 +66,7 @@ class LLMAdvisor:
                     model=model_name,
                     temperature=0.3,
                     max_tokens=400,
+                    timeout=3.0,
                     response_format={"type": "json_object"}
                 )
                 import json

@@ -1,7 +1,8 @@
 /**
  * KISAAN_SATHI (किसान साथी) Web Application Engine
- * Supports 11 Indian Languages, First-Launch Language Selector Modal with Default Option,
- * XGBoost + SHAP Explainability, Plant Doctor AI, Voice Saathi, and Supabase Keep-Alive.
+ * Supports 11 Indian Languages, 11 Regional Agro-Ecological Hubs, 11 Soil Health Cards,
+ * First-Launch Language Selector Modal with Default Option, XGBoost + SHAP Explainability,
+ * Plant Doctor AI, Voice Saathi, and Supabase Keep-Alive.
  */
 
 // 11 INDIAN LANGUAGES LOCALIZATION DICTIONARY
@@ -16,7 +17,7 @@ const I18N_DICTIONARY = {
     live_mandi_label: "लाइव मंडी भाव",
     hero_headline: "वैज्ञानिक प्रमाणों और सटीक डेटा पर आधारित स्मार्ट कृषि सलाह",
     hero_sub: "XGBoost 99.09% सटीकता के साथ मिट्टी व मौसम का विश्लेषण करता है, और Groq AI किसान को अपनी मातृभाषा में आवाज के साथ मार्गदर्शन देता है।",
-    quick_hubs_label: "प्रमुख कृषि क्षेत्र चुनें:",
+    quick_hubs_label: "प्रमुख कृषि क्षेत्र व मृदा प्रकार:",
     lbl_temperature: "Temperature / तापमान",
     lbl_humidity: "Humidity / नमी",
     lbl_rain7d: "7-Day Rain / वर्षा",
@@ -99,7 +100,7 @@ const I18N_DICTIONARY = {
     live_mandi_label: "LIVE APMC MANDI",
     hero_headline: "Smart Farming Advisory Backed by Explainable Science",
     hero_sub: "XGBoost computes soil and climate vectors with 99.09% accuracy, and Groq AI gives natural voice guidance.",
-    quick_hubs_label: "Quick Regional Hubs:",
+    quick_hubs_label: "Quick Regional Soil Hubs:",
     lbl_temperature: "Temperature",
     lbl_humidity: "Humidity",
     lbl_rain7d: "7-Day Rain",
@@ -181,8 +182,8 @@ const I18N_DICTIONARY = {
     supabase_sync: "सुपाबेस थेट सुरू आहे",
     live_mandi_label: "थेट बाजार भाव",
     hero_headline: "शास्त्रीय पुराव्यांवर आधारित स्मार्ट शेती सल्ला",
-    hero_sub: "XGBoost ९९.०९% अचूकतेसह माती व हवामानाचे विश्लेषण करते, आणि Groq AI मराठीत बोलून मार्गदर्शन करते.",
-    quick_hubs_label: "प्रमुख शेती विभाग निवडा:",
+    hero_sub: "XGBoost ९९.०९% अचूकतेसह माती व हवामानाचे विश्लेषण करते, आणि Groq AI मराठीत मार्गदर्शन करते.",
+    quick_hubs_label: "प्रमुख शेती विभाग व मातीचे प्रकार:",
     lbl_temperature: "तापमान",
     lbl_humidity: "हवेतील आर्द्रता",
     lbl_rain7d: "७-दिवसांचा पाऊस",
@@ -347,7 +348,7 @@ const I18N_DICTIONARY = {
     supabase_sync: "సుపాబేస్ లైవ్ యాక్టివ్",
     live_mandi_label: "ప్రత్యక్ష మార్కెట్ ధరలు",
     hero_headline: "శాస్త్రీయ డేటాతో కూడిన స్మార్ట్ వ్యవసాయ సలహా",
-    hero_sub: "XGBoost 99.09% ఖచ్చితత్వంతో నేల మరియు వాతావరణాన్ని విశ్లేషిస్తుంది, మరియు Groq AI తెలుగులో వాయిస్ ద్వారా మార్గనిర్దేశం చేస్తుంది.",
+    hero_sub: "XGBoost 99.09% ఖచ్చితత్వంతో నేల మరియు వాతావరణాన్ని విశ్లేషిస్తుంది, Groq AI తెలుగులో మార్గనిర్దేశం చేస్తుంది.",
     quick_hubs_label: "వ్యవసాయ ప్రాంతాన్ని ఎంచుకోండి:",
     lbl_temperature: "ఉష్ణోగ్రత",
     lbl_humidity: "గాలిలో తేమ",
@@ -358,7 +359,7 @@ const I18N_DICTIONARY = {
     tab_mandi: "మార్కెట్ ధరలు & వాతావరణం",
     tab_supabase: "సుపాబేస్ & సిస్టమ్ స్థితి",
     panel_soil_title: "పొలం వివరాలు & నేల పరీక్ష",
-    panel_soil_sub: "సాయిల్ హెల్త్ కార్డును లోడ్ చేయండి లేదా వివరాలు నింపండి",
+    panel_soil_sub: "సాయిల్ హెల్త్ కార్డును లోడ్ చేయండి",
     lbl_state: "రాష్ట్రం",
     lbl_district: "జిల్లా",
     lbl_n: "నైట్రోజన్ (N) కిలో/హెక్టారు",
@@ -921,7 +922,7 @@ const I18N_DICTIONARY = {
   }
 };
 
-// DEMO HUBS DATA
+// 11 INDIAN REGIONAL AGRO-ECOLOGICAL HUBS DATA
 const DEMO_HUBS = {
   nashik: {
     id: "nashik",
@@ -931,7 +932,7 @@ const DEMO_HUBS = {
     district: "Nashik",
     lat: 19.9975,
     lon: 73.7898,
-    soil: { n: 85, p: 48, k: 190, ph: 6.8, type: "Black Cotton Loam" },
+    soil: { n: 85, p: 48, k: 190, ph: 6.8, oc: 0.72, type: "Medium Black Cotton (Regur) Loam", farmer: "Ramesh Kisan Patil" },
     weather: { temp: "26.5°C", hum: "74%", rain: "68 mm", cond: "Partly Cloudy • अनुकूल मौसम", spray: "Good for Spraying • छिड़काव के लिए उत्तम समय", icon: "⛅" },
     topCrop: { name: "🍇 Grapes / अंगूर (Vitis vinifera)", family: "Vitaceae (Fruit) • 135 Days", score: "94.8%", yield: "8 - 12 Tonnes", rev: "₹3,50,000 - ₹5,00,000", rate: "₹6,200 / Qtl ↗", sowing: "Oct - Nov (Pruning)" },
     shapText: "आपकी मिट्टी में पोटाश (190 kg/ha) और अनुकूल pH (6.8) अंगूर की मिठास और बेहतर पैदावार के लिए सर्वाधिक अनुकूल हैं।",
@@ -955,7 +956,7 @@ const DEMO_HUBS = {
     district: "Indore",
     lat: 22.7196,
     lon: 75.8577,
-    soil: { n: 45, p: 62, k: 82, ph: 7.4, type: "Deep Black Malwa Clay" },
+    soil: { n: 45, p: 62, k: 82, ph: 7.4, oc: 0.58, type: "Deep Black Malwa Vertisol Clay", farmer: "Vikram Singh Chouhan" },
     weather: { temp: "28.0°C", hum: "65%", rain: "42 mm", cond: "Clear & Sunny • साफ मौसम", spray: "Excellent for Spraying • छिड़काव हेतु श्रेष्ठ समय", icon: "☀️" },
     topCrop: { name: "🌾 Chickpea / चना (Cicer arietinum)", family: "Fabaceae (Legume/Pulse) • 110 Days", score: "93.4%", yield: "8 - 12 Quintals", rev: "₹50,000 - ₹74,000", rate: "₹6,150 / Qtl ↗", sowing: "Oct - Nov (Rabi)" },
     shapText: "मालवा की गहरी काली मिट्टी व संतुलित फॉस्फोरस (62 kg/ha) दलहनी फसलों में जड़ ग्रंथियों के विकास और चने के दानों के भराव के लिए सर्वोत्तम है।",
@@ -979,7 +980,7 @@ const DEMO_HUBS = {
     district: "Ludhiana",
     lat: 30.9010,
     lon: 75.8573,
-    soil: { n: 92, p: 42, k: 38, ph: 7.2, type: "Alluvial Sandy Loam" },
+    soil: { n: 92, p: 42, k: 38, ph: 7.2, oc: 0.45, type: "Indo-Gangetic Alluvial Sandy Loam", farmer: "Gurpreet Singh Dhillon" },
     weather: { temp: "30.5°C", hum: "68%", rain: "55 mm", cond: "Warm Humid • उमस भरा", spray: "Spray after 4 PM • शाम 4 बजे बाद छिड़काव", icon: "🌤️" },
     topCrop: { name: "🌾 Rice / धान (Oryza sativa)", family: "Poaceae (Cereal) • 130 Days", score: "92.8%", yield: "22 - 28 Quintals", rev: "₹85,000 - ₹1,10,000", rate: "₹3,950 / Qtl ↗", sowing: "June - July (Transplanting)" },
     shapText: "ਜਲੋੜ ਦੋਮਟ ਮਿੱਟੀ ਅਤੇ ਉੱਚ ਨਾਈਟ੍ਰੋਜਨ (92 kg/ha) ਝੋਨੇ ਦੇ ਵਧੀਆ ਫੁਟਾਰੇ ਅਤੇ ਵੱਧ ਝਾੜ ਲਈ ਸਭ ਤੋਂ ਵਧੀਆ ਹਨ।",
@@ -991,7 +992,7 @@ const DEMO_HUBS = {
       { name: "Groundwater Strain", pct: 25, val: "-6%", pos: false }
     ],
     runners: [
-      { name: "🌽 Maize / मक्का", score: "88.1%", meta: "Est: ₹55K - ₹72K / acre • Mandi: ₹2,280/Qtl" },
+      { name: "🌽 Maize / ਮक्का", score: "88.1%", meta: "Est: ₹55K - ₹72K / acre • Mandi: ₹2,280/Qtl" },
       { name: "🌿 Cotton / कपास", score: "83.6%", meta: "Est: ₹75K - ₹1.05L / acre • Mandi: ₹7,450/Qtl" }
     ]
   },
@@ -1003,7 +1004,7 @@ const DEMO_HUBS = {
     district: "Guntur",
     lat: 16.3067,
     lon: 80.4365,
-    soil: { n: 70, p: 55, k: 140, ph: 6.5, type: "Red Clayey Sandy Loam" },
+    soil: { n: 70, p: 55, k: 140, ph: 6.5, oc: 0.65, type: "Coastal Red Clayey Sandy Loam", farmer: "Venkat Ramanayya" },
     weather: { temp: "31.2°C", hum: "78%", rain: "80 mm", cond: "Tropical Humid • उष्ण आर्द्र", spray: "Check Wind Speed • हवा की गति देखकर छिड़कें", icon: "🌧️" },
     topCrop: { name: "🌿 Cotton / పత్తి (Gossypium hirsutum)", family: "Malvaceae (Fiber) • 160 Days", score: "94.1%", yield: "10 - 14 Quintals", rev: "₹75,000 - ₹1,05,000", rate: "₹7,450 / Qtl ▶", sowing: "May - June (Kharif)" },
     shapText: "ఎర్ర నేలలు మరియు అధిక పొటాష్ (140 kg/ha) పత్తి కాయల పరిమాణం మరియు నాణ్యమైన దిగుబడికి ఎంతో ప్రయోజనకరం.",
@@ -1018,7 +1019,171 @@ const DEMO_HUBS = {
       { name: "🌶️ Chilli / మిర్చి", score: "91.8%", meta: "Est: ₹1.2L - ₹1.8L / acre • Mandi: ₹18,500/Qtl" },
       { name: "🌽 Maize / మొక్కజొన్న", score: "85.0%", meta: "Est: ₹55K - ₹72K / acre • Mandi: ₹2,280/Qtl" }
     ]
+  },
+  rajkot: {
+    id: "rajkot",
+    name_en: "Rajkot, Gujarat",
+    name_hi: "राजकोट, गुजरात",
+    state: "Gujarat",
+    district: "Rajkot",
+    lat: 22.3039,
+    lon: 70.8022,
+    soil: { n: 58, p: 64, k: 165, ph: 7.8, oc: 0.52, type: "Saurashtra Calcareous Loam", farmer: "Mansukhbhai Patel" },
+    weather: { temp: "29.8°C", hum: "62%", rain: "35 mm", cond: "Sunny • शुष्क मौसम", spray: "Excellent for Spraying", icon: "☀️" },
+    topCrop: { name: "🥜 Groundnut / મગફળી", family: "Fabaceae (Oilseed) • 105 Days", score: "93.8%", yield: "12 - 16 Quintals", rev: "₹72,000 - ₹96,000", rate: "₹6,800 / Qtl ↗", sowing: "June - July" },
+    shapText: "ચૂનાયુક્ત કાળી ગોરાડુ જમીન મગફળીના દાણાના ભરાવ અને તેલની ટકાવારી માટે ઉત્તમ છે.",
+    shapBars: [
+      { name: "Phosphorus (P: 64)", pct: 80, val: "+25%", pos: true },
+      { name: "Potassium (K: 165)", pct: 75, val: "+22%", pos: true },
+      { name: "Soil Calcium", pct: 60, val: "+15%", pos: true }
+    ],
+    runners: [
+      { name: "🌿 Cotton / કપાસ", score: "90.2%", meta: "Est: ₹75K - ₹1.05L / acre • Mandi: ₹7,450/Qtl" },
+      { name: "🌾 Sesame / તલ", score: "86.4%", meta: "Est: ₹45K - ₹65K / acre • Mandi: ₹11,200/Qtl" }
+    ]
+  },
+  thanjavur: {
+    id: "thanjavur",
+    name_en: "Thanjavur, Tamil Nadu",
+    name_hi: "तंजावूर, तमिलनाडु",
+    state: "Tamil Nadu",
+    district: "Thanjavur",
+    lat: 10.7870,
+    lon: 79.1378,
+    soil: { n: 88, p: 36, k: 95, ph: 6.7, oc: 0.81, type: "Cauvery Deltaic Silt Clay", farmer: "Muthusamy Sundaram" },
+    weather: { temp: "31.5°C", hum: "76%", rain: "95 mm", cond: "Delta Rain • டெல்டா மழை", spray: "Spray after Rain Clears", icon: "🌦️" },
+    topCrop: { name: "🌾 Rice / நெல் (Oryza sativa)", family: "Poaceae (Cereal) • 120 Days", score: "95.2%", yield: "24 - 30 Quintals", rev: "₹95,000 - ₹1,20,000", rate: "₹3,950 / Qtl ↗", sowing: "Kuruvai / Samba" },
+    shapText: "காவிரி டெல்டா வண்டல் மண் அதிக அங்கக கரிமம் (0.81%) நெல் பயிருக்கு அதிக மகசூலை உறுதி செய்கிறது.",
+    shapBars: [
+      { name: "Organic Carbon (0.81%)", pct: 86, val: "+27%", pos: true },
+      { name: "Nitrogen (N: 88)", pct: 78, val: "+23%", pos: true }
+    ],
+    runners: [
+      { name: "🌾 Blackgram / உளுந்து", score: "89.4%", meta: "Est: ₹35K - ₹50K / acre • Mandi: ₹7,800/Qtl" },
+      { name: "🍌 Banana / வாழை", score: "87.1%", meta: "Est: ₹1.8L - ₹2.5L / acre • Mandi: ₹2,400/Qtl" }
+    ]
+  },
+  bardhaman: {
+    id: "bardhaman",
+    name_en: "Bardhaman, West Bengal",
+    name_hi: "बर्धमान, पश्चिम बंगाल",
+    state: "West Bengal",
+    district: "Bardhaman",
+    lat: 23.2324,
+    lon: 87.8615,
+    soil: { n: 95, p: 32, k: 88, ph: 6.2, oc: 0.78, type: "Gangetic Old Alluvial Clay Loam", farmer: "Subrata Mukherjee" },
+    weather: { temp: "30.0°C", hum: "82%", rain: "110 mm", cond: "Monsoon Showers", spray: "Hold Spraying for 24h", icon: "🌧️" },
+    topCrop: { name: "🌾 Rice / আমন ধান", family: "Poaceae (Cereal) • 135 Days", score: "94.6%", yield: "25 - 32 Quintals", rev: "₹90,000 - ₹1,15,000", rate: "₹3,800 / Qtl ↗", sowing: "Aman / Boro Season" },
+    shapText: "গাঙ্গেয় পলিমাটি ও উচ্চ নাইট্রোজেন ধান গাছের দ্রুত বৃদ্ধি ও পুষ্ট শিষের জন্য অত্যন্ত উপযোগী।",
+    shapBars: [
+      { name: "Nitrogen (N: 95)", pct: 88, val: "+28%", pos: true },
+      { name: "Soil Organic Carbon", pct: 72, val: "+20%", pos: true }
+    ],
+    runners: [
+      { name: "🥔 Potato / আলু", score: "91.5%", meta: "Est: ₹65K - ₹95K / acre • Mandi: ₹1,450/Qtl" },
+      { name: "🌿 Jute / পাট", score: "86.8%", meta: "Est: ₹45K - ₹68K / acre • Mandi: ₹5,400/Qtl" }
+    ]
+  },
+  jaipur: {
+    id: "jaipur",
+    name_en: "Jaipur, Rajasthan",
+    name_hi: "जयपुर, राजस्थान",
+    state: "Rajasthan",
+    district: "Jaipur",
+    lat: 26.9124,
+    lon: 75.7873,
+    soil: { n: 32, p: 28, k: 120, ph: 8.2, oc: 0.28, type: "Desert Light Sandy Loam", farmer: "Ramkishan Gurjar" },
+    weather: { temp: "34.5°C", hum: "42%", rain: "18 mm", cond: "Dry & Sunny • तेज धूप", spray: "Spray Early Morning (6-8 AM)", icon: "☀️" },
+    topCrop: { name: "🌾 Mothbeans / मोठ (Vigna aconitifolia)", family: "Fabaceae (Drought Pulse) • 75 Days", score: "93.1%", yield: "5 - 8 Quintals", rev: "₹38,000 - ₹58,000", rate: "₹7,200 / Qtl ↗", sowing: "July (Kharif)" },
+    shapText: "रेतीली दोमट मिट्टी और कम पानी की उपलब्धता में मोठ व बाजरा की फसल न्यूनतम जोखिम में सर्वोत्तम लाभ देती है।",
+    shapBars: [
+      { name: "Drought Resilience", pct: 92, val: "+32%", pos: true },
+      { name: "Potassium (K: 120)", pct: 60, val: "+16%", pos: true },
+      { name: "Low Rain Requirement", pct: 55, val: "+14%", pos: true }
+    ],
+    runners: [
+      { name: "🌾 Chickpea / चना", score: "88.7%", meta: "Est: ₹45K - ₹68K / acre • Mandi: ₹6,150/Qtl" },
+      { name: "🌱 Mustard / सरसों", score: "85.3%", meta: "Est: ₹42K - ₹62K / acre • Mandi: ₹5,650/Qtl" }
+    ]
+  },
+  dharwad: {
+    id: "dharwad",
+    name_en: "Dharwad, Karnataka",
+    name_hi: "धारवाड़, कर्नाटक",
+    state: "Karnataka",
+    district: "Dharwad",
+    lat: 15.4589,
+    lon: 75.0078,
+    soil: { n: 75, p: 46, k: 115, ph: 6.4, oc: 0.69, type: "Western Ghats Red Laterite Loam", farmer: "Basavaraj Bommai Gowda" },
+    weather: { temp: "27.5°C", hum: "72%", rain: "75 mm", cond: "Pleasant • ಹಿತಕರ ಹವಾಮಾನ", spray: "Good for Spraying", icon: "⛅" },
+    topCrop: { name: "🌽 Maize / ಮೆಕ್ಕೆಜೋಳ", family: "Poaceae (Cereal) • 105 Days", score: "93.7%", yield: "25 - 32 Quintals", rev: "₹60,000 - ₹82,000", rate: "₹2,280 / Qtl ↗", sowing: "June - July" },
+    shapText: "ಕೆಂಪು ಲ್ಯಾಟರೈಟ್ ಮಣ್ಣು ಮೆಕ್ಕೆಜೋಳ ಮತ್ತು ಹತ್ತಿ ಬೆಳೆಗಳಿಗೆ ಅತ್ಯುತ್ತಮ ಒಳಚರಂಡಿ ಮತ್ತು ಪೋಷಕಾಂಶ ಒದಗಿಸುತ್ತದೆ.",
+    shapBars: [
+      { name: "Soil Drainage", pct: 82, val: "+25%", pos: true },
+      { name: "Potassium (K: 115)", pct: 68, val: "+19%", pos: true }
+    ],
+    runners: [
+      { name: "🌿 Cotton / ಹತ್ತಿ", score: "89.8%", meta: "Est: ₹75K - ₹1.05L / acre • Mandi: ₹7,450/Qtl" },
+      { name: "🌱 Soybean / ಸೋಯಾಬೀನ್", score: "85.6%", meta: "Est: ₹45K - ₹62K / acre • Mandi: ₹4,680/Qtl" }
+    ]
+  },
+  varanasi: {
+    id: "varanasi",
+    name_en: "Varanasi, Uttar Pradesh",
+    name_hi: "वाराणसी, उत्तर प्रदेश",
+    state: "Uttar Pradesh",
+    district: "Varanasi",
+    lat: 25.3176,
+    lon: 82.9739,
+    soil: { n: 82, p: 52, k: 68, ph: 7.1, oc: 0.61, type: "Eastern Gangetic Silt Alluvial", farmer: "Chandrabhan Tiwari" },
+    weather: { temp: "29.2°C", hum: "69%", rain: "60 mm", cond: "Scattered Clouds", spray: "Spray in Afternoon", icon: "🌤️" },
+    topCrop: { name: "🌾 Wheat / गेहूं (Triticum aestivum)", family: "Poaceae (Rabi Cereal) • 125 Days", score: "94.2%", yield: "18 - 24 Quintals", rev: "₹75,000 - ₹98,000", rate: "₹2,550 / Qtl ↗", sowing: "Nov - Dec" },
+    shapText: "गंगा के मैदानों की दोमट जलोढ़ मिट्टी गेहूं के कल्ले फूटने और दाने के भराव के लिए अत्यंत उपजाऊ है।",
+    shapBars: [
+      { name: "Phosphorus (P: 52)", pct: 84, val: "+26%", pos: true },
+      { name: "Soil Silt Content", pct: 75, val: "+21%", pos: true }
+    ],
+    runners: [
+      { name: "🌾 Pigeonpeas / अरहर", score: "90.1%", meta: "Est: ₹55K - ₹78K / acre • Mandi: ₹10,200/Qtl" },
+      { name: "🌱 Mustard / सरसों", score: "87.4%", meta: "Est: ₹42K - ₹62K / acre • Mandi: ₹5,650/Qtl" }
+    ]
+  },
+  palakkad: {
+    id: "palakkad",
+    name_en: "Palakkad, Kerala",
+    name_hi: "पालक्काड, केरल",
+    state: "Kerala",
+    district: "Palakkad",
+    lat: 10.7867,
+    lon: 76.6548,
+    soil: { n: 68, p: 24, k: 75, ph: 5.4, oc: 1.15, type: "High-Rainfall Acidic Peaty Laterite", farmer: "Gopalakrishnan Nair" },
+    weather: { temp: "28.5°C", hum: "85%", rain: "140 mm", cond: "Monsoon Rains • മഴ", spray: "Do Not Spray (Heavy Rain)", icon: "🌧️" },
+    topCrop: { name: "🥥 Coconut / തെങ്ങ്", family: "Arecaceae (Palm) • Perennial", score: "95.5%", yield: "80 - 100 Nuts/Palm", rev: "₹1,20,000 - ₹1,80,000", rate: "₹3,400 / 100 Nuts ↗", sowing: "May - June" },
+    shapText: "അമ്ലത്വമുള്ള ഉയർന്ന ജൈവാംശമുള്ള (1.15%) മണ്ണ് തെങ്ങ്, നെല്ല് കൃഷിക്ക് ഏറ്റവും അനുയോജ്യമാണ്.",
+    shapBars: [
+      { name: "High Organic Matter (1.15%)", pct: 90, val: "+30%", pos: true },
+      { name: "High Rainfall Adaptation", pct: 85, val: "+26%", pos: true }
+    ],
+    runners: [
+      { name: "🍌 Banana / നേന്ത്രവാഴ", score: "91.0%", meta: "Est: ₹1.5L - ₹2.2L / acre • Mandi: ₹3,800/Qtl" },
+      { name: "🌾 Rice / നെല്ല്", score: "88.2%", meta: "Est: ₹60K - ₹85K / acre • Mandi: ₹3,950/Qtl" }
+    ]
   }
+};
+
+// 11 INDIAN SOIL HEALTH CARDS
+const SAMPLE_SOIL_CARDS_MAP = {
+  sample_1_nashik: { hub: "nashik", n: 85, p: 48, k: 190, ph: 6.8, oc: 0.72, texture: "Medium Black Cotton (Regur) Loam", farmer: "Ramesh Kisan Patil", state: "Maharashtra", district: "Nashik" },
+  sample_2_indore: { hub: "indore", n: 45, p: 62, k: 82, ph: 7.4, oc: 0.58, texture: "Deep Black Malwa Vertisol Clay", farmer: "Vikram Singh Chouhan", state: "Madhya Pradesh", district: "Indore" },
+  sample_3_ludhiana: { hub: "ludhiana", n: 92, p: 42, k: 38, ph: 7.2, oc: 0.45, texture: "Indo-Gangetic Alluvial Sandy Loam", farmer: "Gurpreet Singh Dhillon", state: "Punjab", district: "Ludhiana" },
+  sample_4_guntur: { hub: "guntur", n: 70, p: 55, k: 140, ph: 6.5, oc: 0.65, texture: "Coastal Red Clayey Sandy Loam", farmer: "Venkat Ramanayya", state: "Andhra Pradesh", district: "Guntur" },
+  sample_5_rajkot: { hub: "rajkot", n: 58, p: 64, k: 165, ph: 7.8, oc: 0.52, texture: "Saurashtra Calcareous Loam", farmer: "Mansukhbhai Patel", state: "Gujarat", district: "Rajkot" },
+  sample_6_thanjavur: { hub: "thanjavur", n: 88, p: 36, k: 95, ph: 6.7, oc: 0.81, texture: "Cauvery Deltaic Silt Clay", farmer: "Muthusamy Sundaram", state: "Tamil Nadu", district: "Thanjavur" },
+  sample_7_bardhaman: { hub: "bardhaman", n: 95, p: 32, k: 88, ph: 6.2, oc: 0.78, texture: "Gangetic Old Alluvial Clay Loam", farmer: "Subrata Mukherjee", state: "West Bengal", district: "Bardhaman" },
+  sample_8_jaipur: { hub: "jaipur", n: 32, p: 28, k: 120, ph: 8.2, oc: 0.28, texture: "Desert Light Sandy Loam", farmer: "Ramkishan Gurjar", state: "Rajasthan", district: "Jaipur" },
+  sample_9_dharwad: { hub: "dharwad", n: 75, p: 46, k: 115, ph: 6.4, oc: 0.69, texture: "Western Ghats Red Laterite Loam", farmer: "Basavaraj Bommai Gowda", state: "Karnataka", district: "Dharwad" },
+  sample_10_varanasi: { hub: "varanasi", n: 82, p: 52, k: 68, ph: 7.1, oc: 0.61, texture: "Eastern Gangetic Silt Alluvial", farmer: "Chandrabhan Tiwari", state: "Uttar Pradesh", district: "Varanasi" },
+  sample_11_palakkad: { hub: "palakkad", n: 68, p: 24, k: 75, ph: 5.4, oc: 1.15, texture: "High-Rainfall Acidic Peaty Laterite", farmer: "Gopalakrishnan Nair", state: "Kerala", district: "Palakkad" }
 };
 
 // LEAF DISEASE SAMPLES
@@ -1197,7 +1362,7 @@ function setupTabs() {
 }
 
 // =========================================================================
-// 3. REGIONAL HUBS (NASHIK, INDORE, LUDHIANA, GUNTUR)
+// 3. REGIONAL HUBS (11 INDIAN STATES & SOIL CLASSIFICATIONS)
 // =========================================================================
 function setupHubSelector() {
   const chips = document.querySelectorAll(".hub-chip");
@@ -1226,7 +1391,7 @@ function selectHub(key) {
   document.getElementById("weatherEmoji").textContent = hub.weather.icon;
   document.getElementById("weatherSprayText").textContent = hub.weather.spray;
 
-  // Inputs
+  // Form Inputs
   document.getElementById("inputState").value = hub.state;
   document.getElementById("inputDistrict").value = hub.district;
   document.getElementById("inputN").value = hub.soil.n;
@@ -1235,21 +1400,67 @@ function selectHub(key) {
   document.getElementById("inputPH").value = hub.soil.ph;
   updatePHDisplay(hub.soil.ph);
 
+  // Update Soil Card Preview Box
+  updateSoilCardPreviewBox({
+    texture: hub.soil.type,
+    farmer: hub.soil.farmer,
+    n: hub.soil.n,
+    p: hub.soil.p,
+    k: hub.soil.k,
+    ph: hub.soil.ph,
+    oc: hub.soil.oc || 0.65
+  });
+
   // Update Recommendation View
   updateRecommendationUI(hub);
 }
 
 // =========================================================================
-// 4. SOIL CARD PRESET & pH SLIDER
+// 4. SOIL HEALTH CARD PRESETS & LIVE PREVIEW BOX
 // =========================================================================
 function setupSoilCardPreset() {
   const select = document.getElementById("soilCardPresetSelect");
   select.addEventListener("change", () => {
     const val = select.value;
-    if (val === "sample_1_nashik") selectHub("nashik");
-    else if (val === "sample_2_indore") selectHub("indore");
-    else if (val === "sample_3_ludhiana") selectHub("ludhiana");
+    const card = SAMPLE_SOIL_CARDS_MAP[val];
+    if (card) {
+      // Sync with hub
+      selectHub(card.hub);
+      updateSoilCardPreviewBox(card);
+    }
   });
+
+  // Init initial preview
+  if (DEMO_HUBS[currentHub]) {
+    const h = DEMO_HUBS[currentHub];
+    updateSoilCardPreviewBox({
+      texture: h.soil.type,
+      farmer: h.soil.farmer,
+      n: h.soil.n,
+      p: h.soil.p,
+      k: h.soil.k,
+      ph: h.soil.ph,
+      oc: h.soil.oc || 0.72
+    });
+  }
+}
+
+function updateSoilCardPreviewBox(card) {
+  const badge = document.getElementById("soilTextureBadge");
+  const farmer = document.getElementById("soilFarmerName");
+  const pillN = document.getElementById("soilPillN");
+  const pillP = document.getElementById("soilPillP");
+  const pillK = document.getElementById("soilPillK");
+  const pillPH = document.getElementById("soilPillPH");
+  const pillOC = document.getElementById("soilPillOC");
+
+  if (badge) badge.textContent = `🪨 ${card.texture}`;
+  if (farmer) farmer.textContent = `Farmer: ${card.farmer}`;
+  if (pillN) pillN.textContent = `N: ${card.n} (${card.n > 80 ? 'High' : (card.n < 40 ? 'Low' : 'Med')})`;
+  if (pillP) pillP.textContent = `P: ${card.p} (${card.p > 55 ? 'High' : (card.p < 30 ? 'Low' : 'Med')})`;
+  if (pillK) pillK.textContent = `K: ${card.k} (${card.k > 150 ? 'High' : (card.k < 60 ? 'Low' : 'Med')})`;
+  if (pillPH) pillPH.textContent = `pH: ${card.ph} (${card.ph < 6.0 ? 'Acidic' : (card.ph > 7.5 ? 'Alkaline' : 'Neutral')})`;
+  if (pillOC) pillOC.textContent = `OC: ${card.oc}% (${card.oc > 0.7 ? 'Good' : 'Moderate'})`;
 }
 
 function setupPHSlider() {

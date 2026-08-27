@@ -26,7 +26,6 @@ class _LocationSoilInputScreenState extends State<LocationSoilInputScreen> {
   double _acres = 2.5;
   String _irrigation = "Borewell";
   String _previousCrop = "Cotton";
-  bool _useCustomSoil = false;
   bool _isOcrLoading = false;
 
   final List<String> _irrigationOptions = ["Borewell", "Rainfed", "Canal", "Drip"];
@@ -41,7 +40,6 @@ class _LocationSoilInputScreenState extends State<LocationSoilInputScreen> {
     _previousCrop = adv.previousCrop ?? "Cotton";
 
     if (adv.customSoilOverride != null) {
-      _useCustomSoil = true;
       final s = adv.customSoilOverride!;
       _n = (s['nitrogen'] as num?)?.toDouble() ?? _n;
       _p = (s['phosphorus'] as num?)?.toDouble() ?? _p;

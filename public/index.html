@@ -231,28 +231,56 @@
             XGBoost 99.09% सटीकता के साथ मिट्टी व मौसम का विश्लेषण करता है, और Groq AI किसान को अपनी मातृभाषा में आवाज के साथ मार्गदर्शन देता है।
           </p>
 
-          <!-- QUICK HUBS -->
-          <div class="hub-selector-wrap">
-            <span class="hub-label" data-i18n="quick_hubs_label">प्रमुख कृषि क्षेत्र चुनें:</span>
-            <div class="hub-chips">
-              <button class="hub-chip active" data-hub="nashik">
-                <span class="hub-icon">🍇</span>
-                <span>Nashik (MH)</span>
-              </button>
-              <button class="hub-chip" data-hub="indore">
-                <span class="hub-icon">🌱</span>
-                <span>Indore (MP)</span>
-              </button>
-              <button class="hub-chip" data-hub="ludhiana">
-                <span class="hub-icon">🌾</span>
-                <span>Ludhiana (PB)</span>
-              </button>
-              <button class="hub-chip" data-hub="guntur">
-                <span class="hub-icon">🌶️</span>
-                <span>Guntur (AP)</span>
-              </button>
+            <!-- QUICK HUBS -->
+            <div class="hub-selector-wrap">
+              <span class="hub-label" data-i18n="quick_hubs_label">प्रमुख कृषि क्षेत्र व मृदा प्रकार (Select Hub):</span>
+              <div class="hub-chips">
+                <button class="hub-chip active" data-hub="nashik" title="Black Cotton (Regur) Loam">
+                  <span class="hub-icon">🍇</span>
+                  <span>Nashik (MH)</span>
+                </button>
+                <button class="hub-chip" data-hub="indore" title="Deep Black Malwa Vertisol Clay">
+                  <span class="hub-icon">🌱</span>
+                  <span>Indore (MP)</span>
+                </button>
+                <button class="hub-chip" data-hub="ludhiana" title="Indo-Gangetic Alluvial Sandy Loam">
+                  <span class="hub-icon">🌾</span>
+                  <span>Ludhiana (PB)</span>
+                </button>
+                <button class="hub-chip" data-hub="guntur" title="Coastal Red Clayey Sandy Loam">
+                  <span class="hub-icon">🌶️</span>
+                  <span>Guntur (AP)</span>
+                </button>
+                <button class="hub-chip" data-hub="rajkot" title="Saurashtra Medium Black Calcareous Loam">
+                  <span class="hub-icon">🥜</span>
+                  <span>Rajkot (GJ)</span>
+                </button>
+                <button class="hub-chip" data-hub="thanjavur" title="Cauvery Deltaic Alluvial Silt Clay">
+                  <span class="hub-icon">🌾</span>
+                  <span>Thanjavur (TN)</span>
+                </button>
+                <button class="hub-chip" data-hub="bardhaman" title="Lower Gangetic Old Alluvial Clay Loam">
+                  <span class="hub-icon">🌾</span>
+                  <span>Bardhaman (WB)</span>
+                </button>
+                <button class="hub-chip" data-hub="jaipur" title="Semi-Arid Desert Light Sandy Loam">
+                  <span class="hub-icon">🌾</span>
+                  <span>Jaipur (RJ)</span>
+                </button>
+                <button class="hub-chip" data-hub="dharwad" title="Western Ghats Red Laterite Loam">
+                  <span class="hub-icon">☕</span>
+                  <span>Dharwad (KA)</span>
+                </button>
+                <button class="hub-chip" data-hub="varanasi" title="Eastern Gangetic Silt Alluvial">
+                  <span class="hub-icon">🌾</span>
+                  <span>Varanasi (UP)</span>
+                </button>
+                <button class="hub-chip" data-hub="palakkad" title="High-Rainfall Acidic Peaty Laterite">
+                  <span class="hub-icon">🥥</span>
+                  <span>Palakkad (KL)</span>
+                </button>
+              </div>
             </div>
-          </div>
         </div>
 
         <div class="hero-right">
@@ -332,11 +360,34 @@
             <!-- PRESET CARD LOADER -->
             <div class="preset-dropdown">
               <select id="soilCardPresetSelect" class="form-select-sm">
-                <option value="none">-- Select Soil Card Preset --</option>
-                <option value="sample_1_nashik" selected>Nashik MahaSoil Card (#MH-4012)</option>
-                <option value="sample_2_indore">MP Krishi Vigyan Lab (#MP-8830)</option>
-                <option value="sample_3_ludhiana">PAU Ludhiana Testing (#PB-1049)</option>
+                <option value="none">-- 🇮🇳 Select Indian Soil Health Card (SHC) --</option>
+                <option value="sample_1_nashik" selected>MH: Nashik MahaSoil Lab (#MH-4012 - Black Cotton)</option>
+                <option value="sample_2_indore">MP: Krishi Vigyan Kendra (#MP-8830 - Malwa Vertisol)</option>
+                <option value="sample_3_ludhiana">PB: PAU Ludhiana Testing (#PB-1049 - Indo-Gangetic Alluvial)</option>
+                <option value="sample_4_guntur">AP: YSR Rythu Bharosa (#AP-3190 - Coastal Red Sandy Loam)</option>
+                <option value="sample_5_rajkot">GJ: Gujarat Krishi Mahotsav (#GJ-5521 - Calcareous Loam)</option>
+                <option value="sample_6_thanjavur">TN: Cauvery Delta Lab (#TN-7204 - Deltaic Silt Clay)</option>
+                <option value="sample_7_bardhaman">WB: Mati Tirtha Lab (#WB-6112 - Old Alluvial Clay Loam)</option>
+                <option value="sample_8_jaipur">RJ: Semi-Arid Survey (#RJ-2041 - Desert Light Sandy Loam)</option>
+                <option value="sample_9_dharwad">KA: Raitha Mitra Clinic (#KA-4418 - Red Laterite Loam)</option>
+                <option value="sample_10_varanasi">UP: Krishi Bhawan Soil Hub (#UP-9023 - Gangetic Silt)</option>
+                <option value="sample_11_palakkad">KL: Karshika Karma Sena (#KL-1845 - Acidic Peaty Laterite)</option>
               </select>
+            </div>
+          </div>
+
+          <!-- SOIL TYPE & HEALTH CARD METRICS PREVIEW -->
+          <div class="soil-card-preview-box" id="soilCardPreviewBox">
+            <div class="soil-preview-header">
+              <span class="soil-badge" id="soilTextureBadge">🪨 Medium Black Cotton (Regur) Loam</span>
+              <span class="soil-farmer" id="soilFarmerName">Farmer: Ramesh Kisan Patil</span>
+            </div>
+            <div class="soil-pills-row">
+              <span class="soil-pill pill-n" id="soilPillN">N: 85 (Med)</span>
+              <span class="soil-pill pill-p" id="soilPillP">P: 48 (Med)</span>
+              <span class="soil-pill pill-k" id="soilPillK">K: 190 (High)</span>
+              <span class="soil-pill pill-ph" id="soilPillPH">pH: 6.8 (Neutral)</span>
+              <span class="soil-pill pill-oc" id="soilPillOC">OC: 0.72% (Good)</span>
             </div>
           </div>
 

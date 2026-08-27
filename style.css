@@ -1762,3 +1762,147 @@ body {
   .lang-grid-regional { grid-template-columns: 1fr 1fr; }
 }
 
+/* ==========================================================================
+   SOIL HEALTH CARD PREVIEW & EXPANDED HUB STYLING
+   ========================================================================== */
+.soil-card-preview-box {
+  background: linear-gradient(135deg, #F0FDF4 0%, #FEF3C7 100%);
+  border: 1.5px solid #86EFAC;
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  box-shadow: var(--shadow-sm);
+  animation: fadeIn 0.25s ease-out;
+}
+
+.soil-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.soil-badge {
+  background: var(--color-primary);
+  color: #FFFFFF;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 0.25rem 0.65rem;
+  border-radius: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.soil-farmer {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #78350F;
+}
+
+.soil-pills-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.soil-pill {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 8px;
+  background: #FFFFFF;
+  border: 1px solid #CBD5E1;
+  color: var(--color-text-main);
+}
+
+.soil-pill.pill-n { border-color: #3B82F6; color: #1D4ED8; background: #EFF6FF; }
+.soil-pill.pill-p { border-color: #F59E0B; color: #B45309; background: #FFFBEB; }
+.soil-pill.pill-k { border-color: #10B981; color: #047857; background: #ECFDF5; }
+.soil-pill.pill-ph { border-color: #8B5CF6; color: #6D28D9; background: #F5F3FF; }
+.soil-pill.pill-oc { border-color: #D97706; color: #92400E; background: #FEF3C7; }
+
+/* Enhanced Touch-Friendly Hub Chips */
+.hub-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.hub-chip {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #FFFFFF;
+  padding: 0.4rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: var(--transition-fast);
+}
+
+.hub-chip:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: var(--color-gold);
+  transform: translateY(-1px);
+}
+
+.hub-chip.active {
+  background: var(--color-gold);
+  color: #78350F;
+  border-color: #FFFFFF;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+}
+
+/* MOBILE APP RESPONSIVE OPTIMIZATIONS */
+@media (max-width: 768px) {
+  .header-container {
+    padding: 0.75rem 1rem;
+  }
+  .brand-title {
+    font-size: 1.15rem;
+  }
+  .nav-tabs {
+    overflow-x: auto;
+    white-space: nowrap;
+    padding: 0.5rem;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tab-btn {
+    padding: 0.5rem 0.85rem;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+  }
+  .hero-card {
+    padding: 1rem;
+  }
+  .weather-metrics {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .pillars-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .crop-economics-bar {
+    grid-template-columns: 1fr 1fr;
+  }
+  .card-panel {
+    padding: 1rem;
+  }
+  .form-row.two-col, .form-row.three-col {
+    grid-template-columns: 1fr;
+  }
+  .remedies-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
