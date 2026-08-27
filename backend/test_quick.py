@@ -35,9 +35,9 @@ ping_res = supabase_service.ping_keep_alive()
 print(f"[PASS] Supabase Ping: {ping_res['message']}")
 
 print("[4/4] Testing External APIs Demo Hub...")
-from app.services.external_apis import get_soil_data, get_weather_forecast
-soil = get_soil_data(19.9975, 73.7898)
-weather = get_weather_forecast(19.9975, 73.7898)
-print(f"[PASS] Soil pH: {soil.ph}, Weather Temp: {weather.current_temp_c}C")
+from app.services.external_apis import fetch_soilgrids_data, fetch_weather_data
+soil = fetch_soilgrids_data(19.9975, 73.7898)
+weather = fetch_weather_data(19.9975, 73.7898)
+print(f"[PASS] Soil pH: {soil['ph']}, Weather Temp: {weather['current_temp_c']}C")
 
 print("--- ALL QUICK TESTS PASSED! (Groq LLM + Supabase + ML Engine Verified) ---")

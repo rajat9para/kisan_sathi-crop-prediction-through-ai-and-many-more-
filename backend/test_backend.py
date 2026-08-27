@@ -16,6 +16,12 @@ from app.main import app
 
 client = TestClient(app)
 
+def test_root_frontend():
+    res = client.get("/")
+    assert res.status_code == 200
+    assert "Kisaan_Sathi" in res.text or "किसान साथी" in res.text
+    print("[PASS] GET / -> Indian Agriculture Theme Web Frontend Served Successfully")
+
 def test_health():
     res = client.get("/health")
     assert res.status_code == 200
@@ -97,6 +103,7 @@ def test_ocr_soil_card():
 
 if __name__ == "__main__":
     print("--- Running Kisaan_Sathi Backend Integration Tests ---")
+    test_root_frontend()
     test_health()
     test_db_ping()
     test_recommendation_nashik()
@@ -105,4 +112,4 @@ if __name__ == "__main__":
     test_market_endpoint()
     test_voice_query_groq()
     test_ocr_soil_card()
-    print("--- ALL 8 BACKEND TESTS PASSED (Groq LLM + Supabase Verified)! ---")
+    print("--- ALL 9 BACKEND & FRONTEND TESTS PASSED CONFIDENTLY! ---")

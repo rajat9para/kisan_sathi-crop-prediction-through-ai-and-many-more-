@@ -47,33 +47,48 @@ class LLMAdvisor:
             "4. Format the output strictly as JSON with keys: 'response_text_hi', 'response_text_en', 'tts_audio_text', 'suggested_followups'."
         )
 
-        try:
-            chat_completion = self.client.chat.completions.create(
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": f"Farmer's question: {query_text}"}
-                ],
-                model=config.GROQ_MODEL,
-                temperature=0.3,
-                max_tokens=400,
-                response_format={"type": "json_object"}
-            )
-            import json
-            content = chat_completion.choices[0].message.content
-            parsed = json.loads(content)
-            
-            return {
-                "query": query_text,
-                "detected_intent": "groq_llm_intelligence",
-                "response_text_hi": parsed.get("response_text_hi", ""),
-                "response_text_en": parsed.get("response_text_en", ""),
-                "tts_audio_text": parsed.get("tts_audio_text", parsed.get("response_text_hi", "")),
-                "confidence": 0.98,
-                "suggested_followups": parsed.get("suggested_followups", ["खाद की मात्रा?", "मौसम का हाल?"])
-            }
-        except Exception as e:
-            print(f"[!] Groq query error: {e}. Using fallback rule engine.")
-            return self._fallback_response(query_text)
+        models_to_try = [
+            config.GROQ_MODEL,
+            "llama-3.3-70b-versatile",
+            "llama3-8b-8192",
+            "gemma2-9b-it",
+            "mixtral-8x7b-32768"
+        ]
+        # Remove duplicates while preserving order
+        models_to_try = list(dict.fromkeys([m for m in models_to_try if m]))
+
+        for model_name in models_to_try:
+            try:
+                chat_completion = self.client.chat.completions.create(
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": f"Farmer's question: {query_text}"}
+                    ],
+                    model=model_name,
+                    temperature=0.3,
+                    max_tokens=400,
+                    response_format={"type": "json_object"}
+                )
+                import json
+                content = chat_completion.choices[0].message.content
+                parsed = json.loads(content)
+                
+                return {
+                    "query": query_text,
+                    "detected_intent": "groq_llm_intelligence",
+                    "model_used": model_name,
+                    "response_text_hi": parsed.get("response_text_hi", ""),
+                    "response_text_en": parsed.get("response_text_en", ""),
+                    "tts_audio_text": parsed.get("tts_audio_text", parsed.get("response_text_hi", "")),
+                    "confidence": 0.98,
+                    "suggested_followups": parsed.get("suggested_followups", ["खाद की मात्रा?", "मौसम का हाल?"])
+                }
+            except Exception as e:
+                print(f"[!] Groq query error with model {model_name}: {e}")
+                continue
+
+        print("[!] All Groq models failed or unavailable. Using fallback rule engine.")
+        return self._fallback_response(query_text)
 
     def generate_weather_grounded_spray_plan(
         self,
