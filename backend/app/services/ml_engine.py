@@ -6,12 +6,28 @@ multi-criteria agronomic re-ranking, and bilingual farmer explainability explana
 
 import os
 import json
-import numpy as np
-import pandas as pd
-import joblib
-import xgboost as xgb
 from typing import List, Dict, Any, Tuple
 from app.config import config
+
+try:
+    import numpy as np
+except ImportError:
+    np = None
+
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
+
+try:
+    import joblib
+except ImportError:
+    joblib = None
+
+try:
+    import xgboost as xgb
+except ImportError:
+    xgb = None
 
 # Botanical Crop Family Map for Crop Rotation Impact
 CROP_FAMILIES = {
@@ -352,45 +368,55 @@ class MLEngine:
         return fert_schedule, irrig_schedule
 
     def recommend_crops(self, features: Dict[str, float], previous_crop: str = None, irrigation: str = "Borewell", top_k: int = 3) -> List[Dict[str, Any]]:
-        """Main inference and explainability pipeline."""
-        if not self.model or not self.explainer:
-            # Fallback mock if model wasn't loaded
-            return []
-
+        """Main inference and explainability pipeline with serverless fallback."""
         cols = ["N", "P", "K", "temperature", "humidity", "ph", "rainfall"]
-        input_df = pd.DataFrame([[features[c] for c in cols]], columns=cols)
         
-        # 1. XGBoost Probabilities
-        probs = self.model.predict_proba(input_df)[0]
-        
-        # 2. SHAP Values
-        shap_raw = self.explainer.shap_values(input_df)
-        
-        candidates = []
-        for idx, prob in enumerate(probs):
-            crop_name = self.label_mapping.get(idx, f"crop_{idx}")
-            base_conf = float(prob) * 100.0
+        # If ML binary artifacts are loaded, run XGBoost + SHAP TreeExplainer
+        if self.model and self.explainer and pd is not None:
+            input_df = pd.DataFrame([[features[c] for c in cols]], columns=cols)
+            probs = self.model.predict_proba(input_df)[0]
+            shap_raw = self.explainer.shap_values(input_df)
             
-            fits = self.calculate_pillar_fits(crop_name, features, previous_crop, irrigation)
-            
-            # Weighted Composite Final Match Score
-            # 40% ML base fit, 25% Soil fit, 15% Weather fit, 10% Market trend, 10% Rotation bonus
-            final_match = (
-                base_conf * 0.35 +
-                fits["soil_fit_pct"] * 0.25 +
-                fits["weather_fit_pct"] * 0.20 +
-                fits["market_profitability_pct"] * 0.10 +
-                fits["rotation_impact_pct"] * 0.10
-            )
-            final_match = round(min(99.4, max(35.0, final_match)), 1)
-            
-            candidates.append({
-                "idx": idx,
-                "crop_name": crop_name,
-                "base_conf": round(base_conf, 1),
-                "final_match": final_match,
-                "fits": fits
-            })
+            candidates = []
+            for idx, prob in enumerate(probs):
+                crop_name = self.label_mapping.get(idx, f"crop_{idx}")
+                base_conf = float(prob) * 100.0
+                fits = self.calculate_pillar_fits(crop_name, features, previous_crop, irrigation)
+                
+                final_match = (
+                    base_conf * 0.35 +
+                    fits["soil_fit_pct"] * 0.25 +
+                    fits["weather_fit_pct"] * 0.20 +
+                    fits["market_profitability_pct"] * 0.10 +
+                    fits["rotation_impact_pct"] * 0.10
+                )
+                final_match = round(min(99.4, max(35.0, final_match)), 1)
+                candidates.append({
+                    "idx": idx,
+                    "crop_name": crop_name,
+                    "base_conf": round(base_conf, 1),
+                    "final_match": final_match,
+                    "fits": fits
+                })
+        else:
+            # Deterministic Agronomic Fallback (100% lightweight & serverless safe)
+            shap_raw = None
+            candidates = []
+            for idx, crop_name in enumerate(CROP_METADATA.keys()):
+                fits = self.calculate_pillar_fits(crop_name, features, previous_crop, irrigation)
+                composite = (
+                    fits["soil_fit_pct"] * 0.40 +
+                    fits["weather_fit_pct"] * 0.30 +
+                    fits["market_profitability_pct"] * 0.15 +
+                    fits["rotation_impact_pct"] * 0.15
+                )
+                candidates.append({
+                    "idx": idx,
+                    "crop_name": crop_name,
+                    "base_conf": round(composite, 1),
+                    "final_match": round(min(98.5, max(45.0, composite)), 1),
+                    "fits": fits
+                })
 
         # Rank by composite score
         candidates.sort(key=lambda x: x["final_match"], reverse=True)

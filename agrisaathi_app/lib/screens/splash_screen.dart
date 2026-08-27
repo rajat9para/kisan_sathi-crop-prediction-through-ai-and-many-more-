@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/app_colors.dart';
 import 'home_dashboard_screen.dart';
+import 'language_selection_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -34,15 +36,30 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     _animController.forward();
 
-    Future.delayed(const Duration(milliseconds: 2200), () {
+    Future.delayed(const Duration(milliseconds: 2000), () async {
       if (mounted) {
-        Navigator.of(context).pushReplacement(
-          PageRouteBuilder(
-            pageBuilder: (_, __, ___) => const HomeDashboardScreen(),
-            transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
-            transitionDuration: const Duration(milliseconds: 500),
-          ),
-        );
+        final prefs = await SharedPreferences.getInstance();
+        final hasSavedLang = prefs.getBool('kisaan_sathi_lang_saved') ?? false;
+
+        if (!mounted) return;
+
+        if (hasSavedLang) {
+          Navigator.of(context).pushReplacement(
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => const HomeDashboardScreen(),
+              transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+              transitionDuration: const Duration(milliseconds: 500),
+            ),
+          );
+        } else {
+          Navigator.of(context).pushReplacement(
+            PageRouteBuilder(
+              pageBuilder: (_, __, ___) => const LanguageSelectionScreen(),
+              transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+              transitionDuration: const Duration(milliseconds: 500),
+            ),
+          );
+        }
       }
     });
   }

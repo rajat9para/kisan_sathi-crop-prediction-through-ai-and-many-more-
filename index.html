@@ -4,14 +4,159 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kisaan_Sathi (किसान साथी) — AI Crop Advisory & Plant Doctor</title>
-  <meta name="description" content="AI-Powered Hyper-Local, Explainable Crop Advisory & Diagnostics System for Indian Farmers. XGBoost + SHAP, Groq LLaMA, Supabase PostgreSQL, and Vercel Serverless." />
+  <meta name="description" content="AI-Powered Hyper-Local, Explainable Crop Advisory & Diagnostics System for Indian Farmers supporting All Major Indian Languages." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@500;600;700;800&family=Rozha+One&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@500;600;700;800&family=Rozha+One&family=Tiro+Devanagari+Hindi:ital@0;1&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌾</text></svg>">
 </head>
 <body class="theme-indian-agri">
+
+  <!-- ============================================================== -->
+  <!-- FIRST LAUNCH & ON-DEMAND ALL-INDIAN-LANGUAGES MODAL -->
+  <!-- ============================================================== -->
+  <div class="lang-modal-overlay" id="langModalOverlay" style="display: none;">
+    <div class="lang-modal-card">
+      <div class="lang-modal-header">
+        <div class="lang-modal-title-group">
+          <span class="lang-modal-avatar">🇮🇳</span>
+          <div>
+            <h2 class="lang-modal-title">अपनी भाषा चुनें / Choose Language</h2>
+            <p class="lang-modal-sub">किसान साथी भारत की प्रमुख 11 क्षेत्रीय भाषाओं का समर्थन करता है</p>
+          </div>
+        </div>
+        <button class="lang-modal-close" id="langModalCloseBtn" aria-label="Close">✕</button>
+      </div>
+
+      <div class="lang-modal-body">
+        <!-- Primary Languages Section (Hindi & English) -->
+        <div class="lang-section-label">🌟 प्राथमिक भाषाएँ / Primary Languages (Hindi & English)</div>
+        <div class="lang-grid-primary">
+          <div class="lang-card active" data-lang-code="hi">
+            <div class="lang-card-icon">🇮🇳</div>
+            <div class="lang-card-text">
+              <strong class="lang-native">हिन्दी</strong>
+              <span class="lang-sub">Hindi (राष्ट्रीय / उत्तर व मध्य भारत)</span>
+            </div>
+            <span class="lang-check-badge">✓</span>
+          </div>
+
+          <div class="lang-card" data-lang-code="en">
+            <div class="lang-card-icon">🇬🇧</div>
+            <div class="lang-card-text">
+              <strong class="lang-native">English</strong>
+              <span class="lang-sub">English (Standard / Global)</span>
+            </div>
+            <span class="lang-check-badge">✓</span>
+          </div>
+        </div>
+
+        <!-- Regional Languages Section -->
+        <div class="lang-section-label">🌾 क्षेत्रीय कृषि भाषाएँ / Regional Indian Languages</div>
+        <div class="lang-grid-regional">
+          <div class="lang-card" data-lang-code="mr">
+            <span class="lang-card-icon">🚩</span>
+            <div class="lang-card-text">
+              <strong class="lang-native">मराठी</strong>
+              <span class="lang-sub">Marathi (महाराष्ट्र)</span>
+            </div>
+            <span class="lang-check-badge">✓</span>
+          </div>
+
+          <div class="lang-card" data-lang-code="pa">
+            <span class="lang-card-icon">🌾</span>
+            <div class="lang-card-text">
+              <strong class="lang-native">ਪੰਜਾਬੀ</strong>
+              <span class="lang-sub">Punjabi (ਪੰਜਾਬ / ਹਰਿਆਣਾ)</span>
+            </div>
+            <span class="lang-check-badge">✓</span>
+          </div>
+
+          <div class="lang-card" data-lang-code="te">
+            <span class="lang-card-icon">🌶️</span>
+            <div class="lang-card-text">
+              <strong class="lang-native">తెలుగు</strong>
+              <span class="lang-sub">Telugu (ఆంధ్రప్రదేశ్ / తెలంగాణ)</span>
+            </div>
+            <span class="lang-check-badge">✓</span>
+          </div>
+
+          <div class="lang-card" data-lang-code="ta">
+            <span class="lang-card-icon">🌴</span>
+            <div class="lang-card-text">
+              <strong class="lang-native">தமிழ்</strong>
+              <span class="lang-sub">Tamil (தமிழ்நாடு)</span>
+            </div>
+            <span class="lang-check-badge">✓</span>
+          </div>
+
+          <div class="lang-card" data-lang-code="gu">
+            <span class="lang-card-icon">🥜</span>
+            <div class="lang-card-text">
+              <strong class="lang-native">ગુજરાતી</strong>
+              <span class="lang-sub">Gujarati (ગુજરાત)</span>
+            </div>
+            <span class="lang-check-badge">✓</span>
+          </div>
+
+          <div class="lang-card" data-lang-code="bn">
+            <span class="lang-card-icon">🌾</span>
+            <div class="lang-card-text">
+              <strong class="lang-native">বাংলা</strong>
+              <span class="lang-sub">Bengali (পশ্চিমবঙ্গ)</span>
+            </div>
+            <span class="lang-check-badge">✓</span>
+          </div>
+
+          <div class="lang-card" data-lang-code="kn">
+            <span class="lang-card-icon">☕</span>
+            <div class="lang-card-text">
+              <strong class="lang-native">ಕನ್ನಡ</strong>
+              <span class="lang-sub">Kannada (ಕರ್ನಾಟಕ)</span>
+            </div>
+            <span class="lang-check-badge">✓</span>
+          </div>
+
+          <div class="lang-card" data-lang-code="ml">
+            <span class="lang-card-icon">🥥</span>
+            <div class="lang-card-text">
+              <strong class="lang-native">മലയാളം</strong>
+              <span class="lang-sub">Malayalam (കേരളം)</span>
+            </div>
+            <span class="lang-check-badge">✓</span>
+          </div>
+
+          <div class="lang-card" data-lang-code="or">
+            <span class="lang-card-icon">🌾</span>
+            <div class="lang-card-text">
+              <strong class="lang-native">ଓଡ଼ିଆ</strong>
+              <span class="lang-sub">Odia (ଓଡ଼ିଶା)</span>
+            </div>
+            <span class="lang-check-badge">✓</span>
+          </div>
+        </div>
+
+        <!-- Default Language Checkbox Option -->
+        <div class="lang-default-box">
+          <label class="custom-checkbox-wrap">
+            <input type="checkbox" id="chkSetDefaultLang" checked />
+            <span class="custom-checkmark"></span>
+            <span class="checkbox-desc">
+              <strong data-i18n="make_default_title">Set as my default language</strong> / इसे मेरी डिफ़ॉल्ट भाषा बनाएं
+              <small data-i18n="make_default_sub">(Don't ask on startup, can switch anytime in top bar)</small>
+            </span>
+          </label>
+        </div>
+      </div>
+
+      <div class="lang-modal-footer">
+        <button id="btnConfirmLanguage" class="btn-primary btn-modal-apply">
+          <span data-i18n="btn_continue">✓ Continue to Farm Advisory / आगे बढ़ें ➔</span>
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- TOP APP HEADER -->
   <header class="app-header">
@@ -26,8 +171,8 @@
             <span class="brand-hi">किसान साथी</span>
             <span class="brand-en">Kisaan_Sathi</span>
           </h1>
-          <p class="brand-tagline" data-lang-en="AI-Powered Hyper-Local Crop Advisory & Diagnostics" data-lang-hi="एआई आधारित सूक्ष्म-जलवायु फसल सलाह व रोग निदान">
-            AI-Powered Hyper-Local Crop Advisory & Diagnostics
+          <p class="brand-tagline" data-i18n="brand_tagline">
+            एआई आधारित सूक्ष्म-जलवायु फसल सलाह व रोग निदान
           </p>
         </div>
       </div>
@@ -36,15 +181,17 @@
       <div class="header-controls">
         <div class="status-badge" id="supabaseStatusPill" title="Supabase PostgreSQL Heartbeat Active">
           <span class="status-dot pulse-green"></span>
-          <span class="status-label" data-lang-en="Supabase Live Sync" data-lang-hi="सुपाबेस लाइव सक्रिय">Supabase Live Sync</span>
+          <span class="status-label" data-i18n="supabase_sync">Supabase Live Sync</span>
         </div>
         <div class="status-badge vercel-badge" title="Vercel Serverless Active">
           <span class="status-dot dot-cyan"></span>
           <span class="status-label">Vercel Serverless</span>
         </div>
-        <button id="langToggleBtn" class="lang-switch-btn" aria-label="Toggle Language">
+        <!-- ALL LANGUAGES PICKER BUTTON -->
+        <button id="langToggleBtn" class="lang-switch-btn" aria-label="Choose Language / भाषा चुनें" title="Click to choose from all 11 Indian languages">
           <span class="lang-icon">🌐</span>
-          <span id="langCurrentText">हिन्दी</span>
+          <span id="langCurrentText">हिन्दी (IN)</span>
+          <span class="lang-arrow">▼</span>
         </button>
       </div>
     </div>
@@ -53,7 +200,7 @@
     <div class="mandi-ticker-wrap">
       <div class="ticker-label">
         <span class="ticker-live-dot"></span>
-        <span data-lang-en="LIVE APMC MANDI" data-lang-hi="लाइव मंडी भाव">LIVE APMC MANDI</span>
+        <span data-i18n="live_mandi_label">LIVE APMC MANDI</span>
       </div>
       <div class="ticker-scroll" id="mandiTicker">
         <div class="ticker-item"><span class="commodity">🍇 Grapes / अंगूर (Nashik)</span>: <span class="price">₹6,200/Qtl</span> <span class="trend up">▲ +5.4%</span></div>
@@ -75,18 +222,18 @@
       <div class="hero-content">
         <div class="hero-left">
           <div class="hero-pill">
-            <span>🇮🇳 Smart India Hackathon • Hybrid AI (ML + Groq LLaMA 3.3)</span>
+            <span>🇮🇳 Smart India Hackathon • All Indian Languages • Hybrid AI (ML + Groq LLaMA)</span>
           </div>
-          <h2 class="hero-headline" data-lang-en="Smart Farming Advisory Backed by Explainable Science" data-lang-hi="वैज्ञानिक प्रमाणों और सटीक डेटा पर आधारित स्मार्ट कृषि सलाह">
-            Smart Farming Advisory Backed by Explainable Science
+          <h2 class="hero-headline" data-i18n="hero_headline">
+            वैज्ञानिक प्रमाणों और सटीक डेटा पर आधारित स्मार्ट कृषि सलाह
           </h2>
-          <p class="hero-sub" data-lang-en="Deterministic XGBoost (99.09% accuracy) computes nutrient force vectors. Groq LLM synthesizes natural Hindi voice guidance." data-lang-hi="XGBoost 99.09% सटीकता के साथ मिट्टी व मौसम का विश्लेषण करता है, और Groq AI किसान को सरल हिंदी आवाज में मार्गदर्शन देता है।">
-            Deterministic XGBoost (99.09% accuracy) computes nutrient force vectors. Groq LLM synthesizes natural Hindi voice guidance.
+          <p class="hero-sub" data-i18n="hero_sub">
+            XGBoost 99.09% सटीकता के साथ मिट्टी व मौसम का विश्लेषण करता है, और Groq AI किसान को अपनी मातृभाषा में आवाज के साथ मार्गदर्शन देता है।
           </p>
 
           <!-- QUICK HUBS -->
           <div class="hub-selector-wrap">
-            <span class="hub-label" data-lang-en="Quick Regional Hubs:" data-lang-hi="प्रमुख कृषि क्षेत्र चुनें:">Quick Regional Hubs:</span>
+            <span class="hub-label" data-i18n="quick_hubs_label">प्रमुख कृषि क्षेत्र चुनें:</span>
             <div class="hub-chips">
               <button class="hub-chip active" data-hub="nashik">
                 <span class="hub-icon">🍇</span>
@@ -121,15 +268,15 @@
             <div class="weather-metrics">
               <div class="metric-item">
                 <span class="metric-val" id="weatherTemp">26.5°C</span>
-                <span class="metric-lbl" data-lang-en="Temperature" data-lang-hi="तापमान">Temperature</span>
+                <span class="metric-lbl" data-i18n="lbl_temperature">Temperature / तापमान</span>
               </div>
               <div class="metric-item">
                 <span class="metric-val" id="weatherHumidity">74%</span>
-                <span class="metric-lbl" data-lang-en="Humidity" data-lang-hi="नमी">Humidity</span>
+                <span class="metric-lbl" data-i18n="lbl_humidity">Humidity / नमी</span>
               </div>
               <div class="metric-item">
                 <span class="metric-val" id="weatherRain">68 mm</span>
-                <span class="metric-lbl" data-lang-en="7-Day Rain" data-lang-hi="7-दिवसीय वर्षा">7-Day Rain</span>
+                <span class="metric-lbl" data-i18n="lbl_rain7d">7-Day Rain / वर्षा</span>
               </div>
             </div>
             <div class="spray-alert-banner" id="weatherSprayAlert">
@@ -145,23 +292,23 @@
     <nav class="nav-tabs">
       <button class="tab-btn active" data-tab="tab-recommend">
         <span class="tab-icon">🌱</span>
-        <span data-lang-en="Crop Advisory (XGBoost + SHAP)" data-lang-hi="फसल सलाह (XGBoost + SHAP)">Crop Advisory (XGBoost + SHAP)</span>
+        <span data-i18n="tab_advisory">फसल सलाह (XGBoost + SHAP)</span>
       </button>
       <button class="tab-btn" data-tab="tab-doctor">
         <span class="tab-icon">🌿</span>
-        <span data-lang-en="Plant Doctor (Leaf AI)" data-lang-hi="फसल डॉक्टर (रोग पहचान)">Plant Doctor (Leaf AI)</span>
+        <span data-i18n="tab_doctor">फसल डॉक्टर (रोग पहचान)</span>
       </button>
       <button class="tab-btn" data-tab="tab-voice">
         <span class="tab-icon">🎙️</span>
-        <span data-lang-en="Voice Saathi (Groq LLM)" data-lang-hi="वॉइस साथी (बोलकर पूछें)">Voice Saathi (Groq LLM)</span>
+        <span data-i18n="tab_voice">वॉइस साथी (बोलकर पूछें)</span>
       </button>
       <button class="tab-btn" data-tab="tab-mandi">
         <span class="tab-icon">📊</span>
-        <span data-lang-en="Mandi & Weather Radar" data-lang-hi="मंडी भाव व मौसम रडार">Mandi & Weather Radar</span>
+        <span data-i18n="tab_mandi">मंडी भाव व मौसम रडार</span>
       </button>
       <button class="tab-btn" data-tab="tab-supabase">
         <span class="tab-icon">🗄️</span>
-        <span data-lang-en="Supabase & Anti-Sleep" data-lang-hi="सुपाबेस व सिस्टम स्थिति">Supabase & Anti-Sleep</span>
+        <span data-i18n="tab_supabase">सुपाबेस व सिस्टम स्थिति</span>
       </button>
     </nav>
 
@@ -177,8 +324,8 @@
             <div class="panel-title-wrap">
               <span class="panel-icon">🧪</span>
               <div>
-                <h3 class="panel-title" data-lang-en="Farm Parameters & Soil Health" data-lang-hi="खेत का विवरण व मृदा परीक्षण">Farm Parameters & Soil Health</h3>
-                <p class="panel-sub" data-lang-en="Load official Soil Card or enter parameters manually" data-lang-hi="मृदा स्वास्थ्य कार्ड लोड करें या सीधे मान भरें">Load official Soil Card or enter parameters manually</p>
+                <h3 class="panel-title" data-i18n="panel_soil_title">खेत का विवरण व मृदा परीक्षण</h3>
+                <p class="panel-sub" data-i18n="panel_soil_sub">मृदा स्वास्थ्य कार्ड लोड करें या सीधे मान भरें</p>
               </div>
             </div>
 
@@ -196,26 +343,26 @@
           <form id="recommendForm" class="grid-form">
             <div class="form-row two-col">
               <div class="form-group">
-                <label data-lang-en="State" data-lang-hi="राज्य">State</label>
+                <label data-i18n="lbl_state">State / राज्य</label>
                 <input type="text" id="inputState" class="form-input" value="Maharashtra" required />
               </div>
               <div class="form-group">
-                <label data-lang-en="District" data-lang-hi="जिला">District</label>
+                <label data-i18n="lbl_district">District / जिला</label>
                 <input type="text" id="inputDistrict" class="form-input" value="Nashik" required />
               </div>
             </div>
 
             <div class="form-row three-col">
               <div class="form-group">
-                <label data-lang-en="Nitrogen (N) kg/ha" data-lang-hi="नाइट्रोजन (N)">Nitrogen (N) kg/ha</label>
+                <label data-i18n="lbl_n">Nitrogen (N) kg/ha</label>
                 <input type="number" id="inputN" class="form-input" value="85" min="0" max="250" step="1" required />
               </div>
               <div class="form-group">
-                <label data-lang-en="Phosphorus (P) kg/ha" data-lang-hi="फास्फोरस (P)">Phosphorus (P) kg/ha</label>
+                <label data-i18n="lbl_p">Phosphorus (P) kg/ha</label>
                 <input type="number" id="inputP" class="form-input" value="48" min="0" max="150" step="1" required />
               </div>
               <div class="form-group">
-                <label data-lang-en="Potassium (K) kg/ha" data-lang-hi="पोटाश (K)">Potassium (K) kg/ha</label>
+                <label data-i18n="lbl_k">Potassium (K) kg/ha</label>
                 <input type="number" id="inputK" class="form-input" value="190" min="0" max="300" step="1" required />
               </div>
             </div>
@@ -223,13 +370,13 @@
             <div class="form-row two-col">
               <div class="form-group">
                 <div class="label-with-value">
-                  <label data-lang-en="Soil pH Level" data-lang-hi="मिट्टी का pH मान">Soil pH Level</label>
+                  <label data-i18n="lbl_ph">Soil pH Level / मिट्टी का pH मान</label>
                   <span class="range-val" id="phDisplay">6.8 (Neutral/Ideal)</span>
                 </div>
                 <input type="range" id="inputPH" class="form-range" min="4.0" max="9.5" step="0.1" value="6.8" />
               </div>
               <div class="form-group">
-                <label data-lang-en="Irrigation Facility" data-lang-hi="सिंचाई सुविधा">Irrigation Facility</label>
+                <label data-i18n="lbl_irrigation">Irrigation Facility / सिंचाई सुविधा</label>
                 <select id="inputIrrigation" class="form-select">
                   <option value="Borewell" selected>Borewell / ट्यूबवेल</option>
                   <option value="Canal">Canal / नहर</option>
@@ -241,11 +388,11 @@
 
             <div class="form-row two-col">
               <div class="form-group">
-                <label data-lang-en="Farm Size (Acres)" data-lang-hi="खेत का आकार (एकड़)">Farm Size (Acres)</label>
+                <label data-i18n="lbl_farmsize">Farm Size (Acres) / खेत का आकार</label>
                 <input type="number" id="inputFarmSize" class="form-input" value="2.5" min="0.5" max="100" step="0.5" />
               </div>
               <div class="form-group">
-                <label data-lang-en="Previous Season Crop" data-lang-hi="पिछली फसल (फसल चक्र)">Previous Season Crop</label>
+                <label data-i18n="lbl_prevcrop">Previous Crop / पिछली फसल</label>
                 <select id="inputPrevCrop" class="form-select">
                   <option value="Cotton" selected>Cotton / कपास</option>
                   <option value="Soybean">Soybean / सोयाबीन</option>
@@ -260,7 +407,7 @@
             <div class="form-actions">
               <button type="submit" id="btnRecommend" class="btn-primary">
                 <span class="btn-icon">⚡</span>
-                <span data-lang-en="Run XGBoost ML Prediction & SHAP Analysis" data-lang-hi="XGBoost एआई विश्लेषण चलाएं">Run XGBoost ML Prediction & SHAP Analysis</span>
+                <span data-i18n="btn_run_xgboost">Run XGBoost ML Prediction & SHAP Analysis</span>
               </button>
             </div>
           </form>
@@ -272,8 +419,8 @@
             <div class="panel-title-wrap">
               <span class="panel-icon">🏆</span>
               <div>
-                <h3 class="panel-title" data-lang-en="Ranked Crop Recommendations" data-lang-hi="अनुशंसित सर्वोत्तम फसलें">Ranked Crop Recommendations</h3>
-                <p class="panel-sub" data-lang-en="Multi-factor agronomic ranking + SHAP force vectors" data-lang-hi="मृदा, मौसम और बाजार भाव के आधार पर रैंकिंग">Multi-factor agronomic ranking + SHAP force vectors</p>
+                <h3 class="panel-title" data-i18n="panel_recs_title">अनुशंसित सर्वोत्तम फसलें</h3>
+                <p class="panel-sub" data-i18n="panel_recs_sub">मृदा, मौसम और बाजार भाव के आधार पर रैंकिंग</p>
               </div>
             </div>
             <span class="badge-confidence">Accuracy 99.09%</span>
@@ -283,35 +430,35 @@
           <div class="top-crop-banner" id="topCropBanner">
             <div class="top-crop-header">
               <div class="top-crop-info">
-                <span class="badge-rank">#1 BEST MATCH / सर्वोत्तम</span>
+                <span class="badge-rank" data-i18n="badge_best_match">#1 BEST MATCH / सर्वोत्तम</span>
                 <h2 class="top-crop-name" id="topCropName">🍇 Grapes / अंगूर (Vitis vinifera)</h2>
                 <p class="top-crop-family" id="topCropFamily">Family: Vitaceae (Fruit) • 135 Days Duration</p>
               </div>
               <div class="match-circle" id="topCropScoreCircle">
                 <span class="match-pct" id="topCropScore">94.8%</span>
-                <span class="match-lbl" data-lang-en="Match Score" data-lang-hi="सटीकता">Match</span>
+                <span class="match-lbl" data-i18n="lbl_match">Match</span>
               </div>
             </div>
 
             <!-- 4 PILLARS METERS -->
             <div class="pillars-grid">
               <div class="pillar-item">
-                <span class="pillar-lbl" data-lang-en="Soil Nutrient Fit" data-lang-hi="मृदा पोषण अनुकूलता">Soil Fit</span>
+                <span class="pillar-lbl" data-i18n="pillar_soil">Soil Fit / मृदा</span>
                 <div class="progress-bar-bg"><div class="progress-fill green" style="width: 96%"></div></div>
                 <span class="pillar-val">96%</span>
               </div>
               <div class="pillar-item">
-                <span class="pillar-lbl" data-lang-en="Weather & Rain Fit" data-lang-hi="मौसम अनुकूलता">Weather Fit</span>
+                <span class="pillar-lbl" data-i18n="pillar_weather">Weather Fit / मौसम</span>
                 <div class="progress-bar-bg"><div class="progress-fill cyan" style="width: 92%"></div></div>
                 <span class="pillar-val">92%</span>
               </div>
               <div class="pillar-item">
-                <span class="pillar-lbl" data-lang-en="Market & APMC Fit" data-lang-hi="बाजार मांग व भाव">Market Fit</span>
+                <span class="pillar-lbl" data-i18n="pillar_market">Market Fit / मंडी</span>
                 <div class="progress-bar-bg"><div class="progress-fill amber" style="width: 95%"></div></div>
                 <span class="pillar-val">95%</span>
               </div>
               <div class="pillar-item">
-                <span class="pillar-lbl" data-lang-en="Crop Rotation Benefit" data-lang-hi="फसल चक्र लाभ">Rotation Fit</span>
+                <span class="pillar-lbl" data-i18n="pillar_rotation">Rotation / चक्र</span>
                 <div class="progress-bar-bg"><div class="progress-fill purple" style="width: 88%"></div></div>
                 <span class="pillar-val">88%</span>
               </div>
@@ -320,19 +467,19 @@
             <!-- ECONOMICS HIGHLIGHT -->
             <div class="crop-economics-bar">
               <div class="econ-col">
-                <span class="econ-lbl" data-lang-en="Estimated Yield/Acre" data-lang-hi="अनुमानित पैदावार/एकड़">Est. Yield</span>
+                <span class="econ-lbl" data-i18n="lbl_yield">Est. Yield / पैदावार</span>
                 <strong class="econ-val" id="topCropYield">8 - 12 Tonnes</strong>
               </div>
               <div class="econ-col">
-                <span class="econ-lbl" data-lang-en="Est. Net Revenue/Acre" data-lang-hi="अनुमानित आय/एकड़">Est. Revenue</span>
+                <span class="econ-lbl" data-i18n="lbl_revenue">Est. Revenue / आय</span>
                 <strong class="econ-val text-gold" id="topCropRev">₹3,50,000 - ₹5,00,000</strong>
               </div>
               <div class="econ-col">
-                <span class="econ-lbl" data-lang-en="Mandi Modal Rate" data-lang-hi="मंडी औसत भाव">Mandi Rate</span>
+                <span class="econ-lbl" data-i18n="lbl_rate">Mandi Rate / भाव</span>
                 <strong class="econ-val" id="topCropRate">₹6,200 / Qtl ↗</strong>
               </div>
               <div class="econ-col">
-                <span class="econ-lbl" data-lang-en="Sowing Window" data-lang-hi="बुवाई / छंटाई समय">Sowing Time</span>
+                <span class="econ-lbl" data-i18n="lbl_sowing">Sowing / बुवाई</span>
                 <strong class="econ-val" id="topCropSowing">Oct - Nov</strong>
               </div>
             </div>
@@ -340,10 +487,10 @@
             <!-- SHAP EXPLAINABILITY VISUALIZER -->
             <div class="shap-container">
               <div class="shap-header">
-                <h4 class="shap-title" data-lang-en="🔍 SHAP Explainable AI: Why this crop was recommended?" data-lang-hi="🔍 SHAP व्याख्या: इस फसल की सिफारिश क्यों की गई?">
+                <h4 class="shap-title" data-i18n="shap_title">
                   🔍 SHAP Explainable AI: Why this crop was recommended?
                 </h4>
-                <span class="shap-tag" data-lang-en="Exact Feature Force Attribution" data-lang-hi="सटीक पोषक तत्व प्रभाव">Feature Attribution</span>
+                <span class="shap-tag" data-i18n="shap_tag">Feature Attribution</span>
               </div>
               <p class="shap-explanation" id="shapExplanationText">
                 "आपकी मिट्टी में पोटाश (190 kg/ha) और अनुकूल pH (6.8) अंगूर की मिठास और बेहतर पैदावार के लिए सर्वाधिक अनुकूल हैं।"
@@ -379,7 +526,7 @@
 
             <!-- OTHER RUNNERS UP -->
             <div class="runners-up-section">
-              <h4 class="runners-title" data-lang-en="Alternative Crops (Rank #2 & #3)" data-lang-hi="वैकल्पिक फसलें (रैंक #2 और #3)">Alternative Crops (Rank #2 & #3)</h4>
+              <h4 class="runners-title" data-i18n="runners_title">वैकल्पिक फसलें (Alternative Rank #2 & #3)</h4>
               <div class="runners-grid" id="runnersList">
                 <div class="runner-card">
                   <div class="runner-header">
@@ -414,14 +561,14 @@
             <div class="panel-title-wrap">
               <span class="panel-icon">🔬</span>
               <div>
-                <h3 class="panel-title" data-lang-en="Plant Pathology & Leaf Disease AI" data-lang-hi="पौधा रोग निदान व पत्ती स्कैनर">Plant Pathology & Leaf Disease AI</h3>
-                <p class="panel-sub" data-lang-en="Select sample leaf pathogen or test diagnosis" data-lang-hi="पत्ती का नमूना चुनें या रोग का तुरंत विश्लेषण करें">Select sample leaf pathogen or test diagnosis</p>
+                <h3 class="panel-title" data-i18n="panel_doctor_title">पौधा रोग निदान व पत्ती स्कैनर</h3>
+                <p class="panel-sub" data-i18n="panel_doctor_sub">पत्ती का नमूना चुनें या रोग का तुरंत विश्लेषण करें</p>
               </div>
             </div>
           </div>
 
           <div class="leaf-samples-gallery">
-            <label class="gallery-title" data-lang-en="Sample Crop Pathogens (Click to Test):" data-lang-hi="परीक्षण हेतु पत्तियों के नमूने (क्लिक करें):">Sample Crop Pathogens (Click to Test):</label>
+            <label class="gallery-title" data-i18n="leaf_gallery_title">परीक्षण हेतु पत्तियों के नमूने (क्लिक करें):</label>
             <div class="leaf-grid">
               <button class="leaf-btn active" data-sample="tomato_early_blight">
                 <span class="leaf-icon">🍅</span>
@@ -449,8 +596,8 @@
           <!-- DROP ZONE -->
           <div class="upload-dropzone" id="leafDropZone">
             <span class="drop-icon">📷</span>
-            <h4 data-lang-en="Drag & Drop Crop Photo or Click to Browse" data-lang-hi="खेत से खींची पत्ती की फोटो यहां डालें">Drag & Drop Crop Photo or Click to Browse</h4>
-            <p data-lang-en="Supports Tomato, Potato, Cotton, Wheat, Rice, Corn, Apple" data-lang-hi="टमाटर, आलू, कपास, गेहूं, धान, मक्का आदि के लिए उपयुक्त">Supports Tomato, Potato, Cotton, Wheat, Rice, Corn, Apple</p>
+            <h4 data-i18n="dropzone_title">Drag & Drop Crop Photo or Click to Browse</h4>
+            <p data-i18n="dropzone_sub">Supports Tomato, Potato, Cotton, Wheat, Rice, Corn, Apple</p>
             <input type="file" id="leafFileInput" accept="image/*" style="display: none" />
             <button type="button" class="btn-secondary" onclick="document.getElementById('leafFileInput').click()">
               <span>📁 Browse Image</span>
@@ -459,7 +606,7 @@
 
           <button id="btnRunDiagnosis" class="btn-primary" style="margin-top: 1rem;">
             <span class="btn-icon">⚡</span>
-            <span data-lang-en="Run Instant AI Pathology Diagnosis" data-lang-hi="एआई रोग निदान चलाएं">Run Instant AI Pathology Diagnosis</span>
+            <span data-i18n="btn_run_diagnosis">Run Instant AI Pathology Diagnosis</span>
           </button>
         </div>
 
@@ -469,8 +616,8 @@
             <div class="panel-title-wrap">
               <span class="panel-icon">🩺</span>
               <div>
-                <h3 class="panel-title" data-lang-en="Diagnostic Scan Report" data-lang-hi="रोग निदान रिपोर्ट व उपचार">Diagnostic Scan Report</h3>
-                <p class="panel-sub" data-lang-en="Zero-budget organic + Scientific chemical remedies" data-lang-hi="जैविक व रासायनिक समाधान और मौसम अनुकूल छिड़काव">Zero-budget organic + Scientific chemical remedies</p>
+                <h3 class="panel-title" data-i18n="panel_diag_title">रोग निदान रिपोर्ट व उपचार</h3>
+                <p class="panel-sub" data-i18n="panel_diag_sub">जैविक व रासायनिक समाधान और मौसम अनुकूल छिड़काव</p>
               </div>
             </div>
             <span class="badge-confidence" id="diagConfidence">Confidence: 96.4%</span>
@@ -492,7 +639,7 @@
             <!-- WEATHER GROUNDED SPRAY ADVISORY -->
             <div class="weather-spray-alert" id="diagSprayPlan">
               <div class="spray-alert-title">
-                <span>🌦️ Weather-Grounded Spray Timing / छिड़काव सलाह</span>
+                <span data-i18n="spray_alert_title">🌦️ Weather-Grounded Spray Timing / छिड़काव सलाह</span>
               </div>
               <p class="spray-alert-desc" id="diagSprayText">
                 "नासिक में आगामी शनिवार दोपहर 65% बारिश की संभावना है। अतः छिड़काव आज शाम 4 बजे या रविवार सुबह 7 बजे ही करें ताकि दवा बह न जाए।"
@@ -504,7 +651,7 @@
               <!-- ORGANIC REMEDY -->
               <div class="remedy-card organic">
                 <div class="remedy-head">
-                  <span class="remedy-badge">🌿 100% Organic / प्राकृतिक उपचार</span>
+                  <span class="remedy-badge" data-i18n="remedy_organic_badge">🌿 100% Organic / प्राकृतिक उपचार</span>
                 </div>
                 <p class="remedy-text" id="diagOrganicRemedy">
                   नीम के बीज के अर्क (NSKE 5%) या ट्राइकोडर्मा विरिडी (5 ग्राम/लीटर) का छिड़काव करें। साथ ही 10% गोमूत्र का अर्क फंगस रोकने में अत्यंत प्रभावी है।
@@ -514,7 +661,7 @@
               <!-- CHEMICAL REMEDY -->
               <div class="remedy-card chemical">
                 <div class="remedy-head">
-                  <span class="remedy-badge">🧪 Scientific Chemical / रासायनिक उपचार</span>
+                  <span class="remedy-badge" data-i18n="remedy_chemical_badge">🧪 Scientific Chemical / रासायनिक उपचार</span>
                 </div>
                 <p class="remedy-text" id="diagChemicalRemedy">
                   मैंकोजेब 75 WP (Mancozeb @ 2.5 ग्राम/लीटर पानी) या एजोक्सीस्ट्रोबिन (1 मिली/लीटर) का तुरंत छिड़काव करें।
@@ -542,28 +689,28 @@
               <span class="voice-emoji">🌾</span>
             </div>
             <h3 class="voice-saathi-title">
-              <span data-lang-en="Voice Saathi — AI Farmer Advisor" data-lang-hi="वॉइस साथी — आपका अपना कृषि सलाहकार">Voice Saathi — AI Farmer Advisor</span>
+              <span data-i18n="voice_hero_title">वॉइस साथी — आपका अपना कृषि सलाहकार</span>
             </h3>
-            <p class="voice-saathi-sub" data-lang-en="Powered by Groq LLaMA 3.3. Speaks Hindi & English naturally." data-lang-hi="Groq LLaMA 3.3 द्वारा संचालित। शुद्ध एवं सरल हिंदी में बोलकर सलाह देता है।">
-              Powered by Groq LLaMA 3.3. Speaks Hindi & English naturally.
+            <p class="voice-saathi-sub" data-i18n="voice_hero_sub">
+              Groq LLaMA द्वारा संचालित। भारत की सभी भाषाओं में सरल आवाज के साथ उत्तर देता है।
             </p>
           </div>
 
           <!-- PROMPT CHIPS -->
           <div class="voice-prompt-chips">
-            <span class="chips-label" data-lang-en="Quick Farming Questions:" data-lang-hi="अक्सर पूछे जाने वाले सवाल:">Quick Farming Questions:</span>
+            <span class="chips-label" data-i18n="voice_chips_label">अक्सर पूछे जाने वाले सवाल (Click to Ask):</span>
             <div class="chips-list">
-              <button class="voice-chip" data-query="इसके लिए पानी कितना चाहिए?">
-                <span>💧</span> पानी कितना चाहिए? (Irrigation)
+              <button class="voice-chip" data-query="पानी कितना चाहिए?">
+                <span>💧</span> <span data-i18n="chip_water">पानी कितना चाहिए? (Irrigation)</span>
               </button>
               <button class="voice-chip" data-query="खाद की सही मात्रा कितनी डालें?">
-                <span>🌱</span> खाद की मात्रा? (Fertilizer NPK)
+                <span>🌱</span> <span data-i18n="chip_fertilizer">खाद की मात्रा? (Fertilizer NPK)</span>
               </button>
               <button class="voice-chip" data-query="आज मंडी में क्या भाव चल रहा है?">
-                <span>💰</span> मंडी भाव क्या है? (Mandi Price)
+                <span>💰</span> <span data-i18n="chip_mandi">मंडी भाव क्या है? (Mandi Price)</span>
               </button>
               <button class="voice-chip" data-query="कीट व फंगस नियंत्रण कैसे करें?">
-                <span>🐛</span> कीट नियंत्रण? (Pest Control)
+                <span>🐛</span> <span data-i18n="chip_pest">कीट नियंत्रण? (Pest Control)</span>
               </button>
             </div>
           </div>
@@ -575,17 +722,17 @@
               <span>🎙️</span>
             </button>
             <button id="btnSendVoiceQuery" class="btn-primary btn-voice-send">
-              <span>Ask AI / पूछें</span>
+              <span data-i18n="btn_ask_ai">Ask AI / पूछें</span>
             </button>
           </div>
 
           <!-- AI CONVERSATION RESPONSE CARD -->
           <div class="voice-response-card" id="voiceResponseCard">
             <div class="voice-card-header">
-              <span class="badge-llm">Groq LLaMA 3.3 • Instant Synthesis</span>
+              <span class="badge-llm">Groq LLaMA 3.3 • Multi-Lingual Speech</span>
               <button id="btnAudioTTSPlay" class="btn-tts-play">
                 <span class="tts-icon">🔊</span>
-                <span id="ttsBtnText">Listen Hindi Audio / आवाज सुनें</span>
+                <span id="ttsBtnText" data-i18n="btn_listen_audio">Listen Voice Audio / आवाज सुनें</span>
               </button>
             </div>
             <div class="voice-response-body">
@@ -597,7 +744,7 @@
               </p>
             </div>
             <div class="voice-followups">
-              <span class="follow-lbl" data-lang-en="Suggested Follow-ups:" data-lang-hi="आगे पूछें:">Suggested Follow-ups:</span>
+              <span class="follow-lbl" data-i18n="lbl_followups">Suggested Follow-ups:</span>
               <div class="follow-chips" id="voiceFollowupsList">
                 <button class="follow-chip" data-query="खाद की मात्रा कितनी डालनी है?">खाद की मात्रा?</button>
                 <button class="follow-chip" data-query="मंडी में सबसे अच्छा भाव कब मिलेगा?">मंडी में अच्छा भाव कब मिलेगा?</button>
@@ -619,8 +766,8 @@
             <div class="panel-title-wrap">
               <span class="panel-icon">🌦️</span>
               <div>
-                <h3 class="panel-title" data-lang-en="7-Day Agricultural Weather Forecast" data-lang-hi="7-दिवसीय मौसम व छिड़काव पूर्वानुमान">7-Day Agricultural Weather Forecast</h3>
-                <p class="panel-sub" data-lang-en="Live Open-Meteo Satellite Feed + Spray Conditions" data-lang-hi="ओपन-मीटियो उपग्रह डेटा व छिड़काव रेटिंग">Live Open-Meteo Satellite Feed + Spray Conditions</p>
+                <h3 class="panel-title" data-i18n="panel_weather_title">7-दिवसीय मौसम व छिड़काव पूर्वानुमान</h3>
+                <p class="panel-sub" data-i18n="panel_weather_sub">ओपन-मीटियो उपग्रह डेटा व छिड़काव रेटिंग</p>
               </div>
             </div>
           </div>
@@ -665,8 +812,8 @@
             <div class="panel-title-wrap">
               <span class="panel-icon">💰</span>
               <div>
-                <h3 class="panel-title" data-lang-en="Live APMC Mandi Commodities" data-lang-hi="स्थानीय कृषि उपज मंडी भाव">Live APMC Mandi Commodities</h3>
-                <p class="panel-sub" data-lang-en="Agmarknet verified market arrivals & 7-day trend" data-lang-hi="एगमार्कनेट सत्यापित दैनिक मंडी भाव">Agmarknet verified market arrivals & 7-day trend</p>
+                <h3 class="panel-title" data-i18n="panel_mandi_title">स्थानीय कृषि उपज मंडी भाव</h3>
+                <p class="panel-sub" data-i18n="panel_mandi_sub">एगमार्कनेट सत्यापित दैनिक मंडी भाव</p>
               </div>
             </div>
           </div>
@@ -675,10 +822,10 @@
             <table class="mandi-table">
               <thead>
                 <tr>
-                  <th>Commodity / फसल</th>
-                  <th>Market / मंडी</th>
-                  <th>Modal Rate (₹/Qtl)</th>
-                  <th>7-Day Trend</th>
+                  <th data-i18n="th_commodity">Commodity / फसल</th>
+                  <th data-i18n="th_market">Market / मंडी</th>
+                  <th data-i18n="th_rate">Modal Rate (₹/Qtl)</th>
+                  <th data-i18n="th_trend">7-Day Trend</th>
                 </tr>
               </thead>
               <tbody id="mandiTableBody">
@@ -724,8 +871,8 @@
             <div class="panel-title-wrap">
               <span class="panel-icon">⚡</span>
               <div>
-                <h3 class="panel-title" data-lang-en="Supabase PostgreSQL Anti-Sleep Engine" data-lang-hi="सुपाबेस डेटाबेस व एंटी-स्लीप इंजन">Supabase PostgreSQL Anti-Sleep Engine</h3>
-                <p class="panel-sub" data-lang-en="Automated heartbeat keeps database active 24/7" data-lang-hi="स्वचालित पिंग द्वारा डेटाबेस हमेशा सक्रिय रहता है">Automated heartbeat keeps database active 24/7</p>
+                <h3 class="panel-title" data-i18n="panel_sb_title">सुपाबेस डेटाबेस व एंटी-स्लीप इंजन</h3>
+                <p class="panel-sub" data-i18n="panel_sb_sub">स्वचालित पिंग द्वारा डेटाबेस हमेशा सक्रिय रहता है</p>
               </div>
             </div>
             <span class="status-badge" style="background: rgba(46, 125, 50, 0.2); color: #2E7D32;">● Connected</span>
@@ -763,8 +910,8 @@
             <div class="panel-title-wrap">
               <span class="panel-icon">📋</span>
               <div>
-                <h3 class="panel-title" data-lang-en="Live Cloud Activity Stream" data-lang-hi="हाल ही में दर्ज की गई गतिविधियाँ">Live Cloud Activity Stream</h3>
-                <p class="panel-sub" data-lang-en="Real-time queries saved to Supabase" data-lang-hi="सुपाबेस में दर्ज फसल व रोग जांच रिकॉर्ड">Real-time queries saved to Supabase</p>
+                <h3 class="panel-title" data-i18n="panel_activity_title">हाल ही में दर्ज की गई गतिविधियाँ</h3>
+                <p class="panel-sub" data-i18n="panel_activity_sub">सुपाबेस में दर्ज फसल व रोग जांच रिकॉर्ड</p>
               </div>
             </div>
           </div>
@@ -806,7 +953,7 @@
     <div class="footer-container">
       <div class="footer-left">
         <strong>🌾 Kisaan_Sathi (किसान साथी)</strong>
-        <span>AI-Powered Explainable Agronomic System • Smart India Hackathon</span>
+        <span>AI-Powered Explainable Agronomic System • Smart India Hackathon • 11 Indian Languages</span>
       </div>
       <div class="footer-tags">
         <span class="tech-tag">XGBoost 99.09%</span>
