@@ -82,7 +82,7 @@ async def get_crop_recommendations(req: RecommendationRequest):
 
         is_cached = find_nearest_hub(req.latitude, req.longitude) is not None
 
-        return {
+        response_payload = {
             "timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "is_cached_demo_location": is_cached,
             "location": {
@@ -99,5 +99,14 @@ async def get_crop_recommendations(req: RecommendationRequest):
             "top_recommendations": recommendations,
             "advisory_warnings": warnings
         }
+
+        # Asynchronously log to Supabase in background
+        from app.services.supabase_client import supabase_service
+        try:
+            supabase_service.save_recommendation(response_payload)
+        except Exception as se:
+            print(f"[!] Supabase background log note: {se}")
+
+        return response_payload
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Recommendation engine error: {str(e)}")

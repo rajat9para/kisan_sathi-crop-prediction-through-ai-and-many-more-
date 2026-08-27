@@ -4,14 +4,15 @@
 
 # 🌾 Kisaan_Sathi (किसान साथी)
 ### AI-Powered Hyper-Local, Explainable Crop Advisory & Diagnostics System
-**Offline-First • Real-Time Environmental Grounding • SHAP Mathematical Explainability**
+**Hybrid ML + Groq LLaMA LLM • Vercel Serverless • Supabase PostgreSQL (Anti-Sleep Active)**
 
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20v0.110-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com)
 [![Flutter](https://img.shields.io/badge/Mobile-Flutter%203.41%20%7C%20Dart%203.11-02569B.svg?logo=flutter)](https://flutter.dev)
 [![XGBoost](https://img.shields.io/badge/ML%20Engine-XGBoost%2099.09%25-FF6F00.svg)](https://xgboost.readthedocs.io)
 [![SHAP](https://img.shields.io/badge/Explainability-SHAP%20TreeExplainer-4CAF50.svg)](https://shap.readthedocs.io)
-[![Architecture](https://img.shields.io/badge/Architecture-Offline--First%20Sync-blueviolet.svg)]()
-[![Platform](https://img.shields.io/badge/Target-Android%20%7C%20Windows%20%7C%20Web-success.svg)]()
+[![Groq LLM](https://img.shields.io/badge/LLM%20Engine-Groq%20LLaMA%203.1-F55036.svg)](https://groq.com)
+[![Supabase](https://img.shields.io/badge/Database-Supabase%20PostgreSQL-3ECF8E.svg?logo=supabase)](https://supabase.com)
+[![Vercel](https://img.shields.io/badge/Deploy-Vercel%20Serverless-000000.svg?logo=vercel)](https://vercel.com)
 
 </div>
 
@@ -21,7 +22,11 @@
 
 Small and marginal farmers across India face severe agricultural uncertainty due to changing micro-climates, soil degradation, fluctuating mandi prices, and delayed advisory. Existing solutions provide generic district-level suggestions, operate as opaque black-box models, lack regional language support, and critically fail when internet connectivity drops in remote fields.
 
-**Kisaan_Sathi (किसान साथी)** solves this through an **offline-first, multi-modal, explainable AI ecosystem**. It ingests live soil physics, 7-day atmospheric forecasts, and commodity mandi trends, delivering personalized crop recommendations backed by **mathematical SHAP explainability**, **Hindi voice interaction**, and **on-device leaf disease diagnosis**.
+**Kisaan_Sathi (किसान साथी)** solves this through a **Hybrid AI Architecture**:
+1. **Deterministic Machine Learning (XGBoost + SHAP)**: Computes multi-class crop ranking and mathematical feature force vectors with 99.09% accuracy.
+2. **Conversational Synthesis (Groq LLaMA 3.1 LLM)**: Translates technical metrics into warm, respectful Hindi farmer guidance and dynamic spray timing.
+3. **Cloud & Anti-Sleep Resilience (Vercel + Supabase)**: Serverless backend with automated database heartbeat keep-alive so the database never goes to sleep.
+4. **Offline-First Mobile Client (Flutter)**: 100% on-device disease diagnosis, cached advisory, and background auto-sync.
 
 ---
 
@@ -36,158 +41,108 @@ Small and marginal farmers across India face severe agricultural uncertainty due
               │                                                               │
               ▼                                                               ▼
 ┌──────────────────────────────┐                               ┌──────────────────────────────┐
-│       FastAPI Backend        │                               │ SharedPreferences / SQLite   │
-│   (Microservices Engine)     │                               │ Persistent Cache & History   │
+│  Vercel Serverless Backend   │                               │ SharedPreferences / SQLite   │
+│ (FastAPI + Groq LLaMA LLM)   │                               │ Persistent Cache & History   │
 └─────────────┬────────────────┘                               └──────────────┬───────────────┘
               │                                                               │
  ┌────────────┼────────────┬─────────────┬─────────────┐                      │
  ▼            ▼            ▼             ▼             ▼                      ▼
-SoilGrids  Open-Meteo  Agmarknet    XGBoost +       Hindi Voice      Offline Advisory,
-REST API    Weather      Mandi        SHAP           & OCR           SHAP Visuals &
-(ISRIC)     Forecast     Trends      Engine         Services         On-Device Leaf AI
+SoilGrids  Open-Meteo  Agmarknet    XGBoost +       Supabase         Offline Advisory,
+REST API    Weather      Mandi        SHAP          PostgreSQL       SHAP Visuals &
+(ISRIC)     Forecast     Trends      Engine        (Keep-Alive)      On-Device Leaf AI
 ```
-
-The system operates across three interconnected layers:
-1. **The Mobile Client (Flutter/Dart)**: An offline-first client running on Android, Desktop, and Web with local SQLite/Key-Value persistence, audio synthesis, and connectivity listeners.
-2. **The Intelligence Service (FastAPI/Python)**: Microservice aggregating live environmental APIs, executing multi-class gradient boosting, calculating SHAP feature contributions, and structuring responses.
-3. **The Multi-Source Environmental Ingestion Pipeline**: Pulls real geographic, meteorological, and commodity data with localized demo caching.
 
 ---
 
-## 🧠 3. Core Architectural Modules
-
-### 3.1 Explainable Machine Learning Engine (XGBoost + SHAP)
-Rather than serving ungrounded or black-box predictions, Kisaan_Sathi employs a two-tier scientific pipeline:
-- **Base Classifier**: Multi-class **XGBoost (Extreme Gradient Boosting)** model trained on 22 distinct Indian agricultural crop classes across Nitrogen ($N$), Phosphorus ($P$), Potassium ($K$), Temperature, Humidity, Soil pH, and Rainfall ($R$).
-- **SHAP (SHapley Additive exPlanations) TreeExplainer**: For every candidate crop prediction, the exact game-theoretic marginal contribution $\phi_i$ of each feature is calculated:
-  $$\hat{y}(x) = \phi_0 + \sum_{i=1}^{M} \phi_i(x)$$
-  This translates into visual green positive ($+$) and red negative ($-$) forces on the **"Why this crop?"** screen, showing farmers exactly why a crop fits their soil and climate.
+## 🧠 3. Hybrid AI: ML Prediction + Groq LLM Synthesis
 
 ```
-[Soil + Weather Input] ──► [XGBoost Multi-Class Softmax] ──► [Top Candidate Crops]
-                                   │
-                                   ▼
-                       [SHAP TreeExplainer] ──► [Feature Impact Values (phi_i)]
-                                   │
-                                   ▼
-                       [Agronomic Re-ranking Layer] ──► [Final Ranked Recommendations]
-```
-
-### 3.2 Multi-Pillar Agronomic Decision Re-Ranking
-Predictions are not purely statistical; they are refined through a 4-pillar agronomic weighting algorithm:
-1. **Soil Nutrient Envelope Fit (%)**: Evaluates $N, P, K, \text{pH}$, and Organic Carbon against the physiological optimum thresholds of the crop.
-2. **Weather & Climate Fit (%)**: Validates thermal units, seasonal precipitation probability, and air humidity.
-3. **Market Profitability Trend (%)**: Analyzes real-time Agmarknet mandi modal rates and 7-day price momentum (upward/stable/downward).
-4. **Crop Rotation & Soil Health Index (%)**:
-   - **Legume Bonus (+10%)**: Boosts pulses/legumes (Chickpea, Blackgram, Lentil) following cereal crops (Rice, Maize) for biological nitrogen fixation.
-   - **Monoculture Penalty (-15%)**: Penalizes consecutive cultivation of the same botanical family to prevent pathogen carryover and nutrient depletion.
-5. **Irrigation Source Validation**: Filters high-water requirement crops (e.g., Rice, Sugarcane) when farmer reports strictly rainfed conditions.
-
----
-
-### 3.3 Offline-First Resilience & Sync Manager Architecture
-A crucial architectural guarantee for rural India is resilience under intermittent 2G/3G/4G connectivity:
-
-```
-[Network Status Check]
-         │
-         ├──► [ONLINE]  ──► Query Live FastAPI Backend ──► Update Local Cache + Timestamp
-         │
-         └──► [OFFLINE] ──► Read SharedPreferences Cache ──► Display "Data as of [Time]"
-                                   │
-                                   ▼
-                       [On-Device Leaf AI & Voice] (Operates with 0 KB Network Dependency)
-```
-
-- **Categorized Data Persistence**:
-  - *Static / Invariable Data* (Soil profiles, rotation matrices, ML models) $\rightarrow$ Bundled on-device, accessible forever offline.
-  - *Semi-Live Data* (Weather forecasts, Mandi rates) $\rightarrow$ Cached with an explicit timestamp badge (`Data as of: 27/08 15:20`).
-  - *Interactive Diagnostics* (Leaf disease detection, Voice intent matching) $\rightarrow$ Fully on-device, never touching the network.
-- **Sync Queue & State Recovery**: The client listens to connectivity state changes via `SyncManager`. When network connectivity resumes, cached pending syncs fire automatically in the background.
-
----
-
-### 3.4 Conversational Voice Saathi (Hindi Audio Layer)
-To remove literacy barriers for smallholder farmers:
-- **Speech Synthesis (TTS)**: Leverages native device Text-to-Speech (`flutter_tts`) configured for `hi-IN` with tailored acoustic cadence (0.48 speech rate) for rural audio clarity.
-- **NLP Intent Engine**: Maps natural Hindi, Hinglish, and English spoken utterances to domain intents:
-  - *Water & Irrigation Schedule* (`"इसके लिए पानी कितना चाहिए?"`)
-  - *Fertilizer Dosage & Basal Splits* (`"खाद कब और कितनी डालनी है?"`)
-  - *Mandi Price Inquiries* (`"मंडी में क्या भाव मिल रहा है?"`)
-  - *Weather Warnings & Spray Timing* (`"मौसम कैसा रहेगा?"`)
-
----
-
-### 3.5 100% On-Device Leaf Disease Diagnostic Subsystem
-- **Neural Architecture**: Lightweight MobileNet vision classifier engineered for low-latency on-device inference (<400ms).
-- **Disease Coverage**:
-  - *Tomato / Potato Early Blight* (*Alternaria solani*)
-  - *Potato Late Blight* (*Phytophthora infestans*)
-  - *Cotton Bacterial Blight / Angular Leaf Spot*
-  - *Maize / Corn Vigor & Health*
-- **Prescriptive Guidance**: Returns dual treatment regimens:
-  - **Organic / Bio-control**: Neem Seed Kernel Extract (NSKE 5%), *Trichoderma viride*, Panchagavya.
-  - **Chemical Remediation**: Mancozeb 75 WP, Ridomil MZ, Copper Oxychloride with specific water dilution ratios.
-
----
-
-### 3.6 Soil Health Card (SHC) OCR & Ingestion Pipeline
-- Parses digital photographs and physical government Soil Health Cards.
-- Extracts official lab parameters ($N, P, K, \text{pH}, \text{Organic Carbon \%}$) and identifies nutrient deficiency classifications (Low / Medium / High).
-- Provides interactive visual sliders allowing the farmer or Krishi Vigyan Kendra (KVK) officer to tweak and override values on the fly.
-
----
-
-## 🗺️ 4. Data Flow Topology
-
-```
-[Farmer Location Pin / GPS]
+[Raw Soil + Weather Data]
            │
-           ├───► [SoilGrids API (ISRIC v2.0)] ────► pH, Organic Carbon, Clay/Sand %
-           │
-           ├───► [Open-Meteo API]              ────► 7-Day Temp, Rain Prob, Humidity
-           │
-           └───► [Agmarknet Mandi API]         ────► Commodity Rates & Price Trends
-                               │
-                               ▼
-            ┌──────────────────────────────────────┐
-            │   FastAPI Ingestion & Normalizer     │
-            └──────────────────┬───────────────────┘
-                               │
-                               ▼
-            ┌──────────────────────────────────────┐
-            │     XGBoost Classifier + SHAP        │
-            │     Multi-Pillar Re-ranking Engine   │
-            └──────────────────┬───────────────────┘
-                               │
-                               ▼
-            ┌──────────────────────────────────────┐
-            │  Flutter Mobile UI & Explainability  │
-            │  (Top-3 Ranked Crops + SHAP Bars)    │
-            └──────────────────────────────────────┘
+           ▼
+┌────────────────────────────────────────────────────────┐
+│ 1. XGBOOST ML ENGINE + SHAP EXPLAINER (The Brain)      │
+│    - Rank #1: Grapes (94.8% Match)                     │
+│    - SHAP: Potash (+28%), pH (+18%), Rain (-4%)        │
+│    - Mandi Price: ₹6,200/Qtl (Trending Up)             │
+└───────────────────────────┬────────────────────────────┘
+                            │
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│ 2. GROQ LLAMA LLM ADVISOR (Conversational Intelligence)│
+│    Grounded strictly on XGBoost numbers & forecast:    │
+│    "Generate 3-sentence Hindi voice advisory"          │
+└───────────────────────────┬────────────────────────────┘
+                            │
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│ 3. FARMER AUDIO / TEXT OUTPUT (Voice Saathi)           │
+│    "रामेश्वर जी, आपकी मिट्टी में पोटाश बहुत अच्छा है,  │
+│     इसलिए अंगूर सबसे उत्तम है। पर शनिवार को बारिश है, │
+│     इसलिए छिड़काव रविवार सुबह ही करें।"              │
+└────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 📋 5. Technology Stack Summary
+## 🗄️ 4. Supabase Database & Anti-Sleep Keep-Alive System
 
-| Layer | Component | Description & Rationale |
+Free-tier cloud databases often pause or enter sleep mode after inactivity. Kisaan_Sathi solves this with an **Automated Anti-Sleep Heartbeat Engine**:
+
+1. **Heartbeat Table (`app_keepalive`)**: Automatically created in Supabase PostgreSQL.
+2. **Periodic Keep-Alive Ping**:
+   - Every 6 hours, the backend background worker touches the Supabase database.
+   - Vercel Cron automatically calls `GET /api/db-ping` twice daily (`0 */12 * * *`).
+3. **Database Schema**:
+   - `app_keepalive`: Heartbeat timestamp and health status.
+   - `crop_recommendations`: Saved farmer queries, soil parameters, top crops, and SHAP vectors.
+   - `disease_scans`: Leaf photo diagnostic records with confidence scores.
+
+To set up the tables in Supabase, execute [`backend/supabase_schema.sql`](file:///c:/SmartIndiaHackathon/backend/supabase_schema.sql) in your **Supabase Dashboard -> SQL Editor**.
+
+---
+
+## ☁️ 5. Vercel Hosting & Environment Variables Guide
+
+To host Kisaan_Sathi on **Vercel**, follow these steps:
+
+### Step 1: Import Repository to Vercel
+1. Go to [vercel.com](https://vercel.com) and click **"Add New Project"**.
+2. Select your GitHub repository: `kisan_sathi-crop-prediction-through-ai-and-many-more-`.
+3. Vercel will automatically detect `vercel.json` and the Python serverless runtime.
+
+### Step 2: Fill Environment Variables in Vercel Dashboard
+In **Project Settings -> Environment Variables**, add the following key-value pairs:
+
+| Variable Name | Example / Where to find | Purpose |
 |---|---|---|
-| **Mobile Client** | **Flutter (Dart 3.11)** | Cross-platform (Android, Windows, Web), high-performance reactive UI with rural design tokens. |
-| **State & Offline Storage** | **Provider + SharedPreferences** | Reactive state propagation coupled with persistent on-device JSON caching for offline execution. |
-| **Backend REST API** | **FastAPI (Python 3.12)** | Asynchronous, OpenAPI-compliant microservice serving ML predictions, SHAP calculations, and API proxies. |
-| **Machine Learning Engine** | **XGBoost 3.4 + Scikit-Learn** | High-accuracy multi-class gradient boosted decision trees for 22 Indian crop varieties (99.09% validation accuracy). |
-| **Explainable AI (XAI)** | **SHAP (Shapley Additive exPlanations)** | Calculates exact per-feature contributions for visual transparency ("Why this crop?"). |
-| **Voice & Speech Engine** | **FlutterTts (hi-IN)** | Native offline text-to-speech audio playback in regional Hindi dialect. |
-| **Environmental Ingestion** | **SoilGrids REST + Open-Meteo + Agmarknet** | Real-time global soil layer, hourly atmospheric forecast, and national agricultural market prices with demo hub caching. |
+| `GROQ_API_KEY` | `gsk_...` (from console.groq.com) | Groq LLaMA ultra-fast inference |
+| `GROQ_MODEL` | `llama-3.1-8b-instant` | Default conversational LLM model |
+| `SUPABASE_URL` | `https://<project-id>.supabase.co` | Supabase Cloud Database URL |
+| `SUPABASE_KEY` | `sb_secret_...` (Service Role Secret) | Supabase Serverless DB Admin Key |
+| `SUPABASE_PUBLISHABLE_KEY` | `sb_publishable_...` (Anon Key) | Supabase Client Anon Key |
+| `SUPABASE_JWKS_URL` | `https://<project-id>.supabase.co/auth/v1/...` | Auth JWKS Endpoint |
+
+*(These are also documented in [`.env.example`](file:///c:/SmartIndiaHackathon/.env.example))*
+
+### Step 3: Deploy
+Click **"Deploy"**. Vercel will deploy:
+- `/api/*` $\rightarrow$ Serverless FastAPI backend with XGBoost, SHAP, and Groq LLM.
+- `/api/db-ping` $\rightarrow$ Scheduled keep-alive cron keeping Supabase warm 24/7.
 
 ---
 
-## 🧭 6. Future Roadmap & ISRO Bhuvan Integration
+## 📱 6. Technology Stack
 
-1. **ISRO Bhuvan Geo-Spatial Remote Sensing**: Upgrading from SoilGrids to ISRO Bhuvan optical & SAR radar imagery for sub-meter field-level NDVI vegetation index and soil moisture tracking.
-2. **KVK Cluster Outbreak Dashboard**: Centralized aggregate heatmaps for Agricultural Extension Officers to track regional pest infestations and broadcast advisory alerts.
-3. **12 Indic Languages Voice Model**: Expanding beyond Hindi to Marathi, Punjabi, Telugu, Tamil, Gujarati, Bengali, and Kannada using fine-tuned IndicWhisper models.
+| Layer | Component | Description |
+|---|---|---|
+| **Mobile Client** | **Flutter (Dart 3.11)** | Android, Windows, and Web offline-first interface with rural-tech styling. |
+| **Serverless Backend** | **FastAPI on Vercel** | Asynchronous Python microservice hosting ML models, Groq LLM, and API aggregators. |
+| **Prediction Engine** | **XGBoost Classifier (99.09%)** | Deterministic 22-class crop recommendation model. |
+| **Explainable AI (XAI)** | **SHAP TreeExplainer** | Mathematical feature attribution for every nutrient. |
+| **Conversational LLM** | **Groq LLaMA 3.1** | Real-time Hindi & English voice assistance and spray planning. |
+| **Cloud Database** | **Supabase PostgreSQL** | Cloud storage for recommendation history with automated anti-sleep keep-alive. |
+| **Offline Leaf AI** | **On-Device MobileNet** | Instant on-device blight and pathogen vision classification. |
 
 ---
 
