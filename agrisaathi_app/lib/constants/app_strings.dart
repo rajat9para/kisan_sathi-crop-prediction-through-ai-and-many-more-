@@ -1,7 +1,7 @@
 class AppStrings {
   static bool isHindi = true;
 
-  static String get appName => isHindi ? "एग्रीसाथी" : "AgriSaathi";
+  static String get appName => isHindi ? "किसान साथी" : "Kisaan_Sathi";
   static String get appTagline => isHindi ? "स्मार्ट एआई कृषि व फसल सलाहकार" : "AI Hyper-Local Crop Advisory";
   
   // Dashboard & Navigation
@@ -20,20 +20,21 @@ class AppStrings {
   static String get syncNow => isHindi ? "अभी सिंक करें" : "Sync Now";
   static String get toggleOfflineSim => isHindi ? "एरोप्लेन मोड सिमुलेशन" : "Simulate Airplane Mode";
 
-  // Actions
+  // Actions & Location
+  static String get autoDetectLocation => isHindi ? "📍 मेरा खेत स्थान खोजें (GPS)" : "📍 Auto-Detect Farm Location (GPS)";
   static String get getRecommendations => isHindi ? "फसल सिफारिश प्राप्त करें" : "Generate Crop Advisory";
-  static String get whyThisCrop => isHindi ? "यही फसल क्यों? (AI विश्लेषण)" : "Why this Crop? (AI Breakdown)";
+  static String get whyThisCrop => isHindi ? "यही फसल क्यों? (वैज्ञानिक विश्लेषण)" : "Why this Crop? (Scientific Fit)";
   static String get scanSoilCard => isHindi ? "मृदा स्वास्थ्य कार्ड स्कैन करें" : "Scan Soil Health Card";
   static String get takeLeafPhoto => isHindi ? "पत्ती की फोटो लें" : "Take Leaf Photo";
   static String get askVoice => isHindi ? "माइक दबाकर पूछें..." : "Tap mic and speak...";
 
-  // Explainability
-  static String get explainabilityTitle => isHindi ? "पारदर्शी एआई सिफारिश विश्लेषण" : "Explainable AI Decision Breakdown";
+  // Explainability (Farmer-First)
+  static String get explainabilityTitle => isHindi ? "वैज्ञानिक सिफारिश विश्लेषण" : "Scientific Advisory Breakdown";
   static String get soilFit => isHindi ? "मिट्टी पोषक अनुकूलता" : "Soil Nutrient Fit";
   static String get weatherFit => isHindi ? "मौसम व जलवायु अनुकूलता" : "Weather & Climate Fit";
   static String get marketProfit => isHindi ? "मंडी लाभप्रदता व रुझान" : "Market Profitability Trend";
-  static String get rotationImpact => isHindi ? "फसल चक्र (रोटेशन) प्रभाव" : "Crop Rotation Impact";
-  static String get shapDrivers => isHindi ? "निर्णय को प्रभावित करने वाले मुख्य कारक" : "Key Scientific Decision Drivers (SHAP)";
+  static String get rotationImpact => isHindi ? "फसल चक्र प्रभाव" : "Crop Rotation Impact";
+  static String get shapDrivers => isHindi ? "निर्णय को प्रभावित करने वाले मुख्य कारक" : "Key Soil & Climate Fit Factors";
   static String get fertilizerPlan => isHindi ? "उर्वरक प्रबंधन अनुसूची" : "Fertilizer Schedule";
   static String get irrigationPlan => isHindi ? "सिंचाई प्रबंधन" : "Irrigation Plan";
 }

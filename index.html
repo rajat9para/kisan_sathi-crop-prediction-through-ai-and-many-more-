@@ -228,12 +228,20 @@
             वैज्ञानिक प्रमाणों और सटीक डेटा पर आधारित स्मार्ट कृषि सलाह
           </h2>
           <p class="hero-sub" data-i18n="hero_sub">
-            XGBoost 99.09% सटीकता के साथ मिट्टी व मौसम का विश्लेषण करता है, और Groq AI किसान को अपनी मातृभाषा में आवाज के साथ मार्गदर्शन देता है।
+            आपकी मिट्टी के पोषक तत्वों और उपग्रह मौसम का विश्लेषण कर आपकी मातृभाषा में सही फसल और वैज्ञानिक सलाह।
           </p>
 
-            <!-- QUICK HUBS -->
+            <!-- QUICK HUBS & AUTO-LOCATION -->
             <div class="hub-selector-wrap">
-              <span class="hub-label" data-i18n="quick_hubs_label">प्रमुख कृषि क्षेत्र व मृदा प्रकार (Select Hub):</span>
+              <div class="hub-location-action-row">
+                <button id="btnAutoDetectLocation" class="btn-auto-detect-location" type="button">
+                  <span class="location-pulse-dot"></span>
+                  <span class="location-icon">📍</span>
+                  <span data-i18n="btn_detect_location">Auto-Detect My Farm Location (GPS) / मेरा खेत स्थान खोजें</span>
+                </button>
+                <span id="locationDetectStatus" class="location-status-badge" style="display:none;"></span>
+              </div>
+              <span class="hub-label" data-i18n="quick_hubs_label">प्रमुख कृषि क्षेत्र व मृदा प्रकार (Select Region):</span>
               <div class="hub-chips">
                 <button class="hub-chip active" data-hub="nashik" title="Black Cotton (Regur) Loam">
                   <span class="hub-icon">🍇</span>
@@ -320,7 +328,7 @@
     <nav class="nav-tabs">
       <button class="tab-btn active" data-tab="tab-recommend">
         <span class="tab-icon">🌱</span>
-        <span data-i18n="tab_advisory">फसल सलाह (XGBoost + SHAP)</span>
+        <span data-i18n="tab_advisory">फसल सलाह (Crop Advisory)</span>
       </button>
       <button class="tab-btn" data-tab="tab-doctor">
         <span class="tab-icon">🌿</span>
@@ -336,7 +344,7 @@
       </button>
       <button class="tab-btn" data-tab="tab-supabase">
         <span class="tab-icon">🗄️</span>
-        <span data-i18n="tab_supabase">सुपाबेस व सिस्टम स्थिति</span>
+        <span data-i18n="tab_supabase">क्लाउड सिंक व स्थिति</span>
       </button>
     </nav>
 
@@ -457,14 +465,14 @@
 
             <div class="form-actions">
               <button type="submit" id="btnRecommend" class="btn-primary">
-                <span class="btn-icon">⚡</span>
-                <span data-i18n="btn_run_xgboost">Run XGBoost ML Prediction & SHAP Analysis</span>
+                <span class="btn-icon">🌱</span>
+                <span data-i18n="btn_run_advisory">Analyze Land & Recommend Crops / फसल सलाह पाएं</span>
               </button>
             </div>
           </form>
         </div>
 
-        <!-- RESULTS & SHAP EXPLAINABILITY -->
+        <!-- RESULTS & EXPLAINABILITY -->
         <div class="card-panel results-panel">
           <div class="panel-header">
             <div class="panel-title-wrap">
@@ -474,7 +482,7 @@
                 <p class="panel-sub" data-i18n="panel_recs_sub">मृदा, मौसम और बाजार भाव के आधार पर रैंकिंग</p>
               </div>
             </div>
-            <span class="badge-confidence">Accuracy 99.09%</span>
+            <span class="badge-confidence">Reliability 99.09%</span>
           </div>
 
           <!-- TOP RECOMMENDATION CARD -->
@@ -535,13 +543,13 @@
               </div>
             </div>
 
-            <!-- SHAP EXPLAINABILITY VISUALIZER -->
+            <!-- SCIENTIFIC EXPLAINABILITY VISUALIZER -->
             <div class="shap-container">
               <div class="shap-header">
                 <h4 class="shap-title" data-i18n="shap_title">
-                  🔍 SHAP Explainable AI: Why this crop was recommended?
+                  🌱 Why this crop is best for your land
                 </h4>
-                <span class="shap-tag" data-i18n="shap_tag">Feature Attribution</span>
+                <span class="shap-tag" data-i18n="shap_tag">Soil & Climate Fit Factor</span>
               </div>
               <p class="shap-explanation" id="shapExplanationText">
                 "आपकी मिट्टी में पोटाश (190 kg/ha) और अनुकूल pH (6.8) अंगूर की मिठास और बेहतर पैदावार के लिए सर्वाधिक अनुकूल हैं।"
@@ -577,7 +585,7 @@
 
             <!-- OTHER RUNNERS UP -->
             <div class="runners-up-section">
-              <h4 class="runners-title" data-i18n="runners_title">वैकल्पिक फसलें (Alternative Rank #2 & #3)</h4>
+              <h4 class="runners-title" data-i18n="runners_title">वैकल्पिक फसलें (Alternative Crops)</h4>
               <div class="runners-grid" id="runnersList">
                 <div class="runner-card">
                   <div class="runner-header">
