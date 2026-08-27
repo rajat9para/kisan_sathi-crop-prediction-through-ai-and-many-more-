@@ -21,7 +21,7 @@
   "crons": [
     {
       "path": "/api/db-ping",
-      "schedule": "0 */12 * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 }
