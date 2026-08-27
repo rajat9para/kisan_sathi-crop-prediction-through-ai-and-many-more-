@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kisaan_Sathi (किसान साथी) — AI Crop Advisory & Plant Doctor</title>
+  <meta name="description" content="AI-Powered Hyper-Local, Explainable Crop Advisory & Diagnostics System for Indian Farmers. XGBoost + SHAP, Groq LLaMA, Supabase PostgreSQL, and Vercel Serverless." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@500;600;700;800&family=Rozha+One&family=Tiro+Devanagari+Hindi:ital@0;1&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌾</text></svg>">
+</head>
+<body class="theme-indian-agri">
+
+  <!-- TOP APP HEADER -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand-group">
+        <div class="brand-avatar">
+          <img src="kisaan_sathi_avatar.png" alt="Kisaan Sathi" style="width: 100%; height: 100%; object-fit: cover; border-radius: 10px;" onerror="this.style.display='none'; document.getElementById('avatarEmojiFallback').style.display='inline';" />
+          <span id="avatarEmojiFallback" class="avatar-emoji" style="display:none;">🌾</span>
+        </div>
+        <div class="brand-text">
+          <h1 class="brand-title">
+            <span class="brand-hi">किसान साथी</span>
+            <span class="brand-en">Kisaan_Sathi</span>
+          </h1>
+          <p class="brand-tagline" data-lang-en="AI-Powered Hyper-Local Crop Advisory & Diagnostics" data-lang-hi="एआई आधारित सूक्ष्म-जलवायु फसल सलाह व रोग निदान">
+            AI-Powered Hyper-Local Crop Advisory & Diagnostics
+          </p>
+        </div>
+      </div>
+
+      <!-- STATUS & CONTROLS -->
+      <div class="header-controls">
+        <div class="status-badge" id="supabaseStatusPill" title="Supabase PostgreSQL Heartbeat Active">
+          <span class="status-dot pulse-green"></span>
+          <span class="status-label" data-lang-en="Supabase Live Sync" data-lang-hi="सुपाबेस लाइव सक्रिय">Supabase Live Sync</span>
+        </div>
+        <div class="status-badge vercel-badge" title="Vercel Serverless Active">
+          <span class="status-dot dot-cyan"></span>
+          <span class="status-label">Vercel Serverless</span>
+        </div>
+        <button id="langToggleBtn" class="lang-switch-btn" aria-label="Toggle Language">
+          <span class="lang-icon">🌐</span>
+          <span id="langCurrentText">हिन्दी</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- MANDI TICKER -->
+    <div class="mandi-ticker-wrap">
+      <div class="ticker-label">
+        <span class="ticker-live-dot"></span>
+        <span data-lang-en="LIVE APMC MANDI" data-lang-hi="लाइव मंडी भाव">LIVE APMC MANDI</span>
+      </div>
+      <div class="ticker-scroll" id="mandiTicker">
+        <div class="ticker-item"><span class="commodity">🍇 Grapes / अंगूर (Nashik)</span>: <span class="price">₹6,200/Qtl</span> <span class="trend up">▲ +5.4%</span></div>
+        <div class="ticker-item"><span class="commodity">🍎 Pomegranate / अनार (Nashik)</span>: <span class="price">₹8,400/Qtl</span> <span class="trend up">▲ +3.8%</span></div>
+        <div class="ticker-item"><span class="commodity">🌿 Cotton / कपास (Malegaon)</span>: <span class="price">₹7,450/Qtl</span> <span class="trend stable">▶ ₹7,450</span></div>
+        <div class="ticker-item"><span class="commodity">🌾 Chickpea / चना (Indore)</span>: <span class="price">₹6,150/Qtl</span> <span class="trend up">▲ +2.1%</span></div>
+        <div class="ticker-item"><span class="commodity">🌱 Soybean / सोयाबीन (Indore)</span>: <span class="price">₹4,680/Qtl</span> <span class="trend up">▲ +1.5%</span></div>
+        <div class="ticker-item"><span class="commodity">🌽 Maize / मक्का (Ludhiana)</span>: <span class="price">₹2,280/Qtl</span> <span class="trend up">▲ +4.2%</span></div>
+        <div class="ticker-item"><span class="commodity">🌶️ Chilli / लाल मिर्च (Guntur)</span>: <span class="price">₹18,500/Qtl</span> <span class="trend up">▲ +6.1%</span></div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WRAPPER -->
+  <main class="main-container">
+
+    <!-- HERO PANEL WITH LOCATION PRESETS -->
+    <section class="hero-card">
+      <div class="hero-content">
+        <div class="hero-left">
+          <div class="hero-pill">
+            <span>🇮🇳 Smart India Hackathon • Hybrid AI (ML + Groq LLaMA 3.3)</span>
+          </div>
+          <h2 class="hero-headline" data-lang-en="Smart Farming Advisory Backed by Explainable Science" data-lang-hi="वैज्ञानिक प्रमाणों और सटीक डेटा पर आधारित स्मार्ट कृषि सलाह">
+            Smart Farming Advisory Backed by Explainable Science
+          </h2>
+          <p class="hero-sub" data-lang-en="Deterministic XGBoost (99.09% accuracy) computes nutrient force vectors. Groq LLM synthesizes natural Hindi voice guidance." data-lang-hi="XGBoost 99.09% सटीकता के साथ मिट्टी व मौसम का विश्लेषण करता है, और Groq AI किसान को सरल हिंदी आवाज में मार्गदर्शन देता है।">
+            Deterministic XGBoost (99.09% accuracy) computes nutrient force vectors. Groq LLM synthesizes natural Hindi voice guidance.
+          </p>
+
+          <!-- QUICK HUBS -->
+          <div class="hub-selector-wrap">
+            <span class="hub-label" data-lang-en="Quick Regional Hubs:" data-lang-hi="प्रमुख कृषि क्षेत्र चुनें:">Quick Regional Hubs:</span>
+            <div class="hub-chips">
+              <button class="hub-chip active" data-hub="nashik">
+                <span class="hub-icon">🍇</span>
+                <span>Nashik (MH)</span>
+              </button>
+              <button class="hub-chip" data-hub="indore">
+                <span class="hub-icon">🌱</span>
+                <span>Indore (MP)</span>
+              </button>
+              <button class="hub-chip" data-hub="ludhiana">
+                <span class="hub-icon">🌾</span>
+                <span>Ludhiana (PB)</span>
+              </button>
+              <button class="hub-chip" data-hub="guntur">
+                <span class="hub-icon">🌶️</span>
+                <span>Guntur (AP)</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-right">
+          <!-- LIVE WEATHER WIDGET -->
+          <div class="live-weather-card">
+            <div class="weather-header">
+              <div>
+                <span class="weather-location" id="weatherHubName">Nashik, Maharashtra</span>
+                <span class="weather-status" id="weatherCondition">Partly Cloudy • अनुकूल मौसम</span>
+              </div>
+              <span class="weather-icon-large" id="weatherEmoji">⛅</span>
+            </div>
+            <div class="weather-metrics">
+              <div class="metric-item">
+                <span class="metric-val" id="weatherTemp">26.5°C</span>
+                <span class="metric-lbl" data-lang-en="Temperature" data-lang-hi="तापमान">Temperature</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-val" id="weatherHumidity">74%</span>
+                <span class="metric-lbl" data-lang-en="Humidity" data-lang-hi="नमी">Humidity</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-val" id="weatherRain">68 mm</span>
+                <span class="metric-lbl" data-lang-en="7-Day Rain" data-lang-hi="7-दिवसीय वर्षा">7-Day Rain</span>
+              </div>
+            </div>
+            <div class="spray-alert-banner" id="weatherSprayAlert">
+              <span class="spray-icon">🌾</span>
+              <span id="weatherSprayText">Good for Spraying • छिड़काव के लिए उत्तम समय</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NAVIGATION TABS -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="tab-recommend">
+        <span class="tab-icon">🌱</span>
+        <span data-lang-en="Crop Advisory (XGBoost + SHAP)" data-lang-hi="फसल सलाह (XGBoost + SHAP)">Crop Advisory (XGBoost + SHAP)</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-doctor">
+        <span class="tab-icon">🌿</span>
+        <span data-lang-en="Plant Doctor (Leaf AI)" data-lang-hi="फसल डॉक्टर (रोग पहचान)">Plant Doctor (Leaf AI)</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-voice">
+        <span class="tab-icon">🎙️</span>
+        <span data-lang-en="Voice Saathi (Groq LLM)" data-lang-hi="वॉइस साथी (बोलकर पूछें)">Voice Saathi (Groq LLM)</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-mandi">
+        <span class="tab-icon">📊</span>
+        <span data-lang-en="Mandi & Weather Radar" data-lang-hi="मंडी भाव व मौसम रडार">Mandi & Weather Radar</span>
+      </button>
+      <button class="tab-btn" data-tab="tab-supabase">
+        <span class="tab-icon">🗄️</span>
+        <span data-lang-en="Supabase & Anti-Sleep" data-lang-hi="सुपाबेस व सिस्टम स्थिति">Supabase & Anti-Sleep</span>
+      </button>
+    </nav>
+
+    <!-- ============================================================== -->
+    <!-- TAB 1: CROP RECOMMENDATION & SHAP EXPLAINABILITY -->
+    <!-- ============================================================== -->
+    <section id="tab-recommend" class="tab-pane active">
+      <div class="two-col-layout">
+
+        <!-- INPUT FORM -->
+        <div class="card-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">🧪</span>
+              <div>
+                <h3 class="panel-title" data-lang-en="Farm Parameters & Soil Health" data-lang-hi="खेत का विवरण व मृदा परीक्षण">Farm Parameters & Soil Health</h3>
+                <p class="panel-sub" data-lang-en="Load official Soil Card or enter parameters manually" data-lang-hi="मृदा स्वास्थ्य कार्ड लोड करें या सीधे मान भरें">Load official Soil Card or enter parameters manually</p>
+              </div>
+            </div>
+
+            <!-- PRESET CARD LOADER -->
+            <div class="preset-dropdown">
+              <select id="soilCardPresetSelect" class="form-select-sm">
+                <option value="none">-- Select Soil Card Preset --</option>
+                <option value="sample_1_nashik" selected>Nashik MahaSoil Card (#MH-4012)</option>
+                <option value="sample_2_indore">MP Krishi Vigyan Lab (#MP-8830)</option>
+                <option value="sample_3_ludhiana">PAU Ludhiana Testing (#PB-1049)</option>
+              </select>
+            </div>
+          </div>
+
+          <form id="recommendForm" class="grid-form">
+            <div class="form-row two-col">
+              <div class="form-group">
+                <label data-lang-en="State" data-lang-hi="राज्य">State</label>
+                <input type="text" id="inputState" class="form-input" value="Maharashtra" required />
+              </div>
+              <div class="form-group">
+                <label data-lang-en="District" data-lang-hi="जिला">District</label>
+                <input type="text" id="inputDistrict" class="form-input" value="Nashik" required />
+              </div>
+            </div>
+
+            <div class="form-row three-col">
+              <div class="form-group">
+                <label data-lang-en="Nitrogen (N) kg/ha" data-lang-hi="नाइट्रोजन (N)">Nitrogen (N) kg/ha</label>
+                <input type="number" id="inputN" class="form-input" value="85" min="0" max="250" step="1" required />
+              </div>
+              <div class="form-group">
+                <label data-lang-en="Phosphorus (P) kg/ha" data-lang-hi="फास्फोरस (P)">Phosphorus (P) kg/ha</label>
+                <input type="number" id="inputP" class="form-input" value="48" min="0" max="150" step="1" required />
+              </div>
+              <div class="form-group">
+                <label data-lang-en="Potassium (K) kg/ha" data-lang-hi="पोटाश (K)">Potassium (K) kg/ha</label>
+                <input type="number" id="inputK" class="form-input" value="190" min="0" max="300" step="1" required />
+              </div>
+            </div>
+
+            <div class="form-row two-col">
+              <div class="form-group">
+                <div class="label-with-value">
+                  <label data-lang-en="Soil pH Level" data-lang-hi="मिट्टी का pH मान">Soil pH Level</label>
+                  <span class="range-val" id="phDisplay">6.8 (Neutral/Ideal)</span>
+                </div>
+                <input type="range" id="inputPH" class="form-range" min="4.0" max="9.5" step="0.1" value="6.8" />
+              </div>
+              <div class="form-group">
+                <label data-lang-en="Irrigation Facility" data-lang-hi="सिंचाई सुविधा">Irrigation Facility</label>
+                <select id="inputIrrigation" class="form-select">
+                  <option value="Borewell" selected>Borewell / ट्यूबवेल</option>
+                  <option value="Canal">Canal / नहर</option>
+                  <option value="Drip">Drip Irrigation / ड्रिप सिंचाई</option>
+                  <option value="Rainfed">Rainfed / केवल वर्षा आधारित</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-row two-col">
+              <div class="form-group">
+                <label data-lang-en="Farm Size (Acres)" data-lang-hi="खेत का आकार (एकड़)">Farm Size (Acres)</label>
+                <input type="number" id="inputFarmSize" class="form-input" value="2.5" min="0.5" max="100" step="0.5" />
+              </div>
+              <div class="form-group">
+                <label data-lang-en="Previous Season Crop" data-lang-hi="पिछली फसल (फसल चक्र)">Previous Season Crop</label>
+                <select id="inputPrevCrop" class="form-select">
+                  <option value="Cotton" selected>Cotton / कपास</option>
+                  <option value="Soybean">Soybean / सोयाबीन</option>
+                  <option value="Wheat">Wheat / गेहूं</option>
+                  <option value="Rice">Rice / धान</option>
+                  <option value="Maize">Maize / मक्का</option>
+                  <option value="Fallow">Fallow / परती भूमि</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" id="btnRecommend" class="btn-primary">
+                <span class="btn-icon">⚡</span>
+                <span data-lang-en="Run XGBoost ML Prediction & SHAP Analysis" data-lang-hi="XGBoost एआई विश्लेषण चलाएं">Run XGBoost ML Prediction & SHAP Analysis</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- RESULTS & SHAP EXPLAINABILITY -->
+        <div class="card-panel results-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">🏆</span>
+              <div>
+                <h3 class="panel-title" data-lang-en="Ranked Crop Recommendations" data-lang-hi="अनुशंसित सर्वोत्तम फसलें">Ranked Crop Recommendations</h3>
+                <p class="panel-sub" data-lang-en="Multi-factor agronomic ranking + SHAP force vectors" data-lang-hi="मृदा, मौसम और बाजार भाव के आधार पर रैंकिंग">Multi-factor agronomic ranking + SHAP force vectors</p>
+              </div>
+            </div>
+            <span class="badge-confidence">Accuracy 99.09%</span>
+          </div>
+
+          <!-- TOP RECOMMENDATION CARD -->
+          <div class="top-crop-banner" id="topCropBanner">
+            <div class="top-crop-header">
+              <div class="top-crop-info">
+                <span class="badge-rank">#1 BEST MATCH / सर्वोत्तम</span>
+                <h2 class="top-crop-name" id="topCropName">🍇 Grapes / अंगूर (Vitis vinifera)</h2>
+                <p class="top-crop-family" id="topCropFamily">Family: Vitaceae (Fruit) • 135 Days Duration</p>
+              </div>
+              <div class="match-circle" id="topCropScoreCircle">
+                <span class="match-pct" id="topCropScore">94.8%</span>
+                <span class="match-lbl" data-lang-en="Match Score" data-lang-hi="सटीकता">Match</span>
+              </div>
+            </div>
+
+            <!-- 4 PILLARS METERS -->
+            <div class="pillars-grid">
+              <div class="pillar-item">
+                <span class="pillar-lbl" data-lang-en="Soil Nutrient Fit" data-lang-hi="मृदा पोषण अनुकूलता">Soil Fit</span>
+                <div class="progress-bar-bg"><div class="progress-fill green" style="width: 96%"></div></div>
+                <span class="pillar-val">96%</span>
+              </div>
+              <div class="pillar-item">
+                <span class="pillar-lbl" data-lang-en="Weather & Rain Fit" data-lang-hi="मौसम अनुकूलता">Weather Fit</span>
+                <div class="progress-bar-bg"><div class="progress-fill cyan" style="width: 92%"></div></div>
+                <span class="pillar-val">92%</span>
+              </div>
+              <div class="pillar-item">
+                <span class="pillar-lbl" data-lang-en="Market & APMC Fit" data-lang-hi="बाजार मांग व भाव">Market Fit</span>
+                <div class="progress-bar-bg"><div class="progress-fill amber" style="width: 95%"></div></div>
+                <span class="pillar-val">95%</span>
+              </div>
+              <div class="pillar-item">
+                <span class="pillar-lbl" data-lang-en="Crop Rotation Benefit" data-lang-hi="फसल चक्र लाभ">Rotation Fit</span>
+                <div class="progress-bar-bg"><div class="progress-fill purple" style="width: 88%"></div></div>
+                <span class="pillar-val">88%</span>
+              </div>
+            </div>
+
+            <!-- ECONOMICS HIGHLIGHT -->
+            <div class="crop-economics-bar">
+              <div class="econ-col">
+                <span class="econ-lbl" data-lang-en="Estimated Yield/Acre" data-lang-hi="अनुमानित पैदावार/एकड़">Est. Yield</span>
+                <strong class="econ-val" id="topCropYield">8 - 12 Tonnes</strong>
+              </div>
+              <div class="econ-col">
+                <span class="econ-lbl" data-lang-en="Est. Net Revenue/Acre" data-lang-hi="अनुमानित आय/एकड़">Est. Revenue</span>
+                <strong class="econ-val text-gold" id="topCropRev">₹3,50,000 - ₹5,00,000</strong>
+              </div>
+              <div class="econ-col">
+                <span class="econ-lbl" data-lang-en="Mandi Modal Rate" data-lang-hi="मंडी औसत भाव">Mandi Rate</span>
+                <strong class="econ-val" id="topCropRate">₹6,200 / Qtl ↗</strong>
+              </div>
+              <div class="econ-col">
+                <span class="econ-lbl" data-lang-en="Sowing Window" data-lang-hi="बुवाई / छंटाई समय">Sowing Time</span>
+                <strong class="econ-val" id="topCropSowing">Oct - Nov</strong>
+              </div>
+            </div>
+
+            <!-- SHAP EXPLAINABILITY VISUALIZER -->
+            <div class="shap-container">
+              <div class="shap-header">
+                <h4 class="shap-title" data-lang-en="🔍 SHAP Explainable AI: Why this crop was recommended?" data-lang-hi="🔍 SHAP व्याख्या: इस फसल की सिफारिश क्यों की गई?">
+                  🔍 SHAP Explainable AI: Why this crop was recommended?
+                </h4>
+                <span class="shap-tag" data-lang-en="Exact Feature Force Attribution" data-lang-hi="सटीक पोषक तत्व प्रभाव">Feature Attribution</span>
+              </div>
+              <p class="shap-explanation" id="shapExplanationText">
+                "आपकी मिट्टी में पोटाश (190 kg/ha) और अनुकूल pH (6.8) अंगूर की मिठास और बेहतर पैदावार के लिए सर्वाधिक अनुकूल हैं।"
+              </p>
+              <div class="shap-bars" id="shapBarsList">
+                <div class="shap-bar-row">
+                  <span class="shap-feat">Potassium (K: 190)</span>
+                  <div class="shap-bar-track"><div class="shap-fill positive" style="width: 82%"></div></div>
+                  <span class="shap-impact text-green">+28%</span>
+                </div>
+                <div class="shap-bar-row">
+                  <span class="shap-feat">Soil pH (6.8 Neutral)</span>
+                  <div class="shap-bar-track"><div class="shap-fill positive" style="width: 65%"></div></div>
+                  <span class="shap-impact text-green">+18%</span>
+                </div>
+                <div class="shap-bar-row">
+                  <span class="shap-feat">Nitrogen (N: 85)</span>
+                  <div class="shap-bar-track"><div class="shap-fill positive" style="width: 48%"></div></div>
+                  <span class="shap-impact text-green">+12%</span>
+                </div>
+                <div class="shap-bar-row">
+                  <span class="shap-feat">Phosphorus (P: 48)</span>
+                  <div class="shap-bar-track"><div class="shap-fill positive" style="width: 32%"></div></div>
+                  <span class="shap-impact text-green">+7%</span>
+                </div>
+                <div class="shap-bar-row">
+                  <span class="shap-feat">Rainfall Forecast</span>
+                  <div class="shap-bar-track"><div class="shap-fill negative" style="width: 18%"></div></div>
+                  <span class="shap-impact text-red">-4%</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- OTHER RUNNERS UP -->
+            <div class="runners-up-section">
+              <h4 class="runners-title" data-lang-en="Alternative Crops (Rank #2 & #3)" data-lang-hi="वैकल्पिक फसलें (रैंक #2 और #3)">Alternative Crops (Rank #2 & #3)</h4>
+              <div class="runners-grid" id="runnersList">
+                <div class="runner-card">
+                  <div class="runner-header">
+                    <span class="runner-name">🍎 Pomegranate / अनार</span>
+                    <span class="runner-score">91.2%</span>
+                  </div>
+                  <div class="runner-meta">Est: ₹2.8L - ₹4.2L / acre • Mandi: ₹8,400/Qtl</div>
+                </div>
+                <div class="runner-card">
+                  <div class="runner-header">
+                    <span class="runner-name">🌿 Cotton / कपास</span>
+                    <span class="runner-score">86.5%</span>
+                  </div>
+                  <div class="runner-meta">Est: ₹75K - ₹1.05L / acre • Mandi: ₹7,450/Qtl</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- TAB 2: PLANT DOCTOR (LEAF DISEASE DIAGNOSIS) -->
+    <!-- ============================================================== -->
+    <section id="tab-doctor" class="tab-pane">
+      <div class="two-col-layout">
+        <!-- DOCTOR INPUT & SPECIMEN PICKER -->
+        <div class="card-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">🔬</span>
+              <div>
+                <h3 class="panel-title" data-lang-en="Plant Pathology & Leaf Disease AI" data-lang-hi="पौधा रोग निदान व पत्ती स्कैनर">Plant Pathology & Leaf Disease AI</h3>
+                <p class="panel-sub" data-lang-en="Select sample leaf pathogen or test diagnosis" data-lang-hi="पत्ती का नमूना चुनें या रोग का तुरंत विश्लेषण करें">Select sample leaf pathogen or test diagnosis</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="leaf-samples-gallery">
+            <label class="gallery-title" data-lang-en="Sample Crop Pathogens (Click to Test):" data-lang-hi="परीक्षण हेतु पत्तियों के नमूने (क्लिक करें):">Sample Crop Pathogens (Click to Test):</label>
+            <div class="leaf-grid">
+              <button class="leaf-btn active" data-sample="tomato_early_blight">
+                <span class="leaf-icon">🍅</span>
+                <span class="leaf-name">Tomato Early Blight</span>
+                <span class="leaf-sub">अगेती झुलसा</span>
+              </button>
+              <button class="leaf-btn" data-sample="potato_late_blight">
+                <span class="leaf-icon">🥔</span>
+                <span class="leaf-name">Potato Late Blight</span>
+                <span class="leaf-sub">पछेती झुलसा</span>
+              </button>
+              <button class="leaf-btn" data-sample="cotton_bacterial_blight">
+                <span class="leaf-icon">🌿</span>
+                <span class="leaf-name">Cotton Angular Blight</span>
+                <span class="leaf-sub">जीवाणु कोणीय धब्बा</span>
+              </button>
+              <button class="leaf-btn" data-sample="corn_healthy">
+                <span class="leaf-icon">🌽</span>
+                <span class="leaf-name">Corn Healthy Leaf</span>
+                <span class="leaf-sub">स्वस्थ मक्का पत्ती</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- DROP ZONE -->
+          <div class="upload-dropzone" id="leafDropZone">
+            <span class="drop-icon">📷</span>
+            <h4 data-lang-en="Drag & Drop Crop Photo or Click to Browse" data-lang-hi="खेत से खींची पत्ती की फोटो यहां डालें">Drag & Drop Crop Photo or Click to Browse</h4>
+            <p data-lang-en="Supports Tomato, Potato, Cotton, Wheat, Rice, Corn, Apple" data-lang-hi="टमाटर, आलू, कपास, गेहूं, धान, मक्का आदि के लिए उपयुक्त">Supports Tomato, Potato, Cotton, Wheat, Rice, Corn, Apple</p>
+            <input type="file" id="leafFileInput" accept="image/*" style="display: none" />
+            <button type="button" class="btn-secondary" onclick="document.getElementById('leafFileInput').click()">
+              <span>📁 Browse Image</span>
+            </button>
+          </div>
+
+          <button id="btnRunDiagnosis" class="btn-primary" style="margin-top: 1rem;">
+            <span class="btn-icon">⚡</span>
+            <span data-lang-en="Run Instant AI Pathology Diagnosis" data-lang-hi="एआई रोग निदान चलाएं">Run Instant AI Pathology Diagnosis</span>
+          </button>
+        </div>
+
+        <!-- DIAGNOSIS RESULT & REMEDIES -->
+        <div class="card-panel results-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">🩺</span>
+              <div>
+                <h3 class="panel-title" data-lang-en="Diagnostic Scan Report" data-lang-hi="रोग निदान रिपोर्ट व उपचार">Diagnostic Scan Report</h3>
+                <p class="panel-sub" data-lang-en="Zero-budget organic + Scientific chemical remedies" data-lang-hi="जैविक व रासायनिक समाधान और मौसम अनुकूल छिड़काव">Zero-budget organic + Scientific chemical remedies</p>
+              </div>
+            </div>
+            <span class="badge-confidence" id="diagConfidence">Confidence: 96.4%</span>
+          </div>
+
+          <div class="diagnosis-card" id="diagCard">
+            <div class="diag-header-box">
+              <div class="diag-meta-left">
+                <span class="diag-badge-crop" id="diagCrop">Crop: Tomato / टमाटर</span>
+                <h2 class="diag-disease-name" id="diagDiseaseName">Early Blight (Alternaria solani)</h2>
+                <h3 class="diag-disease-hi" id="diagDiseaseHi">अगेती झुलसा रोग</h3>
+              </div>
+              <div class="diag-severity-box" id="diagSeverityBox">
+                <span class="severity-lbl">Severity / गंभीरता</span>
+                <span class="severity-val" id="diagSeverity">Medium (35% area)</span>
+              </div>
+            </div>
+
+            <!-- WEATHER GROUNDED SPRAY ADVISORY -->
+            <div class="weather-spray-alert" id="diagSprayPlan">
+              <div class="spray-alert-title">
+                <span>🌦️ Weather-Grounded Spray Timing / छिड़काव सलाह</span>
+              </div>
+              <p class="spray-alert-desc" id="diagSprayText">
+                "नासिक में आगामी शनिवार दोपहर 65% बारिश की संभावना है। अतः छिड़काव आज शाम 4 बजे या रविवार सुबह 7 बजे ही करें ताकि दवा बह न जाए।"
+              </p>
+            </div>
+
+            <!-- DUAL REMEDIES GRID -->
+            <div class="remedies-grid">
+              <!-- ORGANIC REMEDY -->
+              <div class="remedy-card organic">
+                <div class="remedy-head">
+                  <span class="remedy-badge">🌿 100% Organic / प्राकृतिक उपचार</span>
+                </div>
+                <p class="remedy-text" id="diagOrganicRemedy">
+                  नीम के बीज के अर्क (NSKE 5%) या ट्राइकोडर्मा विरिडी (5 ग्राम/लीटर) का छिड़काव करें। साथ ही 10% गोमूत्र का अर्क फंगस रोकने में अत्यंत प्रभावी है।
+                </p>
+              </div>
+
+              <!-- CHEMICAL REMEDY -->
+              <div class="remedy-card chemical">
+                <div class="remedy-head">
+                  <span class="remedy-badge">🧪 Scientific Chemical / रासायनिक उपचार</span>
+                </div>
+                <p class="remedy-text" id="diagChemicalRemedy">
+                  मैंकोजेब 75 WP (Mancozeb @ 2.5 ग्राम/लीटर पानी) या एजोक्सीस्ट्रोबिन (1 मिली/लीटर) का तुरंत छिड़काव करें।
+                </p>
+              </div>
+            </div>
+
+            <!-- SUPABASE LOGGED NOTICE -->
+            <div class="supabase-logged-notice">
+              <span>✓ Scan record automatically stored in Supabase table <code>disease_scans</code></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- TAB 3: CONVERSATIONAL VOICE SAATHI (GROQ LLM) -->
+    <!-- ============================================================== -->
+    <section id="tab-voice" class="tab-pane">
+      <div class="voice-assistant-layout">
+        <div class="card-panel voice-panel">
+          <div class="voice-hero-avatar">
+            <div class="avatar-ring">
+              <span class="voice-emoji">🌾</span>
+            </div>
+            <h3 class="voice-saathi-title">
+              <span data-lang-en="Voice Saathi — AI Farmer Advisor" data-lang-hi="वॉइस साथी — आपका अपना कृषि सलाहकार">Voice Saathi — AI Farmer Advisor</span>
+            </h3>
+            <p class="voice-saathi-sub" data-lang-en="Powered by Groq LLaMA 3.3. Speaks Hindi & English naturally." data-lang-hi="Groq LLaMA 3.3 द्वारा संचालित। शुद्ध एवं सरल हिंदी में बोलकर सलाह देता है।">
+              Powered by Groq LLaMA 3.3. Speaks Hindi & English naturally.
+            </p>
+          </div>
+
+          <!-- PROMPT CHIPS -->
+          <div class="voice-prompt-chips">
+            <span class="chips-label" data-lang-en="Quick Farming Questions:" data-lang-hi="अक्सर पूछे जाने वाले सवाल:">Quick Farming Questions:</span>
+            <div class="chips-list">
+              <button class="voice-chip" data-query="इसके लिए पानी कितना चाहिए?">
+                <span>💧</span> पानी कितना चाहिए? (Irrigation)
+              </button>
+              <button class="voice-chip" data-query="खाद की सही मात्रा कितनी डालें?">
+                <span>🌱</span> खाद की मात्रा? (Fertilizer NPK)
+              </button>
+              <button class="voice-chip" data-query="आज मंडी में क्या भाव चल रहा है?">
+                <span>💰</span> मंडी भाव क्या है? (Mandi Price)
+              </button>
+              <button class="voice-chip" data-query="कीट व फंगस नियंत्रण कैसे करें?">
+                <span>🐛</span> कीट नियंत्रण? (Pest Control)
+              </button>
+            </div>
+          </div>
+
+          <!-- INPUT BOX -->
+          <div class="voice-input-wrap">
+            <input type="text" id="voiceTextInput" class="voice-input" placeholder="यहाँ अपना सवाल लिखें या ऊपर से चुनें..." value="इसके लिए पानी कितना चाहिए?" />
+            <button id="btnVoiceSpeak" class="btn-voice-mic" title="Listen in Voice / बोलें">
+              <span>🎙️</span>
+            </button>
+            <button id="btnSendVoiceQuery" class="btn-primary btn-voice-send">
+              <span>Ask AI / पूछें</span>
+            </button>
+          </div>
+
+          <!-- AI CONVERSATION RESPONSE CARD -->
+          <div class="voice-response-card" id="voiceResponseCard">
+            <div class="voice-card-header">
+              <span class="badge-llm">Groq LLaMA 3.3 • Instant Synthesis</span>
+              <button id="btnAudioTTSPlay" class="btn-tts-play">
+                <span class="tts-icon">🔊</span>
+                <span id="ttsBtnText">Listen Hindi Audio / आवाज सुनें</span>
+              </button>
+            </div>
+            <div class="voice-response-body">
+              <h4 class="voice-bubble-hi" id="voiceBubbleHi">
+                "सोयाबीन व मक्का की फसल के लिए 3 से 4 सिंचाइयों की आवश्यकता होती है। फूल आने और फल बनते समय खेत में नमी अवश्य बनाए रखें।"
+              </h4>
+              <p class="voice-bubble-en" id="voiceBubbleEn">
+                "Crops like Soybean require 3 to 4 irrigations. Maintain consistent soil moisture during flowering and pod development."
+              </p>
+            </div>
+            <div class="voice-followups">
+              <span class="follow-lbl" data-lang-en="Suggested Follow-ups:" data-lang-hi="आगे पूछें:">Suggested Follow-ups:</span>
+              <div class="follow-chips" id="voiceFollowupsList">
+                <button class="follow-chip" data-query="खाद की मात्रा कितनी डालनी है?">खाद की मात्रा?</button>
+                <button class="follow-chip" data-query="मंडी में सबसे अच्छा भाव कब मिलेगा?">मंडी में अच्छा भाव कब मिलेगा?</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- TAB 4: APMC MANDI & 7-DAY WEATHER RADAR -->
+    <!-- ============================================================== -->
+    <section id="tab-mandi" class="tab-pane">
+      <div class="two-col-layout">
+        <!-- 7-DAY WEATHER FORECAST -->
+        <div class="card-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">🌦️</span>
+              <div>
+                <h3 class="panel-title" data-lang-en="7-Day Agricultural Weather Forecast" data-lang-hi="7-दिवसीय मौसम व छिड़काव पूर्वानुमान">7-Day Agricultural Weather Forecast</h3>
+                <p class="panel-sub" data-lang-en="Live Open-Meteo Satellite Feed + Spray Conditions" data-lang-hi="ओपन-मीटियो उपग्रह डेटा व छिड़काव रेटिंग">Live Open-Meteo Satellite Feed + Spray Conditions</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="forecast-list" id="forecast7dList">
+            <!-- Day 1 -->
+            <div class="forecast-day-row">
+              <div class="f-day-info">
+                <strong>Friday (28 Aug)</strong>
+                <span>Scattered Light Showers</span>
+              </div>
+              <div class="f-day-temp">28.5°C / 21°C</div>
+              <div class="f-day-rain"><span class="rain-drop">💧</span> 35% Rain</div>
+              <div class="f-day-spray warning">Moderate - Spray after 4 PM</div>
+            </div>
+            <!-- Day 2 -->
+            <div class="forecast-day-row">
+              <div class="f-day-info">
+                <strong>Saturday (29 Aug)</strong>
+                <span>Clear & Sunny</span>
+              </div>
+              <div class="f-day-temp">29°C / 21.5°C</div>
+              <div class="f-day-rain"><span class="rain-drop">💧</span> 15% Rain</div>
+              <div class="f-day-spray good">Good for Spraying</div>
+            </div>
+            <!-- Day 3 -->
+            <div class="forecast-day-row">
+              <div class="f-day-info">
+                <strong>Sunday (30 Aug)</strong>
+                <span>Clear & Sunny</span>
+              </div>
+              <div class="f-day-temp">30°C / 22°C</div>
+              <div class="f-day-rain"><span class="rain-drop">💧</span> 10% Rain</div>
+              <div class="f-day-spray good">Good for Spraying</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MANDI APMC PRICES -->
+        <div class="card-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">💰</span>
+              <div>
+                <h3 class="panel-title" data-lang-en="Live APMC Mandi Commodities" data-lang-hi="स्थानीय कृषि उपज मंडी भाव">Live APMC Mandi Commodities</h3>
+                <p class="panel-sub" data-lang-en="Agmarknet verified market arrivals & 7-day trend" data-lang-hi="एगमार्कनेट सत्यापित दैनिक मंडी भाव">Agmarknet verified market arrivals & 7-day trend</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="mandi-table">
+              <thead>
+                <tr>
+                  <th>Commodity / फसल</th>
+                  <th>Market / मंडी</th>
+                  <th>Modal Rate (₹/Qtl)</th>
+                  <th>7-Day Trend</th>
+                </tr>
+              </thead>
+              <tbody id="mandiTableBody">
+                <tr>
+                  <td><strong>🍇 Grapes / अंगूर</strong><br><small>Thompson Seedless</small></td>
+                  <td>Nashik APMC (MH)</td>
+                  <td><strong class="text-gold">₹6,200</strong></td>
+                  <td><span class="trend up">▲ +5.4%</span></td>
+                </tr>
+                <tr>
+                  <td><strong>🍎 Pomegranate / अनार</strong><br><small>Bhagwa Super</small></td>
+                  <td>Nashik APMC (MH)</td>
+                  <td><strong class="text-gold">₹8,400</strong></td>
+                  <td><span class="trend up">▲ +3.8%</span></td>
+                </tr>
+                <tr>
+                  <td><strong>🌿 Cotton / कपास</strong><br><small>Medium Staple</small></td>
+                  <td>Malegaon APMC (MH)</td>
+                  <td><strong class="text-gold">₹7,450</strong></td>
+                  <td><span class="trend stable">▶ Stable</span></td>
+                </tr>
+                <tr>
+                  <td><strong>🌾 Chickpea / चना</strong><br><small>Desi Deshi</small></td>
+                  <td>Indore APMC (MP)</td>
+                  <td><strong class="text-gold">₹6,150</strong></td>
+                  <td><span class="trend up">▲ +2.1%</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================== -->
+    <!-- TAB 5: SUPABASE & ANTI-SLEEP MONITOR -->
+    <!-- ============================================================== -->
+    <section id="tab-supabase" class="tab-pane">
+      <div class="two-col-layout">
+        <!-- KEEP-ALIVE CARD -->
+        <div class="card-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">⚡</span>
+              <div>
+                <h3 class="panel-title" data-lang-en="Supabase PostgreSQL Anti-Sleep Engine" data-lang-hi="सुपाबेस डेटाबेस व एंटी-स्लीप इंजन">Supabase PostgreSQL Anti-Sleep Engine</h3>
+                <p class="panel-sub" data-lang-en="Automated heartbeat keeps database active 24/7" data-lang-hi="स्वचालित पिंग द्वारा डेटाबेस हमेशा सक्रिय रहता है">Automated heartbeat keeps database active 24/7</p>
+              </div>
+            </div>
+            <span class="status-badge" style="background: rgba(46, 125, 50, 0.2); color: #2E7D32;">● Connected</span>
+          </div>
+
+          <div class="supabase-info-grid">
+            <div class="info-box">
+              <span class="info-lbl">Heartbeat Table</span>
+              <strong class="info-val">public.app_keepalive</strong>
+            </div>
+            <div class="info-box">
+              <span class="info-lbl">Vercel Cron Schedule</span>
+              <strong class="info-val">0 */12 * * * (Twice Daily)</strong>
+            </div>
+            <div class="info-box">
+              <span class="info-lbl">Last Heartbeat Ping</span>
+              <strong class="info-val" id="sbLastPing">Just now (Active)</strong>
+            </div>
+            <div class="info-box">
+              <span class="info-lbl">Database Health</span>
+              <strong class="info-val text-green" id="sbStatus">Healthy & Synced</strong>
+            </div>
+          </div>
+
+          <div style="margin-top: 1.5rem;">
+            <button id="btnManualPing" class="btn-secondary">
+              <span>⚡ Trigger Manual Supabase Heartbeat (/api/db-ping)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- RECENT DB SCANS -->
+        <div class="card-panel">
+          <div class="panel-header">
+            <div class="panel-title-wrap">
+              <span class="panel-icon">📋</span>
+              <div>
+                <h3 class="panel-title" data-lang-en="Live Cloud Activity Stream" data-lang-hi="हाल ही में दर्ज की गई गतिविधियाँ">Live Cloud Activity Stream</h3>
+                <p class="panel-sub" data-lang-en="Real-time queries saved to Supabase" data-lang-hi="सुपाबेस में दर्ज फसल व रोग जांच रिकॉर्ड">Real-time queries saved to Supabase</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="activity-feed" id="activityFeed">
+            <div class="feed-item">
+              <span class="feed-dot green"></span>
+              <div class="feed-info">
+                <strong>Crop Recommendation: Nashik (MH)</strong>
+                <span>Top: Grapes (94.8% Match) • N:85, P:48, K:190</span>
+              </div>
+              <span class="feed-time">1m ago</span>
+            </div>
+            <div class="feed-item">
+              <span class="feed-dot amber"></span>
+              <div class="feed-info">
+                <strong>Disease Diagnostic: Tomato Early Blight</strong>
+                <span>Pathogen: Alternaria solani • Confidence: 96.4%</span>
+              </div>
+              <span class="feed-time">5m ago</span>
+            </div>
+            <div class="feed-item">
+              <span class="feed-dot cyan"></span>
+              <div class="feed-info">
+                <strong>Supabase Keep-Alive Heartbeat</strong>
+                <span>Ping status: healthy • Anti-sleep pulse active</span>
+              </div>
+              <span class="feed-time">12m ago</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <div class="footer-left">
+        <strong>🌾 Kisaan_Sathi (किसान साथी)</strong>
+        <span>AI-Powered Explainable Agronomic System • Smart India Hackathon</span>
+      </div>
+      <div class="footer-tags">
+        <span class="tech-tag">XGBoost 99.09%</span>
+        <span class="tech-tag">SHAP TreeExplainer</span>
+        <span class="tech-tag">Groq LLaMA 3.3</span>
+        <span class="tech-tag">FastAPI</span>
+        <span class="tech-tag">Supabase PostgreSQL</span>
+        <span class="tech-tag">Vercel Serverless</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
