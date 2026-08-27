@@ -29,53 +29,83 @@ app.include_router(voice.router)
 app.include_router(ocr.router)
 
 import os
-from fastapi.responses import FileResponse, JSONResponse
+from typing import Optional
+from fastapi.responses import FileResponse, JSONResponse, HTMLResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-# Locate public directory
+def find_static_file(filename: str) -> Optional[str]:
+    """
+    Bulletproof static file finder that checks all possible paths across
+    local environments, Docker, and Vercel Serverless Lambda runtime.
+    """
+    candidates = [
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "..", "public", filename),
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "public", filename),
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "..", filename),
+        os.path.join(os.getcwd(), "public", filename),
+        os.path.join(os.getcwd(), filename),
+        os.path.join("/var", "task", "public", filename),
+        os.path.join("/var", "task", filename),
+    ]
+    for path in candidates:
+        if os.path.exists(path) and os.path.isfile(path):
+            return path
+    return None
+
+# Mount static directory if found
 current_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 public_dir = os.path.join(current_dir, "..", "public")
 if not os.path.exists(public_dir):
     public_dir = os.path.join(current_dir, "public")
-
 if os.path.exists(public_dir):
     app.mount("/static", StaticFiles(directory=public_dir), name="static")
 
 @app.get("/style.css")
 async def get_style():
-    f = os.path.join(public_dir, "style.css")
-    if os.path.exists(f):
-        return FileResponse(f, media_type="text/css")
-    return JSONResponse(status_code=404, content={"error": "style.css not found"})
+    p = find_static_file("style.css")
+    if p:
+        with open(p, "r", encoding="utf-8") as f:
+            return Response(content=f.read(), media_type="text/css")
+    return Response(content="/* CSS file not found */", media_type="text/css", status_code=200)
 
 @app.get("/app.js")
 async def get_app_js():
-    f = os.path.join(public_dir, "app.js")
-    if os.path.exists(f):
-        return FileResponse(f, media_type="application/javascript")
-    return JSONResponse(status_code=404, content={"error": "app.js not found"})
+    p = find_static_file("app.js")
+    if p:
+        with open(p, "r", encoding="utf-8") as f:
+            return Response(content=f.read(), media_type="application/javascript")
+    return Response(content="// JS file not found", media_type="application/javascript", status_code=200)
 
 @app.get("/kisaan_sathi_avatar.png")
 async def get_avatar():
-    f = os.path.join(public_dir, "kisaan_sathi_avatar.png")
-    if os.path.exists(f):
-        return FileResponse(f, media_type="image/png")
-    return JSONResponse(status_code=404, content={"error": "avatar not found"})
+    p = find_static_file("kisaan_sathi_avatar.png")
+    if p:
+        return FileResponse(p, media_type="image/png")
+    return Response(status_code=404)
 
-@app.get("/")
+@app.get("/static/{file_path:path}")
+async def serve_static_file(file_path: str):
+    p = find_static_file(file_path)
+    if p:
+        return FileResponse(p)
+    return Response(status_code=404)
+
+@app.get("/", response_class=HTMLResponse)
 async def root():
-    index_file = os.path.join(public_dir, "index.html") if os.path.exists(public_dir) else None
-    if index_file and os.path.exists(index_file):
-        return FileResponse(index_file)
-    return {
-        "app": "Kisaan_Sathi AI Backend",
-        "version": config.API_VERSION,
-        "status": "active",
-        "llm_engine": f"Groq ({config.GROQ_MODEL})",
-        "database": "Supabase PostgreSQL (Active & Keep-Alive Enabled)",
-        "docs": "/docs",
-        "demo_hubs": ["Nashik (MH)", "Indore (MP)", "Ludhiana (PB)", "Guntur (AP)"]
-    }
+    p = find_static_file("index.html")
+    if p:
+        with open(p, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read(), status_code=200)
+    return HTMLResponse(content="""
+        <!DOCTYPE html>
+        <html>
+        <head><title>Kisaan_Sathi AI</title></head>
+        <body style="font-family: sans-serif; text-align: center; padding: 50px;">
+            <h1>🌾 Kisaan_Sathi (किसान साथी) AI Engine Active</h1>
+            <p>API is running smoothly. Visit <a href="/docs">/docs</a> for API documentation.</p>
+        </body>
+        </html>
+    """, status_code=200)
 
 @app.get("/api/status")
 async def api_status():
@@ -104,3 +134,4 @@ async def db_ping():
         "keep_alive": "triggered",
         "supabase_status": res
     }
+
