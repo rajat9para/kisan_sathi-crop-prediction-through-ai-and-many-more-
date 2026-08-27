@@ -159,6 +159,33 @@ body {
   border-radius: 50%;
 }
 
+.gov-badge-emblem {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 9999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.3px;
+}
+
+.gov-trust-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: rgba(34, 197, 94, 0.2);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  border-radius: 9999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #DCFCE7;
+}
+
 .pulse-green {
   background: #4ADE80;
   box-shadow: 0 0 8px #4ADE80;
@@ -1826,42 +1853,54 @@ body {
 .soil-pill.pill-ph { border-color: #8B5CF6; color: #6D28D9; background: #F5F3FF; }
 .soil-pill.pill-oc { border-color: #D97706; color: #92400E; background: #FEF3C7; }
 
-/* Enhanced Touch-Friendly Hub Chips */
+/* Enhanced High-Contrast Touch-Friendly Hub Chips */
 .hub-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  gap: 0.6rem;
+  margin-top: 0.65rem;
 }
 
 .hub-chip {
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  color: #FFFFFF;
-  padding: 0.4rem 0.75rem;
+  background: #FFFFFF;
+  border: 1.5px solid #16A34A;
+  color: #14532D !important;
+  padding: 0.45rem 0.85rem;
   border-radius: 12px;
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: 0.82rem;
+  font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  transition: var(--transition-fast);
+  gap: 0.45rem;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+  transition: all 0.2s ease;
+}
+
+.hub-chip span {
+  color: #14532D;
+  font-weight: 700;
 }
 
 .hub-chip:hover {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: var(--color-gold);
-  transform: translateY(-1px);
+  background: #DCFCE7;
+  border-color: #15803D;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
 }
 
 .hub-chip.active {
-  background: var(--color-gold);
-  color: #78350F;
-  border-color: #FFFFFF;
+  background: linear-gradient(135deg, #D97706, #B45309) !important;
+  color: #FFFFFF !important;
+  border-color: #F59E0B !important;
   font-weight: 800;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+  box-shadow: 0 4px 14px rgba(217, 119, 6, 0.45);
 }
+
+.hub-chip.active span {
+  color: #FFFFFF !important;
+}
+
 
 /* MOBILE APP RESPONSIVE OPTIMIZATIONS */
 @media (max-width: 768px) {
