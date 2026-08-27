@@ -14,7 +14,7 @@
 <body class="theme-indian-agri">
 
   <!-- ============================================================== -->
-  <!-- FIRST LAUNCH & ON-DEMAND ALL-INDIAN-LANGUAGES MODAL -->
+  <!-- VIEWPORT-CENTERED ALL-INDIAN-LANGUAGES MODAL DIALOG -->
   <!-- ============================================================== -->
   <div class="lang-modal-overlay" id="langModalOverlay" style="display: none;">
     <div class="lang-modal-card">
@@ -22,8 +22,8 @@
         <div class="lang-modal-title-group">
           <span class="lang-modal-avatar">🇮🇳</span>
           <div>
-            <h2 class="lang-modal-title">अपनी भाषा चुनें / Choose Language</h2>
-            <p class="lang-modal-sub">किसान साथी भारत की प्रमुख 11 क्षेत्रीय भाषाओं का समर्थन करता है</p>
+            <h2 class="lang-modal-title" data-i18n="modal_title">अपनी भाषा चुनें / Choose Language</h2>
+            <p class="lang-modal-sub" data-i18n="modal_sub">किसान साथी भारत की प्रमुख 11 क्षेत्रीय भाषाओं का समर्थन करता है</p>
           </div>
         </div>
         <button class="lang-modal-close" id="langModalCloseBtn" aria-label="Close">✕</button>
@@ -31,7 +31,7 @@
 
       <div class="lang-modal-body">
         <!-- Primary Languages Section (Hindi & English) -->
-        <div class="lang-section-label">🌟 प्राथमिक भाषाएँ / Primary Languages (Hindi & English)</div>
+        <div class="lang-section-label" data-i18n="primary_langs_label">🌟 प्राथमिक भाषाएँ / Primary Languages (Hindi & English)</div>
         <div class="lang-grid-primary">
           <div class="lang-card active" data-lang-code="hi">
             <div class="lang-card-icon">🇮🇳</div>
@@ -53,7 +53,7 @@
         </div>
 
         <!-- Regional Languages Section -->
-        <div class="lang-section-label">🌾 क्षेत्रीय कृषि भाषाएँ / Regional Indian Languages</div>
+        <div class="lang-section-label" data-i18n="regional_langs_label">🌾 क्षेत्रीय कृषि भाषाएँ / Regional Indian Languages</div>
         <div class="lang-grid-regional">
           <div class="lang-card" data-lang-code="mr">
             <span class="lang-card-icon">🚩</span>
@@ -332,19 +332,19 @@
       </button>
       <button class="tab-btn" data-tab="tab-doctor">
         <span class="tab-icon">🌿</span>
-        <span data-i18n="tab_doctor">फसल डॉक्टर</span>
+        <span data-i18n="tab_doctor">फसल डॉक्टर (रोग निदान)</span>
       </button>
       <button class="tab-btn" data-tab="tab-voice">
         <span class="tab-icon">🎙️</span>
-        <span data-i18n="tab_voice">वॉइस साथी</span>
+        <span data-i18n="tab_voice">वॉइस साथी (कृषि सलाहकार)</span>
       </button>
       <button class="tab-btn" data-tab="tab-mandi">
         <span class="tab-icon">📊</span>
-        <span data-i18n="tab_mandi">मंडी भाव व मौसम</span>
+        <span data-i18n="tab_mandi">मंडी भाव व मौसम रडार</span>
       </button>
-      <button class="tab-btn" data-tab="tab-supabase">
+      <button class="tab-btn" data-tab="tab-helpline">
         <span class="tab-icon">🏛️</span>
-        <span data-i18n="tab_supabase">डिजिटल कृषि सेवा स्थिति</span>
+        <span data-i18n="tab_helpline">किसान सहायता व अधिकारी संपर्क</span>
       </button>
     </nav>
 
@@ -392,7 +392,7 @@
             </div>
             <div class="soil-pills-row">
               <span class="soil-pill pill-n" id="soilPillN">नाइट्रोजन: ८५ (अधिक)</span>
-              <span class="soil-pill pill-p" id="soilPillP">फॉस्फरस: ४८ (मध्यम)</span>
+              <span class="soil-pill pill-p" id="soilPillP">फॉस्फोरस: ४८ (मध्यम)</span>
               <span class="soil-pill pill-k" id="soilPillK">पोटाश: १९० (अधिक)</span>
               <span class="soil-pill pill-ph" id="soilPillPH">सामू pH: ६.८ (संतुलित)</span>
               <span class="soil-pill pill-oc" id="soilPillOC">जैविक कार्बन: ०.७२% (उत्तम)</span>
@@ -571,7 +571,7 @@
                   <span class="shap-impact text-green">+१२%</span>
                 </div>
                 <div class="shap-bar-row">
-                  <span class="shap-feat">फॉस्फरस (P: ४८ किग्रा/हे.)</span>
+                  <span class="shap-feat">फॉस्फोरस (P: ४८ किग्रा/हे.)</span>
                   <div class="shap-bar-track"><div class="shap-fill positive" style="width: 32%"></div></div>
                   <span class="shap-impact text-green">+७%</span>
                 </div>
@@ -611,71 +611,57 @@
     </section>
 
     <!-- ============================================================== -->
-    <!-- TAB 2: PLANT DOCTOR & LEAF PATHOLOGY DIAGNOSTICS -->
+    <!-- TAB 2: LIVE PLANT DOCTOR & LEAF PATHOLOGY SCANNER -->
     <!-- ============================================================== -->
     <section id="tab-doctor" class="tab-pane">
       <div class="two-col-layout">
 
-        <!-- LEAF UPLOAD & SAMPLE PICKER -->
+        <!-- LIVE SCANNER & UPLOAD ZONE (NO PRESET BUTTONS) -->
         <div class="card-panel">
           <div class="panel-header">
             <div class="panel-title-wrap">
               <span class="panel-icon">🔬</span>
               <div>
                 <h3 class="panel-title" data-i18n="panel_doctor_title">पौधा रोग निदान व पत्ती स्कैनर</h3>
-                <p class="panel-sub" data-i18n="panel_doctor_sub">पत्ती का नमूना चुनें या रोग का तुरंत विश्लेषण करें</p>
+                <p class="panel-sub" data-i18n="panel_doctor_sub">खेत से पत्ती की फोटो अपलोड करें व एआई जांच चलाएं</p>
               </div>
             </div>
           </div>
 
-          <!-- SAMPLE LEAF CHIPS -->
-          <div class="leaf-samples-section">
-            <span class="sample-label" data-i18n="leaf_gallery_title">परीक्षण हेतु पत्तियों के नमूने (क्लिक करें):</span>
-            <div class="leaf-samples-grid">
-              <button class="leaf-thumb-btn active" data-sample="tomato_early_blight">
-                <span class="leaf-emoji">🍅</span>
-                <div>
-                  <strong class="leaf-name">टमाटर: अगेती झुलसा</strong>
-                  <span class="leaf-sub">Early Blight</span>
-                </div>
-              </button>
-              <button class="leaf-thumb-btn" data-sample="potato_late_blight">
-                <span class="leaf-emoji">🥔</span>
-                <div>
-                  <strong class="leaf-name">आलू: पछेती झुलसा</strong>
-                  <span class="leaf-sub">Late Blight</span>
-                </div>
-              </button>
-              <button class="leaf-thumb-btn" data-sample="cotton_bacterial_blight">
-                <span class="leaf-emoji">🌿</span>
-                <div>
-                  <strong class="leaf-name">कपास: जीवाणु झुलसा</strong>
-                  <span class="leaf-sub">Bacterial Spot</span>
-                </div>
-              </button>
-              <button class="leaf-thumb-btn" data-sample="corn_healthy">
-                <span class="leaf-emoji">🌽</span>
-                <div>
-                  <strong class="leaf-name">मक्का: स्वस्थ पत्ती</strong>
-                  <span class="leaf-sub">Healthy Leaf</span>
-                </div>
+          <!-- INTERACTIVE LIVE SCANNER CONTAINER -->
+          <div class="leaf-scanner-container">
+            <div class="scanner-dropzone-large" id="leafDropzone">
+              <span class="scanner-icon-hero">📷</span>
+              <strong data-i18n="dropzone_title">खेत से खींची पत्ती की फोटो यहां डालें</strong>
+              <p data-i18n="dropzone_sub">टमाटर, आलू, कपास, गेहूं, धान, मक्का आदि के लिए उपयुक्त</p>
+              
+              <div class="scanner-actions-row">
+                <span class="btn-cam-capture">
+                  <span>📁</span> <span data-i18n="btn_choose_photo">फोटो चुनें</span>
+                </span>
+                <span class="btn-cam-capture" style="background:#0284C7;">
+                  <span>📸</span> <span data-i18n="btn_open_camera">कैमरा खोलें</span>
+                </span>
+              </div>
+              <input type="file" id="leafFileInput" accept="image/*" capture="environment" style="display: none;" />
+            </div>
+
+            <!-- LIVE SCAN VISUALIZER WITH LASER SCANNING BEAM -->
+            <div class="live-scan-preview-box" id="leafScanVisualizer" style="display: none;">
+              <img id="leafPreviewImg" class="live-scan-canvas" src="" alt="Leaf Scan" />
+              <div class="scan-laser-line" id="scanLaserLine"></div>
+              <div class="scan-overlay-badge" id="scanStatusBadge">
+                <span class="status-dot pulse-green"></span>
+                <span>एआई स्कैनिंग प्रक्रिया चालू...</span>
+              </div>
+            </div>
+
+            <div>
+              <button id="btnDiagnose" class="btn-primary" style="width: 100%;">
+                <span class="btn-icon">🔬</span>
+                <span data-i18n="btn_run_diagnosis">रोग निदान व उपचार योजना देखें</span>
               </button>
             </div>
-          </div>
-
-          <!-- UPLOAD DROPZONE -->
-          <div class="upload-dropzone" id="leafDropzone">
-            <span class="drop-icon">📷</span>
-            <strong data-i18n="dropzone_title">खेत से खींची पत्ती की फोटो यहां डालें</strong>
-            <p data-i18n="dropzone_sub">टमाटर, आलू, कपास, गेहूं, धान, मक्का आदि के लिए उपयुक्त</p>
-            <input type="file" id="leafFileInput" accept="image/*" style="display: none;" />
-          </div>
-
-          <div style="margin-top: 1rem;">
-            <button id="btnDiagnose" class="btn-primary" style="width: 100%;">
-              <span class="btn-icon">🔬</span>
-              <span data-i18n="btn_run_diagnosis">रोग निदान व उपचार योजना देखें</span>
-            </button>
           </div>
         </div>
 
@@ -723,6 +709,14 @@
                 </p>
               </div>
             </div>
+
+            <!-- SEND TO AGRICULTURE OFFICER BUTTON -->
+            <div style="margin-top: 1.25rem;">
+              <button id="btnSendLeafReportToOfficer" class="btn-secondary" style="width: 100%;">
+                <span>👨‍🔬</span>
+                <span data-i18n="btn_send_officer">यह रिपोर्ट स्थानीय कृषि अधिकारी (KVK) को भेजें</span>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -730,7 +724,7 @@
     </section>
 
     <!-- ============================================================== -->
-    <!-- TAB 3: VOICE SAATHI (AI VOICE ADVISOR) -->
+    <!-- TAB 3: VOICE SAATHI (AI MULTILINGUAL ADVISOR) -->
     <!-- ============================================================== -->
     <section id="tab-voice" class="tab-pane">
       <div class="voice-panel-wrap">
@@ -743,14 +737,18 @@
         <div class="voice-box-container">
           <div class="voice-chips-row">
             <span class="chips-label" data-i18n="voice_chips_label">अक्सर पूछे जाने वाले सवाल:</span>
-            <button class="voice-chip" data-q="मेरे खेत के लिए सिंचाई का सही समय क्या है?">💧 <span data-i18n="chip_water">सिंचाई की मात्रा</span></button>
-            <button class="voice-chip" data-q="फसल में खाद और यूरिया की कितनी मात्रा देनी चाहिए?">🧪 <span data-i18n="chip_fertilizer">खाद की मात्रा (NPK)</span></button>
+            <button class="voice-chip" data-q="मेरे खेत के लिए सिंचाई का सही समय और पानी की मात्रा क्या है?">💧 <span data-i18n="chip_water">सिंचाई की मात्रा</span></button>
+            <button class="voice-chip" data-q="फसल में यूरिया और डीएपी खाद की कितनी मात्रा देनी चाहिए?">🧪 <span data-i18n="chip_fertilizer">खाद की मात्रा (NPK)</span></button>
             <button class="voice-chip" data-q="आज नासिक और इंदौर मंडी में क्या भाव चल रहा है?">📊 <span data-i18n="chip_mandi">मंडी भाव क्या है?</span></button>
-            <button class="voice-chip" data-q="कीट और फफूंद से फसल को कैसे बचाएं?">🐛 <span data-i18n="chip_pest">कीट रोकथाम</span></button>
+            <button class="voice-chip" data-q="पत्तियों पर लगे पीले धब्बों और फफूंद से फसल को कैसे बचाएं?">🐛 <span data-i18n="chip_pest">कीट व रोग रोकथाम</span></button>
+            <button class="voice-chip" data-q="प्रधानमंत्री किसान सम्मान निधि और फसल बीमा का लाभ कैसे लें?">🏛️ <span data-i18n="chip_schemes">सरकारी योजनाएं</span></button>
           </div>
 
           <div class="voice-input-group">
-            <input type="text" id="voiceInputText" class="form-input voice-text-input" placeholder="यहाँ प्रश्न लिखें या माइक से बोलें..." value="मेरे खेत के लिए सिंचाई का सही समय क्या है?" />
+            <input type="text" id="voiceInputText" class="form-input voice-text-input" placeholder="यहाँ कोई भी कृषि प्रश्न लिखें या माइक दबाएं..." value="मेरे खेत के लिए सिंचाई का सही समय क्या है?" />
+            <button id="btnVoiceMicListen" class="btn-secondary" style="padding:0.75rem 1rem;" title="Speak with Mic / बोलकर पूछें">
+              <span id="micIconStatus">🎤</span>
+            </button>
             <button id="btnAskVoice" class="btn-primary">
               <span>🎙️</span>
               <span data-i18n="btn_ask_ai">पूछें</span>
@@ -773,7 +771,8 @@
           <div class="voice-followups-wrap" id="voiceFollowups">
             <span class="followup-lbl" data-i18n="lbl_followups">आगे पूछें:</span>
             <button class="voice-chip followup" onclick="sendVoiceQuery('यूरिया की पहली खुराक कब देनी चाहिए?')">💬 यूरिया की पहली खुराक कब दें?</button>
-            <button class="voice-chip followup" onclick="sendVoiceQuery('कीटनाशक छिड़काव का सबसे अच्छा समय?')">💬 कीटनाशक छिड़काव का सही समय?</button>
+            <button class="voice-chip followup" onclick="sendVoiceQuery('कीटनाशक छिड़काव का सबसे अच्छा समय क्या है?')">💬 कीटनाशक छिड़काव का सही समय?</button>
+            <button class="voice-chip followup" onclick="sendVoiceQuery('जैविक कीटनाशक नीमास्त्र कैसे बनाएं?')">💬 जैविक नीमास्त्र कैसे बनाएं?</button>
           </div>
         </div>
       </div>
@@ -895,86 +894,114 @@
     </section>
 
     <!-- ============================================================== -->
-    <!-- TAB 5: NATIONAL AGRI-CLOUD SERVICES & HEALTH -->
+    <!-- TAB 5: KRISHI HELPLINE & AGRICULTURE OFFICER (KVK) NETWORK -->
     <!-- ============================================================== -->
-    <section id="tab-supabase" class="tab-pane">
-      <div class="two-col-layout">
-        <div class="card-panel">
-          <div class="panel-header">
-            <div class="panel-title-wrap">
-              <span class="panel-icon">🏛️</span>
-              <div>
-                <h3 class="panel-title" data-i18n="panel_sb_title">डिजिटल कृषि सेवा व डेटा स्थिति</h3>
-                <p class="panel-sub" data-i18n="panel_sb_sub">भारतीय कृषि अनुसंधान व मंडी डेटा नेटवर्क से लाइव कनेक्टेड</p>
-              </div>
-            </div>
-            <span class="status-badge" style="background: rgba(46, 125, 50, 0.2); color: #2E7D32;">● सक्रिय</span>
-          </div>
+    <section id="tab-helpline" class="tab-pane">
+      <div class="helpline-grid">
 
-          <div class="supabase-info-grid">
-            <div class="info-box">
-              <span class="info-lbl" data-i18n="lbl_svc_soil">मृदा स्वास्थ्य डेटाबेस</span>
-              <strong class="info-val">सक्रिय व सुरक्षित (Active)</strong>
-            </div>
-            <div class="info-box">
-              <span class="info-lbl" data-i18n="lbl_svc_mandi">दैनिक मंडी भाव सिंक</span>
-              <strong class="info-val">एगमार्कनेट से अद्यतित</strong>
-            </div>
-            <div class="info-box">
-              <span class="info-lbl" data-i18n="lbl_svc_weather">मौसम उपग्रह नेटवर्क</span>
-              <strong class="info-val">लाइव कनेक्टेड (२४x७)</strong>
-            </div>
-            <div class="info-box">
-              <span class="info-lbl" data-i18n="lbl_svc_accuracy">प्रणाली विश्वसनीयता</span>
-              <strong class="info-val text-green">९९.०९% सटीकता</strong>
+        <!-- KISAN CALL CENTER 24x7 -->
+        <div class="helpline-card">
+          <div class="helpline-header">
+            <span class="helpline-icon">📞</span>
+            <div>
+              <h3 class="helpline-title" data-i18n="kcc_title">राष्ट्रीय किसान कॉल सेंटर (KCC)</h3>
+              <p class="helpline-sub" data-i18n="kcc_sub">भारत सरकार की २४x७ निःशुल्क कृषि हेल्पलाइन</p>
             </div>
           </div>
+          <div class="helpline-number-box">
+            <div>
+              <span style="font-size:0.75rem; color:#475569;" data-i18n="toll_free_lbl">टोल फ्री नंबर:</span>
+              <div class="helpline-number">1800-180-1551</div>
+            </div>
+            <a href="tel:18001801551" class="btn-call-direct">
+              <span>📞</span> <span data-i18n="btn_call_now">अभी कॉल करें</span>
+            </a>
+          </div>
+        </div>
 
-          <div style="margin-top: 1.5rem;">
-            <button id="btnManualPing" class="btn-secondary">
-              <span data-i18n="btn_verify_sync">🔄 लाइव डेटा कनेक्शन सत्यापित करें</span>
+        <!-- SEND ADVISORY REPORT TO AGRICULTURE OFFICER -->
+        <div class="helpline-card" style="background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); border-color: #F59E0B;">
+          <div class="helpline-header">
+            <span class="helpline-icon">📄</span>
+            <div>
+              <h3 class="helpline-title" style="color: #78350F;" data-i18n="send_report_title">कृषि अधिकारी को रिपोर्ट भेजें</h3>
+              <p class="helpline-sub" style="color: #92400E;" data-i18n="send_report_sub">खेत की मृदा व रोग निदान की आधिकारिक पीडीएफ तैयार करें</p>
+            </div>
+          </div>
+          <div class="helpline-number-box" style="border-color: #D97706;">
+            <div>
+              <span style="font-size:0.75rem; color:#78350F;">व्हाट्सएप / प्रिंट हेतु तैयार</span>
+              <strong style="display:block; font-size:0.95rem; color:#B45309;" id="officerReportStatus">आधिकारिक परामर्श पत्र</strong>
+            </div>
+            <button id="btnGenerateOfficialReport" class="btn-call-direct" style="background: #D97706;">
+              <span>🖨️</span> <span data-i18n="btn_export_pdf">रिपोर्ट डाउनलोड / शेयर</span>
             </button>
           </div>
         </div>
 
-        <!-- RECENT DB SCANS -->
-        <div class="card-panel">
-          <div class="panel-header">
-            <div class="panel-title-wrap">
-              <span class="panel-icon">📋</span>
-              <div>
-                <h3 class="panel-title" data-i18n="panel_activity_title">हाल ही में दर्ज की गई गतिविधियाँ</h3>
-                <p class="panel-sub" data-i18n="panel_activity_sub">सुरक्षित सर्वर में दर्ज फसल व रोग जांच रिकॉर्ड</p>
-              </div>
-            </div>
-          </div>
+      </div>
 
-          <div class="activity-feed" id="activityFeed">
-            <div class="feed-item">
-              <span class="feed-dot green"></span>
-              <div class="feed-info">
-                <strong>फसल सलाह: नासिक (महाराष्ट्र)</strong>
-                <span>सर्वोत्तम फसल: अंगूर (९५% अनुकूलता) • N:८५, P:४८, K:१९०</span>
-              </div>
-              <span class="feed-time">अभी</span>
-            </div>
-            <div class="feed-item">
-              <span class="feed-dot amber"></span>
-              <div class="feed-info">
-                <strong>रोग निदान: टमाटर अगेती झुलसा</strong>
-                <span>कारक: Alternaria solani • विश्वसनीयता: ९६.४%</span>
-              </div>
-              <span class="feed-time">५ मिनट पहले</span>
-            </div>
-            <div class="feed-item">
-              <span class="feed-dot cyan"></span>
-              <div class="feed-info">
-                <strong>दैनिक मौसम व मंडी दर अपडेट</strong>
-                <span>नासिक, इंदौर, लुधियाना, गुंटूर मंडी दरें अद्यतित</span>
-              </div>
-              <span class="feed-time">१० मिनट पहले</span>
+      <!-- LOCAL DISTRICT KVK & AGRICULTURE EXTENSION DIRECTORY -->
+      <div class="officer-directory-card">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <span class="panel-icon">👨‍🔬</span>
+            <div>
+              <h3 class="panel-title" data-i18n="kvk_title">निकटतम कृषि विज्ञान केंद्र (KVK) व कृषि अधिकारी विवरण</h3>
+              <p class="panel-sub" data-i18n="kvk_sub">आपके चयनित जिले के अधिकृत कृषि वैज्ञानिक व विस्तार केंद्र</p>
             </div>
           </div>
+        </div>
+
+        <div class="officer-kvk-box" id="kvkOfficerInfo">
+          <div class="kvk-info-pill">
+            <span data-i18n="kvk_center_lbl">कृषि विज्ञान केंद्र (KVK):</span>
+            <strong id="kvkCenterName">कृषि विज्ञान केंद्र, यशवंतराव चव्हाण मुक्त विद्यापीठ, नासिक</strong>
+          </div>
+          <div class="kvk-info-pill">
+            <span data-i18n="kvk_officer_lbl">कृषि वैज्ञानिक / नोडल अधिकारी:</span>
+            <strong id="kvkOfficerName">डॉ. राजेंद्र पाटिल (वरिष्ठ वैज्ञानिक, मृदा व शस्य)</strong>
+          </div>
+          <div class="kvk-info-pill">
+            <span data-i18n="kvk_contact_lbl">कार्यालय संपर्क:</span>
+            <strong id="kvkContactPhone">0253-2231714 / kvknashik@icar.gov.in</strong>
+          </div>
+        </div>
+      </div>
+
+      <!-- GOVERNMENT SCHEMES DIRECTORY -->
+      <div class="officer-directory-card">
+        <div class="panel-header">
+          <div class="panel-title-wrap">
+            <span class="panel-icon">🏛️</span>
+            <div>
+              <h3 class="panel-title" data-i18n="schemes_title">प्रमुख सरकारी कृषि योजनाएं व प्रत्यक्ष लाभ</h3>
+              <p class="panel-sub" data-i18n="schemes_sub">केंद्र व राज्य सरकार द्वारा संचालित किसान कल्याण पोर्टल</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="scheme-link-grid">
+          <a href="https://pmkisan.gov.in/" target="_blank" rel="noopener" class="scheme-card">
+            <span class="scheme-icon">🌾</span>
+            <strong>PM-KISAN सम्मान निधि</strong>
+            <span>प्रतिवर्ष ₹6,000 की प्रत्यक्ष आर्थिक सहायता</span>
+          </a>
+          <a href="https://pmfby.gov.in/" target="_blank" rel="noopener" class="scheme-card">
+            <span class="scheme-icon">🛡️</span>
+            <strong>PMFBY फसल बीमा</strong>
+            <span>सूखा, बाढ़ व कीट प्रकोप से शत-प्रतिशत सुरक्षा</span>
+          </a>
+          <a href="https://soilhealth.dac.gov.in/" target="_blank" rel="noopener" class="scheme-card">
+            <span class="scheme-icon">🧪</span>
+            <strong>मृदा स्वास्थ्य कार्ड (SHC)</strong>
+            <span>मुफ्त मिट्टी जांच व पोषक तत्व प्रबंधन</span>
+          </a>
+          <a href="https://pmksy.gov.in/" target="_blank" rel="noopener" class="scheme-card">
+            <span class="scheme-icon">💧</span>
+            <strong>पीएम कृषि सिंचाई योजना</strong>
+            <span>ड्रिप व स्प्रिंकलर सिंचाई पर ५५-७०% सब्सिडी</span>
+          </a>
         </div>
       </div>
     </section>
@@ -989,7 +1016,7 @@
         <span data-i18n="footer_sub">राष्ट्रीय डिजिटल कृषि एवं मृदा स्वास्थ्य सलाहकार पोर्टल • भारत सरकार द्वारा जनहित में जारी</span>
       </div>
       <div class="footer-tags">
-        <span class="tech-tag" data-i18n="tag_icar">🛡️ ICAR अनुमोदित</span>
+        <span class="tech-tag" data-i18n="tag_icar">🛡️ ICAR प्रमाणित</span>
         <span class="tech-tag" data-i18n="tag_shc">🌾 मृदा स्वास्थ्य कार्ड मानक</span>
         <span class="tech-tag" data-i18n="tag_mandi">📊 एगमार्कनेट मंडी भाव</span>
         <span class="tech-tag" data-i18n="tag_weather">🛰️ राष्ट्रीय मौसम वेधशाला</span>
