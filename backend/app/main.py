@@ -2,7 +2,7 @@ import asyncio
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import config
-from app.routers import advisory, soil, weather, market, voice, ocr
+from app.routers import advisory, soil, weather, market, voice, ocr, doctor
 from app.services.supabase_client import supabase_service
 
 app = FastAPI(
@@ -22,6 +22,7 @@ app.add_middleware(
 
 # Register Routers
 app.include_router(advisory.router)
+app.include_router(doctor.router)
 app.include_router(soil.router)
 app.include_router(weather.router)
 app.include_router(market.router)
