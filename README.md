@@ -6,7 +6,7 @@
 ### National Digital Agriculture, Soil Health & Plant Pathology AI Platform
 **Smart India Hackathon 2026 • 18 Agro-Ecological Hubs • 11 Indian Languages • XGBoost (98.2% Accuracy) + SHAP TreeExplainer • Computer Vision Leaf Pathology • Groq Multilingual LLM • ICAR-KVK Network**
 
-[![Web App](https://img.shields.io/badge/Web%20App-Live%20Ready-2E7D32.svg?logo=googlechrome)](https://kisaansathi-iota.vercel.app/)
+[![Web App](https://img.shields.io/badge/Web%20App-Live%20Ready-2E7D32.svg?logo=googlechrome)](https://kisaansathicroppredictionaiandmanym.vercel.app/)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20v0.110-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com)
 [![Flutter](https://img.shields.io/badge/Mobile-Flutter%203.41%20%7C%20Dart%203.11-02569B.svg?logo=flutter)](https://flutter.dev)
 [![XGBoost](https://img.shields.io/badge/ML%20Engine-XGBoost%2098.2%25-FF6F00.svg)](https://xgboost.readthedocs.io)
@@ -236,4 +236,4 @@ TEST 3: GROQ LLM MULTILINGUAL VOICE SAATHI ADVISOR
 - **Project**: Kisaan_Sathi (किसान साथी)
 - **Target Competition**: Smart India Hackathon (SIH) 2026
 - **Repository**: [rajat9para/kisan_sathi-crop-prediction-through-ai-and-many-more-](https://github.com/rajat9para/kisan_sathi-crop-prediction-through-ai-and-many-more-)
-- **Live Deployment**: [kisaansathi-iota.vercel.app](https://kisaansathi-iota.vercel.app/)
+- **Live Deployment**: [kisaansathicroppredictionaiandmanym.vercel.app](https://kisaansathicroppredictionaiandmanym.vercel.app/)
