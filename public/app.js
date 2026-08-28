@@ -873,7 +873,7 @@ const DEMO_HUBS = {
 
 // CURRENT APP STATE
 let currentLang = "hi";
-let currentHub = "nashik";
+let currentHub = "dehradun";
 let currentTipIdx = 0;
 let tipCarouselTimer = null;
 let currentDiagnosisReport = null;
@@ -1299,6 +1299,36 @@ function setupHubSelector() {
       runDynamicCropPrediction();
     });
   });
+
+  const searchInput = document.getElementById("hubSearchInput");
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      let firstMatch = null;
+      chips.forEach(chip => {
+        const hubKey = chip.getAttribute("data-hub");
+        const hub = DEMO_HUBS[hubKey];
+        const match = !q || hubKey.includes(q) || 
+          (hub && (hub.name_en.toLowerCase().includes(q) || hub.name_hi.includes(q) ||
+                   hub.district_en.toLowerCase().includes(q) || hub.district_hi.includes(q) ||
+                   hub.state_en.toLowerCase().includes(q) || hub.state_hi.includes(q) ||
+                   (q.includes("haridwar") && hubKey === "dehradun") ||
+                   (q.includes("roorkee") && hubKey === "dehradun") ||
+                   (q.includes("rishikesh") && hubKey === "dehradun") ||
+                   (q.includes("uk") && (hubKey === "dehradun" || hubKey === "pantnagar"))
+          ));
+        chip.style.display = match ? "inline-flex" : "none";
+        if (match && !firstMatch) firstMatch = hubKey;
+      });
+      if (q.length >= 3 && firstMatch) {
+        chips.forEach(c => c.classList.remove("active"));
+        const matchedChip = document.querySelector(`.hub-chip[data-hub="${firstMatch}"]`);
+        if (matchedChip) matchedChip.classList.add("active");
+        selectHub(firstMatch);
+        runDynamicCropPrediction();
+      }
+    });
+  }
 }
 
 function setupLocationAutoDetect() {
@@ -1342,11 +1372,18 @@ function matchNearestHubAndSelect(userLat, userLon, showFeedback) {
   let closestHub = "dehradun";
   let minDistance = Infinity;
 
-  for (const [key, hub] of Object.entries(DEMO_HUBS)) {
-    const d = calculateDistance(userLat, userLon, hub.lat, hub.lon);
-    if (d < minDistance) {
-      minDistance = d;
-      closestHub = key;
+  // Exact territorial bounding for Dehradun / Haridwar / Roorkee Plains (Uttarakhand & Upper Doab)
+  if ((userLat >= 29.2 && userLat <= 31.0 && userLon >= 77.2 && userLon <= 78.9) ||
+      (userLat >= 29.8 && userLat <= 30.6 && userLon >= 77.7 && userLon <= 78.4)) {
+    closestHub = "dehradun";
+    minDistance = 0;
+  } else {
+    for (const [key, hub] of Object.entries(DEMO_HUBS)) {
+      const d = calculateDistance(userLat, userLon, hub.lat, hub.lon);
+      if (d < minDistance) {
+        minDistance = d;
+        closestHub = key;
+      }
     }
   }
 
@@ -1748,6 +1785,8 @@ function renderCurrentTip() {
   });
 }
 
+let currentLeafFileName = "";
+
 function setupLivePlantDoctor() {
   const dropzone = document.getElementById("leafDropzone");
   const fileInput = document.getElementById("leafFileInput");
@@ -1755,6 +1794,7 @@ function setupLivePlantDoctor() {
   const previewBox = document.getElementById("leafScanVisualizer");
   const previewImg = document.getElementById("leafPreviewImg");
   const btnSendReport = document.getElementById("btnSendLeafReportToOfficer");
+  const cropSelect = document.getElementById("leafCropSelector");
 
   if (dropzone && fileInput) {
     dropzone.addEventListener("click", () => fileInput.click());
@@ -1783,6 +1823,7 @@ function setupLivePlantDoctor() {
   }
 
   function processLeafFile(file) {
+    currentLeafFileName = file.name || "";
     const reader = new FileReader();
     reader.onload = (re) => {
       currentLeafBase64 = re.target.result;
@@ -1799,9 +1840,17 @@ function setupLivePlantDoctor() {
     });
   }
 
+  if (cropSelect) {
+    cropSelect.addEventListener("change", () => {
+      if (currentLeafBase64) {
+        runRealLeafScanInference();
+      }
+    });
+  }
+
   if (btnSendReport) {
     btnSendReport.addEventListener("click", () => {
-      const hub = DEMO_HUBS[currentHub] || DEMO_HUBS.nashik;
+      const hub = DEMO_HUBS[currentHub] || DEMO_HUBS.dehradun;
       const isEn = (currentLang === "en");
       const crop = document.getElementById("diagCrop")?.textContent || "Crop";
       const disease = document.getElementById("diagDiseaseName")?.textContent || "Leaf Diagnosis";
@@ -1834,6 +1883,15 @@ async function runRealLeafScanInference() {
     statusBadge.innerHTML = `<span class="status-dot pulse-green"></span> <span>${isEn ? 'AI Pathology Analysis in Progress...' : 'पत्ती के ऊतकों का विश्लेषण जारी...'}</span>`;
   }
 
+  // Determine crop hint from user selector, filename, or context
+  const cropSelectEl = document.getElementById("leafCropSelector");
+  let cropHint = "";
+  if (cropSelectEl && cropSelectEl.value && cropSelectEl.value !== "auto") {
+    cropHint = cropSelectEl.value;
+  } else if (currentLeafFileName) {
+    cropHint = currentLeafFileName;
+  }
+
   // Query Backend Diagnostic API
   let diagnosisData = null;
   try {
@@ -1842,7 +1900,7 @@ async function runRealLeafScanInference() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         image_base64: currentLeafBase64,
-        crop_hint: DEMO_HUBS[currentHub]?.district_en || "tomato",
+        crop_hint: cropHint,
         language: currentLang
       })
     });
@@ -1865,7 +1923,7 @@ async function runRealLeafScanInference() {
     if (resultBox) resultBox.style.display = "flex";
 
     renderDiagnosisResults(diagnosisData);
-  }, 1000);
+  }, 800);
 }
 
 function renderDiagnosisResults(data) {

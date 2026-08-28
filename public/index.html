@@ -267,9 +267,12 @@
                 </button>
                 <span id="locationDetectStatus" class="location-status-badge" style="display:none;"></span>
               </div>
+              <div class="hub-search-box-wrap" style="margin: 0.6rem 0;">
+                <input type="text" id="hubSearchInput" class="form-control hub-search-input" placeholder="🔍 खोजें: देहरादून, हरिद्वार, रुड़की, लुधियाना, जयपुर, नासिक... / Search any district" style="font-size:0.88rem; padding: 0.55rem 1rem; border-radius: 8px; border: 1.5px solid #CBD5E1; width: 100%;" />
+              </div>
               <span class="hub-label" data-i18n="quick_hubs_label">प्रमुख कृषि क्षेत्र व मृदा प्रकार चुनें:</span>
-              <div class="hub-chips">
-                <button class="hub-chip" data-hub="dehradun" title="Doon Valley Alluvial & Terai Loam (Dehradun / Haridwar / Roorkee)">
+              <div class="hub-chips" id="hubChipsContainer">
+                <button class="hub-chip active" data-hub="dehradun" title="Doon Valley Alluvial & Terai Loam (Dehradun / Haridwar / Roorkee)">
                   <span class="hub-icon">🏔️</span>
                   <span id="chipLabel_dehradun">देहरादून / हरिद्वार (उत्तराखंड)</span>
                 </button>
@@ -281,7 +284,7 @@
                   <span class="hub-icon">🍎</span>
                   <span id="chipLabel_shimla">शिमला (हिमाचल प्रदेश)</span>
                 </button>
-                <button class="hub-chip active" data-hub="nashik" title="Black Cotton (Regur) Loam">
+                <button class="hub-chip" data-hub="nashik" title="Black Cotton (Regur) Loam">
                   <span class="hub-icon">🍇</span>
                   <span id="chipLabel_nashik">नासिक (महाराष्ट्र)</span>
                 </button>
@@ -628,6 +631,28 @@
 
           <!-- INTERACTIVE LIVE SCANNER CONTAINER -->
           <div class="leaf-scanner-container">
+            <div class="crop-select-row" style="margin-bottom: 0.8rem;">
+              <label for="leafCropSelector" style="font-weight:700; font-size:0.88rem; color:#14532D; display:block; margin-bottom:0.3rem;">
+                🌾 <span data-i18n="lbl_crop_select_scanner">फसल चुनें (या AI ऑटो-डिटेक्ट रहने दें):</span>
+              </label>
+              <select id="leafCropSelector" class="form-control" style="font-weight: 600; padding:0.55rem 0.8rem; border-radius:8px; border:1.5px solid #86EFAC;">
+                <option value="auto">🔍 AI Auto-Detect from Leaf Image / फोटो से स्वतः पहचान</option>
+                <option value="wheat">🌾 Wheat (गेहूं) - पीला/भूरा रतुआ (Rust), झुलसा (Blight), चूर्णी फफूंद</option>
+                <option value="rice">🌾 Paddy / Rice (धान) - झोंका (Blast), जीवाणु झुलसा (BLB), शीथ ब्लाइट</option>
+                <option value="tomato">🍅 Tomato (टमाटर) - अगेती/पछेती झुलसा (Early/Late Blight), पत्ती मरोड़</option>
+                <option value="potato">🥔 Potato (आलू) - पछेती झुलसा (Late Blight), अगेती झुलसा</option>
+                <option value="cotton">🌿 Cotton (कपास) - जीवाणु झुलसा (Bacterial Blight), दहिया रोग</option>
+                <option value="maize">🌽 Maize / Corn (मक्का) - टर्सिकम झुलसा (Turcicum Blight)</option>
+                <option value="chilli">🌶️ Chilli (मिर्च) - पत्ती मरोड़ (Leaf Curl), फल सड़न व डाई-बैक</option>
+                <option value="mustard">🌻 Mustard (सरसों) - सफेद रतुआ (White Rust), झुलसा</option>
+                <option value="sugarcane">🎋 Sugarcane (गन्ना) - लाल सड़न (Red Rot / कैंसर)</option>
+                <option value="soybean">🌱 Soybean (सोयाबीन) - पीला मोजेक विषाणु (YMV)</option>
+                <option value="apple">🍎 Apple (सेब) - स्केब रोग (Apple Scab)</option>
+                <option value="grapes">🍇 Grapes (अंगूर) - काला सड़न (Black Rot) व डाउनी मिल्ड्यू</option>
+                <option value="chickpea">🌾 Chickpea (चना) - एस्कोकाइटा झुलसा (Ascochyta Blight)</option>
+              </select>
+            </div>
+
             <div class="scanner-dropzone-large" id="leafDropzone">
               <span class="scanner-icon-hero">📷</span>
               <strong data-i18n="dropzone_title">खेत से खींची पत्ती की फोटो यहां डालें</strong>
