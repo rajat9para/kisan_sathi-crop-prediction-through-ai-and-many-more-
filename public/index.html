@@ -183,9 +183,10 @@
           <span>🇮🇳</span>
           <span data-i18n="gov_banner">भारत सरकार • कृषि एवं किसान कल्याण मंत्रालय</span>
         </div>
-        <div class="gov-trust-pill">
-          <span class="status-dot pulse-green"></span>
-          <span data-i18n="gov_verified">ICAR एवं Agmarknet सत्यापित</span>
+        <!-- CLEAN SATELLITE NETWORK STATUS PILL (GREEN DOT + SMALL FONT) -->
+        <div class="gov-trust-pill" id="networkStatusPill" title="Satellite Cloud Connection Status">
+          <span class="status-dot pulse-green" id="networkDot"></span>
+          <span id="networkStatusText" style="font-size:0.72rem; font-weight:800; letter-spacing:0.5px;">ONLINE</span>
         </div>
         <!-- ALL LANGUAGES PICKER BUTTON -->
         <button id="langToggleBtn" class="lang-switch-btn" aria-label="Choose Language / भाषा चुनें" title="Click to choose from all 11 Indian languages">
@@ -203,13 +204,13 @@
         <span data-i18n="live_mandi_label">दैनिक मंडी भाव</span>
       </div>
       <div class="ticker-scroll" id="mandiTicker">
-        <div class="ticker-item"><span class="commodity">🍇 अंगूर (नासिक)</span>: <span class="price">₹६,२००/क्विंटल</span> <span class="trend up">▲ +५.४%</span></div>
-        <div class="ticker-item"><span class="commodity">🍎 अनार (नासिक)</span>: <span class="price">₹८,४००/क्विंटल</span> <span class="trend up">▲ +३.८%</span></div>
-        <div class="ticker-item"><span class="commodity">🌿 कपास (मालेगांव)</span>: <span class="price">₹७,४५०/क्विंटल</span> <span class="trend stable">▶ ₹७,४५०</span></div>
-        <div class="ticker-item"><span class="commodity">🌾 चना (इंदौर)</span>: <span class="price">₹६,१५०/क्विंटल</span> <span class="trend up">▲ +२.१%</span></div>
-        <div class="ticker-item"><span class="commodity">🌱 सोयाबीन (इंदौर)</span>: <span class="price">₹४,६८०/क्विंटल</span> <span class="trend up">▲ +१.५%</span></div>
-        <div class="ticker-item"><span class="commodity">🌽 मक्का (लुधियाना)</span>: <span class="price">₹२,२८०/क्विंटल</span> <span class="trend up">▲ +४.२%</span></div>
-        <div class="ticker-item"><span class="commodity">🌶️ लाल मिर्च (गुंटूर)</span>: <span class="price">₹१८,५००/क्विंटल</span> <span class="trend up">▲ +६.१%</span></div>
+        <div class="ticker-item"><span class="commodity" id="tickerCommodity1">🍇 अंगूर (नासिक)</span>: <span class="price">₹६,२००/क्विंटल</span> <span class="trend up">▲ +५.४%</span></div>
+        <div class="ticker-item"><span class="commodity" id="tickerCommodity2">🍎 अनार (नासिक)</span>: <span class="price">₹८,४००/क्विंटल</span> <span class="trend up">▲ +३.८%</span></div>
+        <div class="ticker-item"><span class="commodity" id="tickerCommodity3">🌿 कपास (मालेगांव)</span>: <span class="price">₹७,४५०/क्विंटल</span> <span class="trend stable">▶ ₹७,४५०</span></div>
+        <div class="ticker-item"><span class="commodity" id="tickerCommodity4">🌾 चना (इंदौर)</span>: <span class="price">₹६,१५०/क्विंटल</span> <span class="trend up">▲ +२.१%</span></div>
+        <div class="ticker-item"><span class="commodity" id="tickerCommodity5">🌱 सोयाबीन (इंदौर)</span>: <span class="price">₹४,६८०/क्विंटल</span> <span class="trend up">▲ +१.५%</span></div>
+        <div class="ticker-item"><span class="commodity" id="tickerCommodity6">🌽 मक्का (लुधियाना)</span>: <span class="price">₹२,२८०/क्विंटल</span> <span class="trend up">▲ +४.२%</span></div>
+        <div class="ticker-item"><span class="commodity" id="tickerCommodity7">🌶️ लाल मिर्च (गुंटूर)</span>: <span class="price">₹१८,५००/क्विंटल</span> <span class="trend up">▲ +६.१%</span></div>
       </div>
     </div>
   </header>
@@ -368,18 +369,7 @@
             <!-- PRESET CARD LOADER -->
             <div class="preset-dropdown">
               <select id="soilCardPresetSelect" class="form-select-sm">
-                <option value="none">-- 🇮🇳 मृदा स्वास्थ्य कार्ड (SHC) चुनें --</option>
-                <option value="sample_1_nashik" selected>महाराष्ट्र: नासिक महा-मृदा प्रयोगशाला (#MH-4012)</option>
-                <option value="sample_2_indore">मध्य प्रदेश: कृषि विज्ञान केंद्र (#MP-8830)</option>
-                <option value="sample_3_ludhiana">पंजाब: पीएयू लुधियाना परीक्षण केंद्र (#PB-1049)</option>
-                <option value="sample_4_guntur">आंध्र प्रदेश: रायथू भरोसा केंद्र (#AP-3190)</option>
-                <option value="sample_5_rajkot">गुजरात: कृषि महोत्सव प्रयोगशाला (#GJ-5521)</option>
-                <option value="sample_6_thanjavur">तमिलनाडु: कावेरी डेल्टा परीक्षण लैब (#TN-7204)</option>
-                <option value="sample_7_bardhaman">पश्चिम बंगाल: माटी तीर्थ केंद्र (#WB-6112)</option>
-                <option value="sample_8_jaipur">राजस्थान: शुष्क क्षेत्र मृदा सर्वेक्षण (#RJ-2041)</option>
-                <option value="sample_9_dharwad">कर्नाटक: रैथा मित्र क्लिनिक (#KA-4418)</option>
-                <option value="sample_10_varanasi">उत्तर प्रदेश: कृषि भवन सॉइल हब (#UP-9023)</option>
-                <option value="sample_11_palakkad">केरल: कार्षिक कर्म सेना लैब (#KL-1845)</option>
+                <!-- Dynamically translated in JavaScript -->
               </select>
             </div>
           </div>
@@ -432,15 +422,12 @@
                   <label data-i18n="lbl_ph">मिट्टी का सामू (pH)</label>
                   <span class="range-val" id="phDisplay">6.8 (संतुलित / उत्तम)</span>
                 </div>
-                <input type="range" id="inputPH" class="form-range" min="4.0" max="9.5" step="0.1" value="6.8" />
+                <input type="range" id="inputPH" class="form-range" min="3.5" max="9.5" step="0.1" value="6.8" />
               </div>
               <div class="form-group">
                 <label data-i18n="lbl_irrigation">सिंचाई सुविधा</label>
                 <select id="inputIrrigation" class="form-select">
-                  <option value="Borewell" selected>ट्यूबवेल / नलकूप</option>
-                  <option value="Canal">नहर / वितरिका</option>
-                  <option value="Drip">ड्रिप / टपक सिंचाई</option>
-                  <option value="Rainfed">केवल वर्षा आधारित</option>
+                  <!-- Dynamically populated in JavaScript -->
                 </select>
               </div>
             </div>
@@ -453,12 +440,7 @@
               <div class="form-group">
                 <label data-i18n="lbl_prevcrop">पिछली फसल</label>
                 <select id="inputPrevCrop" class="form-select">
-                  <option value="Cotton" selected>कपास</option>
-                  <option value="Soybean">सोयाबीन</option>
-                  <option value="Wheat">गेहूं</option>
-                  <option value="Rice">धान</option>
-                  <option value="Maize">मक्का</option>
-                  <option value="Fallow">परती भूमि</option>
+                  <!-- Dynamically populated in JavaScript -->
                 </select>
               </div>
             </div>
@@ -503,23 +485,23 @@
             <div class="pillars-grid">
               <div class="pillar-item">
                 <span class="pillar-lbl" data-i18n="pillar_soil">मृदा अनुकूलता</span>
-                <div class="progress-bar-bg"><div class="progress-fill green" style="width: 96%"></div></div>
-                <span class="pillar-val">९६%</span>
+                <div class="progress-bar-bg"><div class="progress-fill green" id="pillarFillSoil" style="width: 96%"></div></div>
+                <span class="pillar-val" id="pillarValSoil">९६%</span>
               </div>
               <div class="pillar-item">
                 <span class="pillar-lbl" data-i18n="pillar_weather">मौसम अनुकूलता</span>
-                <div class="progress-bar-bg"><div class="progress-fill cyan" style="width: 92%"></div></div>
-                <span class="pillar-val">९२%</span>
+                <div class="progress-bar-bg"><div class="progress-fill cyan" id="pillarFillWeather" style="width: 92%"></div></div>
+                <span class="pillar-val" id="pillarValWeather">९२%</span>
               </div>
               <div class="pillar-item">
                 <span class="pillar-lbl" data-i18n="pillar_market">मंडी भाव</span>
-                <div class="progress-bar-bg"><div class="progress-fill amber" style="width: 95%"></div></div>
-                <span class="pillar-val">९५%</span>
+                <div class="progress-bar-bg"><div class="progress-fill amber" id="pillarFillMarket" style="width: 95%"></div></div>
+                <span class="pillar-val" id="pillarValMarket">९५%</span>
               </div>
               <div class="pillar-item">
                 <span class="pillar-lbl" data-i18n="pillar_rotation">फसल चक्र</span>
-                <div class="progress-bar-bg"><div class="progress-fill purple" style="width: 88%"></div></div>
-                <span class="pillar-val">८८%</span>
+                <div class="progress-bar-bg"><div class="progress-fill purple" id="pillarFillRotation" style="width: 88%"></div></div>
+                <span class="pillar-val" id="pillarValRotation">८८%</span>
               </div>
             </div>
 
@@ -555,31 +537,7 @@
                 "आपकी मिट्टी में पोटाश (१९० किग्रा/हेक्टेयर) और संतुलित pH (६.८) अंगूर की मिठास और बेहतर पैदावार के लिए सर्वाधिक अनुकूल हैं।"
               </p>
               <div class="shap-bars" id="shapBarsList">
-                <div class="shap-bar-row">
-                  <span class="shap-feat">पोटाश (K: १९० किग्रा/हे.)</span>
-                  <div class="shap-bar-track"><div class="shap-fill positive" style="width: 82%"></div></div>
-                  <span class="shap-impact text-green">+२८%</span>
-                </div>
-                <div class="shap-bar-row">
-                  <span class="shap-feat">मिट्टी pH (६.८ संतुलित)</span>
-                  <div class="shap-bar-track"><div class="shap-fill positive" style="width: 65%"></div></div>
-                  <span class="shap-impact text-green">+१८%</span>
-                </div>
-                <div class="shap-bar-row">
-                  <span class="shap-feat">नाइट्रोजन (N: ८५ किग्रा/हे.)</span>
-                  <div class="shap-bar-track"><div class="shap-fill positive" style="width: 48%"></div></div>
-                  <span class="shap-impact text-green">+१२%</span>
-                </div>
-                <div class="shap-bar-row">
-                  <span class="shap-feat">फॉस्फोरस (P: ४८ किग्रा/हे.)</span>
-                  <div class="shap-bar-track"><div class="shap-fill positive" style="width: 32%"></div></div>
-                  <span class="shap-impact text-green">+७%</span>
-                </div>
-                <div class="shap-bar-row">
-                  <span class="shap-feat">वर्षा पूर्वानुमान प्रभाव</span>
-                  <div class="shap-bar-track"><div class="shap-fill negative" style="width: 18%"></div></div>
-                  <span class="shap-impact text-red">-४%</span>
-                </div>
+                <!-- Dynamically populated in JavaScript -->
               </div>
             </div>
 
@@ -587,20 +545,7 @@
             <div class="runners-up-section">
               <h4 class="runners-title" data-i18n="runners_title">वैकल्पिक फसलें (अन्य अनुशंसित विकल्प)</h4>
               <div class="runners-grid" id="runnersList">
-                <div class="runner-card">
-                  <div class="runner-header">
-                    <span class="runner-name">🍎 अनार (Pomegranate)</span>
-                    <span class="runner-score">९१.२%</span>
-                  </div>
-                  <div class="runner-meta">अपेक्षित आय: ₹२.८ - ₹४.२ लाख प्रति एकड़ • मंडी भाव: ₹८,४००/क्विंटल</div>
-                </div>
-                <div class="runner-card">
-                  <div class="runner-header">
-                    <span class="runner-name">🌿 कपास (Cotton)</span>
-                    <span class="runner-score">८६.५%</span>
-                  </div>
-                  <div class="runner-meta">अपेक्षित आय: ₹७५ हजार - ₹१.०५ लाख • मंडी भाव: ₹७,४५०/क्विंटल</div>
-                </div>
+                <!-- Dynamically populated in JavaScript -->
               </div>
             </div>
 
@@ -665,19 +610,49 @@
           </div>
         </div>
 
-        <!-- DIAGNOSIS RESULTS & WEATHER SPRAY TIMING -->
+        <!-- RIGHT PANEL: DYNAMIC ROTATING CROP PROTECTION TIPS (BEFORE SCAN) / DIAGNOSIS REPORT (AFTER SCAN) -->
         <div class="card-panel">
           <div class="panel-header">
             <div class="panel-title-wrap">
               <span class="panel-icon">🩺</span>
               <div>
-                <h3 class="panel-title" data-i18n="panel_diag_title">रोग निदान रिपोर्ट व उपचार</h3>
-                <p class="panel-sub" data-i18n="panel_diag_sub">जैविक व रासायनिक समाधान और मौसम अनुकूल छिड़काव</p>
+                <h3 class="panel-title" id="diagPanelTitle" data-i18n="panel_diag_title">फसल सुरक्षा ज्ञान व रोग निदान</h3>
+                <p class="panel-sub" id="diagPanelSub" data-i18n="panel_diag_sub">जैविक व रासायनिक समाधान और मौसम अनुकूल छिड़काव</p>
               </div>
             </div>
           </div>
 
-          <div class="diagnosis-card" id="diagnosisResultBox">
+          <!-- 1. DYNAMIC ROTATING CROP PROTECTION TIPS CAROUSEL (SHOWN INITIALLY BEFORE SCAN) -->
+          <div id="leafAdvisoryTipsBox" class="leaf-tips-carousel-card">
+            <div class="tips-carousel-header">
+              <span class="tips-badge-live">
+                <span class="tips-timer-dot"></span>
+                <span data-i18n="tips_live_badge">दैनिक फसल सुरक्षा सलाह</span>
+              </span>
+              <span style="font-size:0.75rem; color:#166534;" id="tipsTimerCount">प्रत्येक 6 सेकंड में अपडेट</span>
+            </div>
+
+            <div class="tips-slide-content" id="tipsSlideContent">
+              <span class="tips-hero-icon" id="tipIcon">🌿</span>
+              <h4 class="tips-slide-title" id="tipTitle">नीम तेल (NSKE 5%) का जैविक सुरक्षा चक्र</h4>
+              <p class="tips-slide-desc" id="tipDesc">रस चूसक कीटों, सफेद मक्खी और फफूंद से बचाव के लिए 5 मिली प्रति लीटर पानी में मिलाकर सुबह या शाम छिड़कें।</p>
+            </div>
+
+            <div class="tips-indicators-row">
+              <div class="tips-dots" id="tipsDotsList">
+                <span class="tips-dot active" data-idx="0"></span>
+                <span class="tips-dot" data-idx="1"></span>
+                <span class="tips-dot" data-idx="2"></span>
+                <span class="tips-dot" data-idx="3"></span>
+              </div>
+              <button id="btnNextTip" class="tips-next-btn">
+                <span data-i18n="btn_next_tip">अगला सुझाव ➔</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- 2. DIAGNOSIS RESULTS CARD (SHOWN AFTER SCAN RUNS) -->
+          <div class="diagnosis-card" id="diagnosisResultBox" style="display: none;">
             <div class="diag-header-box">
               <div>
                 <span class="diag-badge-crop" id="diagCrop">टमाटर (Tomato)</span>
@@ -757,7 +732,7 @@
 
           <div class="voice-response-card" id="voiceResponseCard">
             <div class="response-header">
-              <span>🌾 किसान साथी सलाहकार उत्तर:</span>
+              <span id="voiceSpeakerHeader">🌾 किसान साथी सलाहकार उत्तर:</span>
               <button id="btnListenVoice" class="btn-listen-voice">
                 <span>🔊</span>
                 <span data-i18n="btn_listen_audio">आवाज सुनें</span>
@@ -770,9 +745,9 @@
 
           <div class="voice-followups-wrap" id="voiceFollowups">
             <span class="followup-lbl" data-i18n="lbl_followups">आगे पूछें:</span>
-            <button class="voice-chip followup" onclick="sendVoiceQuery('यूरिया की पहली खुराक कब देनी चाहिए?')">💬 यूरिया की पहली खुराक कब दें?</button>
-            <button class="voice-chip followup" onclick="sendVoiceQuery('कीटनाशक छिड़काव का सबसे अच्छा समय क्या है?')">💬 कीटनाशक छिड़काव का सही समय?</button>
-            <button class="voice-chip followup" onclick="sendVoiceQuery('जैविक कीटनाशक नीमास्त्र कैसे बनाएं?')">💬 जैविक नीमास्त्र कैसे बनाएं?</button>
+            <button class="voice-chip followup" data-followup="urea">💬 <span id="followup1Text">यूरिया की पहली खुराक कब दें?</span></button>
+            <button class="voice-chip followup" data-followup="spray">💬 <span id="followup2Text">कीटनाशक छिड़काव का सही समय?</span></button>
+            <button class="voice-chip followup" data-followup="organic">💬 <span id="followup3Text">जैविक नीमास्त्र कैसे बनाएं?</span></button>
           </div>
         </div>
       </div>
@@ -797,34 +772,7 @@
           </div>
 
           <div class="weather-forecast-list" id="weatherForecastList">
-            <div class="forecast-day-row">
-              <span class="day-name">आज (शुक्रवार)</span>
-              <span class="day-icon">⛅</span>
-              <span class="day-cond">आंशिक बादल • २६.५°C</span>
-              <span class="day-rain">१० मिमी वर्षा</span>
-              <span class="badge-spray green">छिड़काव उत्तम</span>
-            </div>
-            <div class="forecast-day-row">
-              <span class="day-name">शनिवार</span>
-              <span class="day-icon">🌦️</span>
-              <span class="day-cond">हल्की फुहार • २७.०°C</span>
-              <span class="day-rain">२५ मिमी वर्षा</span>
-              <span class="badge-spray amber">दोपहर बाद टालें</span>
-            </div>
-            <div class="forecast-day-row">
-              <span class="day-name">रविवार</span>
-              <span class="day-icon">☀️</span>
-              <span class="day-cond">साफ मौसम • २८.५°C</span>
-              <span class="day-rain">० मिमी वर्षा</span>
-              <span class="badge-spray green">छिड़काव उत्तम</span>
-            </div>
-            <div class="forecast-day-row">
-              <span class="day-name">सोमवार</span>
-              <span class="day-icon">🌤️</span>
-              <span class="day-cond">धूप खिली रहेगी • २९.०°C</span>
-              <span class="day-rain">० मिमी वर्षा</span>
-              <span class="badge-spray green">छिड़काव उत्तम</span>
-            </div>
+            <!-- Dynamically populated in JavaScript with live/cached satellite feed -->
           </div>
         </div>
 
@@ -850,42 +798,7 @@
               </tr>
             </thead>
             <tbody id="mandiTableBody">
-              <tr>
-                <td>🍇 अंगूर (Grapes)</td>
-                <td>नासिक (महाराष्ट्र)</td>
-                <td><strong>₹६,२००</strong></td>
-                <td><span class="trend up">▲ +५.४%</span></td>
-              </tr>
-              <tr>
-                <td>🍎 अनार (Pomegranate)</td>
-                <td>नासिक (महाराष्ट्र)</td>
-                <td><strong>₹८,४००</strong></td>
-                <td><span class="trend up">▲ +३.८%</span></td>
-              </tr>
-              <tr>
-                <td>🌿 कपास (Cotton)</td>
-                <td>मालेगांव (महाराष्ट्र)</td>
-                <td><strong>₹७,४५०</strong></td>
-                <td><span class="trend stable">▶ स्थिर</span></td>
-              </tr>
-              <tr>
-                <td>🌾 चना (Chickpea)</td>
-                <td>इंदौर (मध्य प्रदेश)</td>
-                <td><strong>₹६,१५०</strong></td>
-                <td><span class="trend up">▲ +२.१%</span></td>
-              </tr>
-              <tr>
-                <td>🌱 सोयाबीन (Soybean)</td>
-                <td>इंदौर (मध्य प्रदेश)</td>
-                <td><strong>₹४,६८०</strong></td>
-                <td><span class="trend up">▲ +१.५%</span></td>
-              </tr>
-              <tr>
-                <td>🌶️ लाल मिर्च (Chilli)</td>
-                <td>गुंटूर (आंध्र प्रदेश)</td>
-                <td><strong>₹१८,५००</strong></td>
-                <td><span class="trend up">▲ +६.१%</span></td>
-              </tr>
+              <!-- Dynamically populated in JavaScript with live/cached APMC feed -->
             </tbody>
           </table>
         </div>
@@ -930,7 +843,7 @@
           </div>
           <div class="helpline-number-box" style="border-color: #D97706;">
             <div>
-              <span style="font-size:0.75rem; color:#78350F;">व्हाट्सएप / प्रिंट हेतु तैयार</span>
+              <span style="font-size:0.75rem; color:#78350F;" data-i18n="whatsapp_ready_lbl">व्हाट्सएप / प्रिंट हेतु तैयार</span>
               <strong style="display:block; font-size:0.95rem; color:#B45309;" id="officerReportStatus">आधिकारिक परामर्श पत्र</strong>
             </div>
             <button id="btnGenerateOfficialReport" class="btn-call-direct" style="background: #D97706;">
@@ -985,22 +898,22 @@
           <a href="https://pmkisan.gov.in/" target="_blank" rel="noopener" class="scheme-card">
             <span class="scheme-icon">🌾</span>
             <strong>PM-KISAN सम्मान निधि</strong>
-            <span>प्रतिवर्ष ₹6,000 की प्रत्यक्ष आर्थिक सहायता</span>
+            <span data-i18n="scheme_pmkisan_desc">प्रतिवर्ष ₹6,000 की प्रत्यक्ष आर्थिक सहायता</span>
           </a>
           <a href="https://pmfby.gov.in/" target="_blank" rel="noopener" class="scheme-card">
             <span class="scheme-icon">🛡️</span>
             <strong>PMFBY फसल बीमा</strong>
-            <span>सूखा, बाढ़ व कीट प्रकोप से शत-प्रतिशत सुरक्षा</span>
+            <span data-i18n="scheme_pmfby_desc">सूखा, बाढ़ व कीट प्रकोप से शत-प्रतिशत सुरक्षा</span>
           </a>
           <a href="https://soilhealth.dac.gov.in/" target="_blank" rel="noopener" class="scheme-card">
             <span class="scheme-icon">🧪</span>
             <strong>मृदा स्वास्थ्य कार्ड (SHC)</strong>
-            <span>मुफ्त मिट्टी जांच व पोषक तत्व प्रबंधन</span>
+            <span data-i18n="scheme_shc_desc">मुफ्त मिट्टी जांच व पोषक तत्व प्रबंधन</span>
           </a>
           <a href="https://pmksy.gov.in/" target="_blank" rel="noopener" class="scheme-card">
             <span class="scheme-icon">💧</span>
             <strong>पीएम कृषि सिंचाई योजना</strong>
-            <span>ड्रिप व स्प्रिंकलर सिंचाई पर ५५-७०% सब्सिडी</span>
+            <span data-i18n="scheme_pmksy_desc">ड्रिप व स्प्रिंकलर सिंचाई पर ५५-७०% सब्सिडी</span>
           </a>
         </div>
       </div>
