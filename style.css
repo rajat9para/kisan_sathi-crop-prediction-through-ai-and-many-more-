@@ -2680,6 +2680,153 @@ body {
   color: #FFFFFF;
 }
 
+/* ==========================================================================
+   OFFICIAL CITIZEN PORTAL HERO & SWASTH DHARA BANNERS
+   ========================================================================== */
+.portal-top-banner-card {
+  background: #FFFFFF;
+  border: 1.5px solid #CBD5E1;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.06);
+  margin-bottom: 1.25rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.portal-top-banner-card:hover {
+  box-shadow: 0 10px 28px rgba(22, 163, 74, 0.12);
+}
+
+.banner-img-wrap {
+  position: relative;
+  width: 100%;
+  max-height: 280px;
+  overflow: hidden;
+  background: #0B381B;
+}
+
+.banner-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.banner-action-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  background: linear-gradient(90deg, #F0FDF4 0%, #FFFFFF 100%);
+  border-top: 1px solid #E2E8F0;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.banner-motto-text {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #14532D;
+}
+
+.banner-buttons-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btn-banner-action {
+  background: #16A34A;
+  color: #FFFFFF;
+  padding: 0.45rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(22, 163, 74, 0.25);
+}
+
+.btn-banner-action:hover {
+  background: #15803D;
+  transform: translateY(-1px);
+}
+
+.btn-banner-action.secondary {
+  background: #FFFFFF;
+  color: #166534;
+  border: 1.5px solid #16A34A;
+  box-shadow: none;
+}
+
+.btn-banner-action.secondary:hover {
+  background: #F0FDF4;
+  border-color: #15803D;
+}
+
+/* SWASTH DHARA FOOTER BANNER */
+.swasth-dhara-banner-card {
+  background: #FFFFFF;
+  border: 2px solid #86EFAC;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(22, 163, 74, 0.12);
+  margin-top: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.swasth-dhara-img-wrap {
+  width: 100%;
+  max-height: 120px;
+  overflow: hidden;
+}
+
+.swasth-dhara-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+}
+
+.swasth-dhara-footer-strip {
+  background: linear-gradient(90deg, #14532D 0%, #166534 100%);
+  color: #FFFFFF;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.swasth-dhara-pill-group {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.swasth-badge-pill {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #E2E8F0;
+}
+
+
 
 
 

@@ -530,6 +530,10 @@ const I18N_DICTIONARY = {
     modal_title: "अपनी भाषा चुनें / Choose Language", modal_sub: "किसान साथी भारत की प्रमुख 11 क्षेत्रीय भाषाओं का समर्थन करता है",
     primary_langs_label: "🌟 प्राथमिक भाषाएँ / Primary Languages", regional_langs_label: "🌾 क्षेत्रीय कृषि भाषाएँ / Regional Indian Languages",
     make_default_title: "इसे मेरी डिफ़ॉल्ट भाषा बनाएं", make_default_sub: "(अगली बार सीधे इसी भाषा में खुलेगा)", btn_continue: "✓ आगे बढ़ें ➔",
+    banner_empower_text: "मृदा स्वास्थ्य व वैज्ञानिक अंतर्दृष्टि से किसान सशक्तिकरण एवं समृद्ध भारत",
+    btn_banner_shc: "मृदा स्वास्थ्य कार्ड लोड करें", btn_banner_lab: "निकटतम मृदा लैब व KVK",
+    swasth_dhara_slogan: "स्वस्थ धरा • खेत हरा — राष्ट्रीय मृदा स्वास्थ्य एवं कृषि समृद्धि अभियान",
+    pill_100_testing: "🔬 १००% वैज्ञानिक मृदा जांच", pill_sat_weather: "🛰️ उपग्रह मौसम रडार", pill_agmark_mandi: "📊 एगमार्कनेट दैनिक भाव",
     footer_sub: "राष्ट्रीय डिजिटल कृषि एवं मृदा स्वास्थ्य सलाहकार पोर्टल • भारत सरकार द्वारा जनहित में जारी",
     tag_icar: "🛡️ ICAR प्रमाणित", tag_shc: "🌾 मृदा स्वास्थ्य कार्ड मानक", tag_mandi: "📊 एगमार्कनेट मंडी भाव", tag_weather: "🛰️ राष्ट्रीय मौसम वेधशाला", tag_langs: "🇮🇳 ११ भारतीय भाषाएँ"
   },
@@ -577,6 +581,10 @@ const I18N_DICTIONARY = {
     modal_title: "Choose Your Language / अपनी भाषा चुनें", modal_sub: "Kisaan_Sathi supports all 11 major Indian regional languages",
     primary_langs_label: "🌟 Primary Languages", regional_langs_label: "🌾 Regional Indian Languages",
     make_default_title: "Set as my default language", make_default_sub: "(Will open directly in English on next visit)", btn_continue: "✓ Continue to Farm Advisory ➔",
+    banner_empower_text: "Empowering Farmers With Soil Insights For Sustainable Growth",
+    btn_banner_shc: "Load Soil Health Card (SHC)", btn_banner_lab: "Find Nearest Soil Lab & KVK",
+    swasth_dhara_slogan: "Swasth Dhara • Khet Hara — National Soil Health & Sustainable Agriculture Mission",
+    pill_100_testing: "🔬 100% Scientific Soil Testing", pill_sat_weather: "🛰️ Satellite Agro-Met Feed", pill_agmark_mandi: "📊 Agmarknet Verified Mandi Rates",
     footer_sub: "National Digital Agriculture & Soil Advisory Portal • Issued in Public Interest by Government of India",
     tag_icar: "🛡️ ICAR Certified", tag_shc: "🌾 Soil Health Card Standard", tag_mandi: "📊 Agmarknet Mandi Rates", tag_weather: "🛰️ National Agro-Met Network", tag_langs: "🇮🇳 11 Indian Languages"
   }
@@ -881,6 +889,7 @@ let currentDiagnosisReport = null;
 document.addEventListener("DOMContentLoaded", () => {
   initLanguageManager();
   setupTabs();
+  setupBannerActionButtons();
   setupHubSelector();
   setupLocationAutoDetect();
   setupSoilCardPreset();
@@ -899,6 +908,71 @@ document.addEventListener("DOMContentLoaded", () => {
   // Run initial dynamic prediction
   runDynamicCropPrediction();
 });
+
+// =========================================================================
+// 3. TAB SWITCHING & BANNER ACTIONS
+// =========================================================================
+function setupTabs() {
+  const tabBtns = document.querySelectorAll(".tab-btn");
+  tabBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      const targetTab = btn.getAttribute("data-tab");
+      switchToTab(targetTab);
+    });
+  });
+}
+
+function switchToTab(targetTabId) {
+  const tabBtns = document.querySelectorAll(".tab-btn");
+  const tabPanes = document.querySelectorAll(".tab-pane");
+
+  tabBtns.forEach(b => {
+    if (b.getAttribute("data-tab") === targetTabId) {
+      b.classList.add("active");
+    } else {
+      b.classList.remove("active");
+    }
+  });
+
+  tabPanes.forEach(pane => {
+    if (pane.id === targetTabId) {
+      pane.classList.add("active");
+      pane.style.display = "block";
+    } else {
+      pane.classList.remove("active");
+      pane.style.display = "none";
+    }
+  });
+}
+
+function setupBannerActionButtons() {
+  const btnSHC = document.getElementById("btnBannerGetSHC");
+  const btnLab = document.getElementById("btnBannerFindLab");
+
+  if (btnSHC) {
+    btnSHC.addEventListener("click", () => {
+      switchToTab("tab-recommend");
+      const cardSelect = document.getElementById("soilCardPresetSelect");
+      if (cardSelect) {
+        cardSelect.scrollIntoView({ behavior: "smooth", block: "center" });
+        cardSelect.focus();
+        cardSelect.style.transition = "box-shadow 0.3s ease";
+        cardSelect.style.boxShadow = "0 0 0 4px #22C55E";
+        setTimeout(() => { cardSelect.style.boxShadow = ""; }, 1500);
+      }
+    });
+  }
+
+  if (btnLab) {
+    btnLab.addEventListener("click", () => {
+      switchToTab("tab-helpline");
+      const kvkBox = document.getElementById("kvkOfficerInfo");
+      if (kvkBox) {
+        kvkBox.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    });
+  }
+}
 
 // =========================================================================
 // 4. LANGUAGE SELECTION & MONOLINGUAL POPULATION
