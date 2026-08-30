@@ -1,5 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from datetime import datetime
+from pydantic import BaseModel
+from typing import Optional, List, Dict, Any
 from app.models.schemas import RecommendationRequest, RecommendationResponse
 from app.services.external_apis import fetch_soilgrids_data, fetch_weather_data, fetch_market_prices
 from app.services.ml_engine import ml_engine
@@ -7,11 +9,25 @@ from app.services.demo_cache import find_nearest_hub
 
 router = APIRouter(prefix="/api", tags=["Crop Advisory"])
 
+class SMSAdvisoryRequest(BaseModel):
+    phone_number: Optional[str] = "9876543210"
+    crop_name: str = "Wheat"
+    language: str = "hi" # "hi" or "en"
+    state: Optional[str] = "Maharashtra"
+
+class SMSAdvisoryResponse(BaseModel):
+    status: str
+    channel: str # "USSD / SMS Broadcast"
+    sms_text_hi: str
+    sms_text_en: str
+    character_count: int
+    broadcast_timestamp: str
+
 @router.post("/recommend", response_model=RecommendationResponse)
 async def get_crop_recommendations(req: RecommendationRequest):
     """
     Main endpoint for hyper-local explainable crop recommendations.
-    Pulls real soil and weather (or uses custom overrides/fallback cache),
+    Pulls real soil and weather (or uses custom overrides/IoT/fallback cache),
     runs XGBoost + SHAP feature importance, and returns ranked crops with explainability breakdown.
     """
     try:
@@ -25,6 +41,7 @@ async def get_crop_recommendations(req: RecommendationRequest):
                 "organic_carbon_pct": req.custom_soil.organic_carbon_pct,
                 "clay_content_pct": 35.0,
                 "sand_content_pct": 30.0,
+                "soil_moisture_pct": req.custom_soil.soil_moisture_pct or 32.0,
                 "soil_type": req.custom_soil.texture or "Custom Soil Input",
                 "source": "Farmer Soil Health Card / Manual Input"
             }
@@ -39,6 +56,7 @@ async def get_crop_recommendations(req: RecommendationRequest):
                 "current_condition": req.custom_weather.weather_condition or "Custom Weather",
                 "wind_speed_kmh": 10.0,
                 "rainfall_7d_total_mm": req.custom_weather.rainfall_mm,
+                "soil_moisture_pct": req.custom_weather.soil_moisture_pct or 32.0,
                 "forecast_7d": []
             }
         else:
@@ -55,11 +73,12 @@ async def get_crop_recommendations(req: RecommendationRequest):
             "rainfall": float(weather.get("rainfall_7d_total_mm", 75.0))
         }
 
-        # 4. Run ML Inference, SHAP Calculation & Multi-factor Re-ranking
+        # 4. Run ML Inference, SHAP Calculation, Dynamic Economics & Sustainability Re-ranking
         recommendations = ml_engine.recommend_crops(
             features=features,
             previous_crop=req.previous_crop,
             irrigation=req.irrigation_source or "Borewell",
+            farm_size_acres=req.farm_size_acres or 2.5,
             top_k=4
         )
 
@@ -78,6 +97,13 @@ async def get_crop_recommendations(req: RecommendationRequest):
                 "title_hi": "भारी बारिश का अलर्ट (अगले 7 दिन)",
                 "desc_en": "Ensure proper drainage channels in fields to prevent waterlogging.",
                 "desc_hi": "खेत में जलभराव से बचने के लिए उचित जल निकासी नालियां सुनिश्चित करें।"
+            })
+        if weather.get("soil_moisture_pct", 30) < 18.0:
+            warnings.append({
+                "title_en": "Low Soil Moisture Warning",
+                "title_hi": "मिट्टी में नमी की कमी",
+                "desc_en": "Soil volumetric moisture is critically low (<18%). Schedule light irrigation before sowing.",
+                "desc_hi": "मिट्टी की नमी 18% से कम है। बुवाई से पहले पलेवा या हल्की सिंचाई करें।"
             })
 
         is_cached = find_nearest_hub(req.latitude, req.longitude) is not None
@@ -99,14 +125,31 @@ async def get_crop_recommendations(req: RecommendationRequest):
             "top_recommendations": recommendations,
             "advisory_warnings": warnings
         }
-
-        # Asynchronously log to Supabase in background
-        from app.services.supabase_client import supabase_service
-        try:
-            supabase_service.save_recommendation(response_payload)
-        except Exception as se:
-            print(f"[!] Supabase background log note: {se}")
-
         return response_payload
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Recommendation engine error: {str(e)}")
+        print(f"[!] Error generating recommendations: {e}")
+        raise HTTPException(status_code=500, detail=f"Recommendation Engine error: {str(e)}")
+
+@router.post("/advisory/sms-advisory", response_model=SMSAdvisoryResponse)
+async def generate_sms_advisory(req: SMSAdvisoryRequest):
+    """
+    Generates concise, bandwidth-efficient SMS / USSD advisories for feature phones (Non-smartphone farmers).
+    SIH 2026 Innovation Differentiator.
+    """
+    crop_lower = req.crop_name.lower().strip()
+    schedules = ml_engine.generate_management_schedules(crop_lower)
+    fert = schedules[0][0] if schedules[0] else {"dosage": "50kg DAP/acre"}
+    irrig = schedules[1][0] if schedules[1] else {"note": "Light watering"}
+
+    sms_hi = f"किसान साथी: {req.crop_name} के लिए सलाह- बुवाई पर {fert['dosage']}। सिंचाई: {irrig['note']}। हेल्पलाइन 1800-180-1551"
+    sms_en = f"Kisaan Sathi: {req.crop_name} advisory- Apply {fert['dosage']}. Irrig: {irrig['note']}. Kisan Call Center: 1800-180-1551"
+
+    return {
+        "status": "ready_for_dispatch",
+        "channel": "USSD / SMS Broadcast Gateway",
+        "sms_text_hi": sms_hi,
+        "sms_text_en": sms_en,
+        "character_count": len(sms_hi),
+        "broadcast_timestamp": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }

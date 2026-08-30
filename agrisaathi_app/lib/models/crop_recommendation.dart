@@ -49,12 +49,16 @@ class CropItem {
   final double rotationImpactPct;
   final String expectedYield;
   final String estimatedRevenue;
+  final double estimatedCostPerAcre;
+  final double estimatedNetProfitPerAcre;
   final String mandiPrice;
   final String priceTrend;
   final String waterRequirement;
   final String sowingWindowEn;
   final String sowingWindowHi;
   final int harvestDurationDays;
+  final double sustainabilityScorePct;
+  final String sustainabilityRating;
   final String whyThisCropEn;
   final String whyThisCropHi;
   final List<ShapFeature> shapContributions;
@@ -74,12 +78,16 @@ class CropItem {
     required this.rotationImpactPct,
     required this.expectedYield,
     required this.estimatedRevenue,
+    this.estimatedCostPerAcre = 22000.0,
+    this.estimatedNetProfitPerAcre = 55000.0,
     required this.mandiPrice,
     required this.priceTrend,
     required this.waterRequirement,
     required this.sowingWindowEn,
     required this.sowingWindowHi,
     required this.harvestDurationDays,
+    this.sustainabilityScorePct = 85.0,
+    this.sustainabilityRating = "High (Eco-Friendly)",
     required this.whyThisCropEn,
     required this.whyThisCropHi,
     required this.shapContributions,
@@ -122,12 +130,16 @@ class CropItem {
       rotationImpactPct: (json['rotation_impact_pct'] as num?)?.toDouble() ?? 85.0,
       expectedYield: json['expected_yield_per_acre'] ?? '',
       estimatedRevenue: json['estimated_revenue_per_acre'] ?? '',
+      estimatedCostPerAcre: (json['estimated_cost_per_acre_rs'] as num?)?.toDouble() ?? 22000.0,
+      estimatedNetProfitPerAcre: (json['estimated_net_profit_per_acre_rs'] as num?)?.toDouble() ?? 55000.0,
       mandiPrice: json['mandi_price_per_quintal'] ?? '',
       priceTrend: json['price_trend'] ?? 'stable',
       waterRequirement: json['water_requirement_level'] ?? 'Medium',
       sowingWindowEn: json['sowing_window'] ?? '',
       sowingWindowHi: json['sowing_window_hi'] ?? '',
       harvestDurationDays: json['harvest_duration_days'] ?? 120,
+      sustainabilityScorePct: (json['sustainability_score_pct'] as num?)?.toDouble() ?? 85.0,
+      sustainabilityRating: json['sustainability_rating'] ?? 'High (Eco-Friendly)',
       whyThisCropEn: json['why_this_crop_summary_en'] ?? '',
       whyThisCropHi: json['why_this_crop_summary_hi'] ?? '',
       shapContributions: shaps,
@@ -149,12 +161,16 @@ class CropItem {
     'rotation_impact_pct': rotationImpactPct,
     'expected_yield_per_acre': expectedYield,
     'estimated_revenue_per_acre': estimatedRevenue,
+    'estimated_cost_per_acre_rs': estimatedCostPerAcre,
+    'estimated_net_profit_per_acre_rs': estimatedNetProfitPerAcre,
     'mandi_price_per_quintal': mandiPrice,
     'price_trend': priceTrend,
     'water_requirement_level': waterRequirement,
     'sowing_window': sowingWindowEn,
     'sowing_window_hi': sowingWindowHi,
     'harvest_duration_days': harvestDurationDays,
+    'sustainability_score_pct': sustainabilityScorePct,
+    'sustainability_rating': sustainabilityRating,
     'why_this_crop_summary_en': whyThisCropEn,
     'why_this_crop_summary_hi': whyThisCropHi,
     'shap_contributions': shapContributions.map((e) => e.toJson()).toList(),

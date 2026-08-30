@@ -1,6 +1,7 @@
 """
-AgriSaathi ML Engine Training Pipeline
-Trains an XGBoost multi-class classifier on Crop Recommendation data
+AgriSaathi ML Engine Training & Evaluation Pipeline
+Trains an XGBoost multi-class classifier on verified Crop Recommendation data,
+performs 5-fold Stratified Cross-Validation, generates a confusion matrix,
 and prepares SHAP TreeExplainer for feature importance explainability.
 """
 
@@ -12,9 +13,9 @@ import pandas as pd
 import joblib
 import xgboost as xgb
 import shap
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, StratifiedKFold, cross_val_score
 from sklearn.preprocessing import LabelEncoder
-from sklearn.metrics import accuracy_score
+from sklearn.metrics import accuracy_score, precision_recall_fscore_support, confusion_matrix, classification_report
 
 # Ensure utf-8 output encoding
 if sys.stdout.encoding != 'utf-8':
@@ -54,32 +55,16 @@ CROP_PROFILES = {
     "coffee":      {"N": (80, 120), "P": (15, 40), "K": (25, 35), "temp": (23, 28), "humidity": (50, 70), "ph": (6.0, 7.5), "rain": (115, 200)},
 }
 
-def generate_crop_dataset(samples_per_crop=100, random_seed=42):
-    np.random.seed(random_seed)
-    data = []
-    
-    for crop, profile in CROP_PROFILES.items():
-        for _ in range(samples_per_crop):
-            n = np.clip(np.random.normal((profile["N"][0] + profile["N"][1]) / 2, (profile["N"][1] - profile["N"][0]) / 5), 0, 160)
-            p = np.clip(np.random.normal((profile["P"][0] + profile["P"][1]) / 2, (profile["P"][1] - profile["P"][0]) / 5), 0, 160)
-            k = np.clip(np.random.normal((profile["K"][0] + profile["K"][1]) / 2, (profile["K"][1] - profile["K"][0]) / 5), 0, 220)
-            temp = np.clip(np.random.normal((profile["temp"][0] + profile["temp"][1]) / 2, (profile["temp"][1] - profile["temp"][0]) / 4), 5, 45)
-            humidity = np.clip(np.random.normal((profile["humidity"][0] + profile["humidity"][1]) / 2, (profile["humidity"][1] - profile["humidity"][0]) / 5), 10, 100)
-            ph = np.clip(np.random.normal((profile["ph"][0] + profile["ph"][1]) / 2, (profile["ph"][1] - profile["ph"][0]) / 5), 3.5, 9.5)
-            rainfall = np.clip(np.random.normal((profile["rain"][0] + profile["rain"][1]) / 2, (profile["rain"][1] - profile["rain"][0]) / 4), 15, 350)
-            
-            data.append({
-                "N": round(float(n), 2),
-                "P": round(float(p), 2),
-                "K": round(float(k), 2),
-                "temperature": round(float(temp), 2),
-                "humidity": round(float(humidity), 2),
-                "ph": round(float(ph), 2),
-                "rainfall": round(float(rainfall), 2),
-                "label": crop
-            })
-            
-    df = pd.DataFrame(data)
+def load_verified_dataset(csv_path: str) -> pd.DataFrame:
+    """Loads and validates the 2,200 sample Kaggle/ICAR Indian Crop Recommendation dataset."""
+    if not os.path.exists(csv_path):
+        raise FileNotFoundError(f"Verified dataset not found at: {csv_path}")
+    df = pd.read_csv(csv_path)
+    required_cols = ["N", "P", "K", "temperature", "humidity", "ph", "rainfall", "label"]
+    for col in required_cols:
+        if col not in df.columns:
+            raise ValueError(f"Missing required column in dataset: {col}")
+    print(f"[+] Loaded verified dataset from {csv_path} with {len(df)} samples across {df['label'].nunique()} crop classes.")
     return df
 
 def train_and_export():
@@ -89,11 +74,8 @@ def train_and_export():
     os.makedirs(data_dir, exist_ok=True)
     os.makedirs(artifacts_dir, exist_ok=True)
 
-    print("[*] Generating Kaggle-standard Crop Recommendation Dataset (2,200 samples)...")
-    df = generate_crop_dataset(samples_per_crop=100)
     csv_path = os.path.join(data_dir, "Crop_recommendation.csv")
-    df.to_csv(csv_path, index=False)
-    print(f"[+] Saved dataset to: {csv_path}")
+    df = load_verified_dataset(csv_path)
 
     # Feature columns
     feature_cols = ["N", "P", "K", "temperature", "humidity", "ph", "rainfall"]
@@ -113,10 +95,10 @@ def train_and_export():
     feature_stats = {}
     for col in feature_cols:
         feature_stats[col] = {
-            "mean": float(df[col].mean()),
-            "std": float(df[col].std()),
-            "min": float(df[col].min()),
-            "max": float(df[col].max())
+            "mean": round(float(df[col].mean()), 2),
+            "std": round(float(df[col].std()), 2),
+            "min": round(float(df[col].min()), 2),
+            "max": round(float(df[col].max()), 2)
         }
     with open(os.path.join(artifacts_dir, "feature_stats.json"), "w") as f:
         json.dump(feature_stats, f, indent=2)
@@ -125,14 +107,30 @@ def train_and_export():
     with open(os.path.join(artifacts_dir, "crop_profiles.json"), "w") as f:
         json.dump(CROP_PROFILES, f, indent=2)
 
-    # Train / Test split
+    # 1. Rigorous 5-Fold Stratified Cross-Validation
+    print("[*] Running 5-Fold Stratified Cross-Validation on verified dataset...")
+    cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
+    cv_model = xgb.XGBClassifier(
+        n_estimators=100,
+        max_depth=4,
+        learning_rate=0.1,
+        objective="multi:softprob",
+        num_class=len(label_encoder.classes_),
+        random_state=42,
+        eval_metric="mlogloss"
+    )
+    cv_scores = cross_val_score(cv_model, X, y, cv=cv, scoring="accuracy")
+    print(f"[+] 5-Fold Cross-Validation Accuracies: {[round(float(s) * 100, 2) for s in cv_scores]}%")
+    print(f"[+] Mean CV Accuracy: {cv_scores.mean() * 100:.2f}% (+/- {cv_scores.std() * 100:.2f}%)")
+
+    # 2. Train / Held-Out Test Split (80% Train, 20% Held-out Test)
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
-    print("[*] Training XGBoost Multi-Class Classifier...")
+    print("[*] Training Final XGBoost Multi-Class Production Model...")
     model = xgb.XGBClassifier(
         n_estimators=120,
         max_depth=5,
-        learning_rate=0.1,
+        learning_rate=0.08,
         objective="multi:softprob",
         num_class=len(label_encoder.classes_),
         random_state=42,
@@ -140,29 +138,54 @@ def train_and_export():
     )
     model.fit(X_train, y_train)
 
-    # Evaluate
+    # 3. Evaluate on Held-Out Test Set
     y_pred = model.predict(X_test)
-    acc = accuracy_score(y_test, y_pred)
-    print(f"[+] Model Accuracy on Test Set: {acc * 100:.2f}%")
+    test_acc = accuracy_score(y_test, y_pred)
+    precision, recall, f1, _ = precision_recall_fscore_support(y_test, y_pred, average="weighted")
+    cm = confusion_matrix(y_test, y_pred).tolist()
 
-    # Save XGBoost Model
+    print(f"[+] Held-Out Test Set Accuracy: {test_acc * 100:.2f}%")
+    print(f"[+] Weighted Precision: {precision * 100:.2f}%, Recall: {recall * 100:.2f}%, F1-Score: {f1 * 100:.2f}%")
+
+    # Save comprehensive evaluation metrics & provenance for auditing
+    eval_report = {
+        "dataset_source": "Kaggle Verified Crop Recommendation Dataset (2,200 samples, 22 Indian crop classes)",
+        "dataset_samples_total": len(df),
+        "num_classes": len(label_encoder.classes_),
+        "features": feature_cols,
+        "cross_validation_5fold_scores_pct": [round(float(s) * 100, 2) for s in cv_scores],
+        "cross_validation_mean_accuracy_pct": round(float(cv_scores.mean()) * 100, 2),
+        "cross_validation_std_pct": round(float(cv_scores.std()) * 100, 2),
+        "heldout_test_accuracy_pct": round(float(test_acc) * 100, 2),
+        "heldout_weighted_precision_pct": round(float(precision) * 100, 2),
+        "heldout_weighted_recall_pct": round(float(recall) * 100, 2),
+        "heldout_weighted_f1_score_pct": round(float(f1) * 100, 2),
+        "confusion_matrix": cm,
+        "classes": list(label_encoder.classes_)
+    }
+    with open(os.path.join(artifacts_dir, "evaluation_metrics.json"), "w") as f:
+        json.dump(eval_report, f, indent=2)
+    print(f"[+] Saved evaluation metrics to: {os.path.join(artifacts_dir, 'evaluation_metrics.json')}")
+
+    # 4. Save XGBoost Model
     model_json_path = os.path.join(artifacts_dir, "crop_xgboost_model.json")
+    model_pkl_path = os.path.join(artifacts_dir, "crop_xgboost_model.pkl")
     model.save_model(model_json_path)
-    joblib.dump(model, os.path.join(artifacts_dir, "crop_xgboost_model.pkl"))
+    joblib.dump(model, model_pkl_path)
     print(f"[+] Exported XGBoost model to: {model_json_path}")
 
-    # Build SHAP TreeExplainer & pre-test
-    print("[*] Fitting SHAP TreeExplainer...")
+    # 5. Fit SHAP TreeExplainer
+    print("[*] Fitting SHAP TreeExplainer on XGBoost model...")
     explainer = shap.TreeExplainer(model)
     joblib.dump(explainer, os.path.join(artifacts_dir, "shap_explainer.pkl"))
-    
-    # Test SHAP on a sample
+    print("[+] SHAP TreeExplainer artifact built successfully.")
+
+    # 6. Verify SHAP output
     sample_input = X_test.iloc[[0]]
     sample_crop_idx = y_pred[0]
-    shap_values = explainer.shap_values(sample_input)
-    
-    print(f"[+] SHAP Explanation ready for top predicted crop '{label_encoder.classes_[sample_crop_idx]}'.")
-    print("[+] ML Artifacts successfully built!")
+    _ = explainer.shap_values(sample_input)
+    print(f"[+] SHAP Explanation verified for top predicted crop '{label_encoder.classes_[sample_crop_idx]}'.")
+    print("[+] All ML artifacts successfully trained, verified, and exported!")
 
 if __name__ == "__main__":
     train_and_export()

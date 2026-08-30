@@ -1,0 +1,33 @@
+name: AgriSaathi Backend & ML CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Verify ML Pipeline & Artifacts
+        run: |
+          python backend/ml/train.py
+
+      - name: Run Automated Pytest Suite
+        run: |
+          PYTHONPATH=backend pytest backend/tests/test_services.py -v

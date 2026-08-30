@@ -208,6 +208,16 @@ class ExplainabilityDetailScreen extends StatelessWidget {
                     "• ${AppStrings.isHindi ? 'जल मांग स्तर:' : 'Water Demand:'} ${crop.waterRequirement}",
                     style: const TextStyle(fontSize: 13, color: AppColors.textPrimary, fontWeight: FontWeight.w500),
                   ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "• ${AppStrings.isHindi ? 'स्थिरता स्कोर:' : 'Sustainability Score:'} ${crop.sustainabilityScorePct.toInt()}% (${crop.sustainabilityRating})",
+                    style: const TextStyle(fontSize: 13, color: AppColors.success, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "• ${AppStrings.isHindi ? 'अनुमानित शुद्ध लाभ:' : 'Estimated Net Profit:'} ₹${crop.estimatedNetProfitPerAcre.toInt()} / ${AppStrings.isHindi ? 'एकड़' : 'Acre'}",
+                    style: const TextStyle(fontSize: 13, color: AppColors.primaryDark, fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
             ),

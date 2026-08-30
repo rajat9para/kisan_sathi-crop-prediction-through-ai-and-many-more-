@@ -8,6 +8,8 @@ import '../constants/demo_constants.dart';
 import 'offline_storage.dart';
 import 'sync_manager.dart';
 
+import 'offline_inference_engine.dart';
+
 class ApiService {
   static const String baseUrl = DemoConstants.backendBaseUrl;
   static const Duration timeoutDuration = Duration(seconds: 4);
@@ -25,10 +27,25 @@ class ApiService {
   }) async {
     final syncMgr = SyncManager();
 
-    // If in offline mode, return cached recommendation
+    // If in offline mode, execute real on-device ML inference engine
     if (!syncMgr.isOnline) {
-      final cached = await OfflineStorage.getCachedRecommendation();
-      if (cached != null) return cached;
+      final double n = (customSoil?['nitrogen'] as num?)?.toDouble() ?? 80.0;
+      final double p = (customSoil?['phosphorus'] as num?)?.toDouble() ?? 45.0;
+      final double k = (customSoil?['potassium'] as num?)?.toDouble() ?? 160.0;
+      final double ph = (customSoil?['ph'] as num?)?.toDouble() ?? 6.8;
+      final double temp = (customWeather?['temperature_c'] as num?)?.toDouble() ?? 26.0;
+      final double hum = (customWeather?['humidity_pct'] as num?)?.toDouble() ?? 70.0;
+      final double rain = (customWeather?['rainfall_mm'] as num?)?.toDouble() ?? 80.0;
+
+      final offlineResult = OfflineInferenceEngine.runInference(
+        n: n, p: p, k: k, ph: ph,
+        temp: temp, humidity: hum, rainfall: rain,
+        farmSizeAcres: farmSizeAcres,
+        previousCrop: previousCrop,
+        irrigation: irrigation,
+      );
+      await OfflineStorage.saveRecommendation(offlineResult);
+      return offlineResult;
     }
 
     try {
@@ -59,12 +76,27 @@ class ApiService {
         return result;
       }
     } catch (e) {
-      print('API Error in recommend: $e. Using offline cache.');
+      print('API Error in recommend: $e. Using offline on-device inference.');
     }
 
-    // Offline fallback
-    final cached = await OfflineStorage.getCachedRecommendation();
-    return cached ?? OfflineStorage.buildInitialDemoRecommendation();
+    // Dynamic On-Device Fallback
+    final double n = (customSoil?['nitrogen'] as num?)?.toDouble() ?? 80.0;
+    final double p = (customSoil?['phosphorus'] as num?)?.toDouble() ?? 45.0;
+    final double k = (customSoil?['potassium'] as num?)?.toDouble() ?? 160.0;
+    final double ph = (customSoil?['ph'] as num?)?.toDouble() ?? 6.8;
+    final double temp = (customWeather?['temperature_c'] as num?)?.toDouble() ?? 26.0;
+    final double hum = (customWeather?['humidity_pct'] as num?)?.toDouble() ?? 70.0;
+    final double rain = (customWeather?['rainfall_mm'] as num?)?.toDouble() ?? 80.0;
+
+    final offlineResult = OfflineInferenceEngine.runInference(
+      n: n, p: p, k: k, ph: ph,
+      temp: temp, humidity: hum, rainfall: rain,
+      farmSizeAcres: farmSizeAcres,
+      previousCrop: previousCrop,
+      irrigation: irrigation,
+    );
+    await OfflineStorage.saveRecommendation(offlineResult);
+    return offlineResult;
   }
 
   static Future<SoilData> getSoilData(double lat, double lon) async {
