@@ -108,24 +108,56 @@ class OfflineInferenceEngine {
       soilPenalties += _calcPenalty(ph, prof["ph"][0], prof["ph"][1]) * 1.5;
       final double soilFit = max(35.0, min(99.0, 100.0 - soilPenalties * 0.7));
 
-      // 2. Weather Match
+      // 2. Weather Match & Irrigation Impact
       double weatherPenalties = 0;
       weatherPenalties += _calcPenalty(temp, prof["temp"][0], prof["temp"][1]);
       weatherPenalties += _calcPenalty(humidity, prof["humidity"][0], prof["humidity"][1]);
       weatherPenalties += _calcPenalty(rainfall, prof["rain"][0], prof["rain"][1]);
-      final double weatherFit = max(35.0, min(99.0, 100.0 - weatherPenalties * 0.7));
+      double weatherFit = max(25.0, min(99.0, 100.0 - weatherPenalties * 0.7));
+
+      final String waterLvl = prof["water"] ?? "Medium";
+      if (irrigation == "Rainfed") {
+        if (waterLvl == "High") {
+          weatherFit = max(12.0, weatherFit * 0.35); // Severe penalty for heavy water crops under rainfed
+        } else if (waterLvl == "Low") {
+          weatherFit = min(99.0, weatherFit * 1.25); // Drought hardy boost
+        } else {
+          weatherFit = weatherFit * 0.85;
+        }
+      } else if (irrigation == "Drip") {
+        if (["grapes", "pomegranate", "banana", "sugarcane", "cotton"].contains(cropKey)) {
+          weatherFit = min(99.0, weatherFit * 1.25);
+        }
+      } else if (irrigation == "Canal" || irrigation == "Borewell") {
+        if (waterLvl == "High" || waterLvl == "Medium") {
+          weatherFit = min(99.0, weatherFit * 1.10);
+        }
+      }
 
       // 3. Rotation Impact
       double rotFit = 85.0;
       final isLegume = prof["legume"] == true;
       if (previousCrop != null && previousCrop.isNotEmpty) {
-        if (previousCrop.toLowerCase().contains("wheat") || previousCrop.toLowerCase().contains("rice")) {
-          if (isLegume) rotFit = 98.0;
+        final prev = previousCrop.toLowerCase();
+        if (prev.contains("wheat") || prev.contains("rice") || prev.contains("maize") || prev.contains("cotton")) {
+          if (isLegume) {
+            rotFit = 99.0;
+          } else if (prev.contains(cropKey)) {
+            rotFit = 38.0; // Same crop monoculture penalty
+          } else {
+            rotFit = 55.0;
+          }
+        } else if (prev.contains("soybean") || prev.contains("chickpea") || prev.contains("dal")) {
+          if (!isLegume) {
+            rotFit = 98.0;
+          } else {
+            rotFit = 48.0;
+          }
         }
       }
 
-      final double composite = (soilFit * 0.40) + (weatherFit * 0.35) + (rotFit * 0.15) + (85.0 * 0.10);
-      final double finalMatch = max(40.0, min(99.2, composite));
+      final double composite = (soilFit * 0.40) + (weatherFit * 0.30) + (rotFit * 0.18) + (85.0 * 0.12);
+      final double finalMatch = max(35.0, min(99.2, composite));
 
       candidateScores.add({
         "crop": cropKey,
@@ -151,15 +183,18 @@ class OfflineInferenceEngine {
       final double wFit = cand["weatherFit"] as double;
 
       final double fitMultiplier = max(0.65, min(1.20, 0.65 + 0.35 * (sFit / 100.0)));
-      final double minYield = ((prof["yield_min"] as double) * fitMultiplier);
-      final double maxYield = ((prof["yield_max"] as double) * fitMultiplier);
-      final double avgYield = (minYield + maxYield) / 2.0;
+      final double minYieldAcre = ((prof["yield_min"] as double) * fitMultiplier);
+      final double maxYieldAcre = ((prof["yield_max"] as double) * fitMultiplier);
+      final double totalMinYield = minYieldAcre * farmSizeAcres;
+      final double totalMaxYield = maxYieldAcre * farmSizeAcres;
+      final double avgTotalYield = (totalMinYield + totalMaxYield) / 2.0;
 
       final String unit = prof["unit"];
       final double price = prof["price"];
-      final double cost = prof["cost"];
-      final double grossRev = unit == "Tonnes" ? avgYield * 10.0 * price : avgYield * price;
-      final double netProfit = max(5000.0, grossRev - cost);
+      final double costPerAcre = prof["cost"];
+      final double totalCost = costPerAcre * farmSizeAcres;
+      final double totalGrossRev = unit == "Tonnes" ? avgTotalYield * 10.0 * price : avgTotalYield * price;
+      final double totalNetProfit = max(5000.0 * farmSizeAcres, totalGrossRev - totalCost);
 
       final isLegume = prof["legume"] == true;
       final double sustScore = isLegume ? 92.0 : (prof["water"] == "Low" ? 88.0 : 74.0);
@@ -215,10 +250,10 @@ class OfflineInferenceEngine {
         weatherFitPct: double.parse(wFit.toStringAsFixed(1)),
         marketProfitabilityPct: 88.0,
         rotationImpactPct: cand["rotFit"] as double,
-        expectedYield: "${minYield.toStringAsFixed(1)} - ${maxYield.toStringAsFixed(1)} $unit / Acre",
-        estimatedRevenue: "₹${grossRev.toInt()} / Acre",
-        estimatedCostPerAcre: cost,
-        estimatedNetProfitPerAcre: netProfit,
+        expectedYield: "${totalMinYield.toStringAsFixed(1)} - ${totalMaxYield.toStringAsFixed(1)} $unit ($farmSizeAcres Ac)",
+        estimatedRevenue: "₹${totalGrossRev.toInt()} ($farmSizeAcres Ac)",
+        estimatedCostPerAcre: costPerAcre,
+        estimatedNetProfitPerAcre: totalNetProfit / farmSizeAcres,
         mandiPrice: "₹${price.toInt()} / $unit",
         priceTrend: "up",
         waterRequirement: prof["water"] ?? "Medium",
@@ -227,8 +262,8 @@ class OfflineInferenceEngine {
         harvestDurationDays: prof["days"] ?? 120,
         sustainabilityScorePct: sustScore,
         sustainabilityRating: sustRating,
-        whyThisCropEn: "${cropKey[0].toUpperCase() + cropKey.substring(1)} has a ${match.toStringAsFixed(1)}% match on-device. Sustainability score is $sustScore%.",
-        whyThisCropHi: "${prof['hi']} का मैच स्कोर ${match.toStringAsFixed(1)}% है। स्थिरता स्कोर $sustScore% है।",
+        whyThisCropEn: "${cropKey[0].toUpperCase() + cropKey.substring(1)} has a ${match.toStringAsFixed(1)}% match for your $farmSizeAcres acre farm with $irrigation water facility.",
+        whyThisCropHi: "${prof['hi']} का मैच स्कोर $farmSizeAcres एकड़ खेत व $irrigation सिंचाई पर ${match.toStringAsFixed(1)}% है।",
         shapContributions: shapList,
         fertilizerSchedule: fertSchedule,
         irrigationSchedule: irrigSchedule,

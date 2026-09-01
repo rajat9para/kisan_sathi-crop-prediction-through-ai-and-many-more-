@@ -513,10 +513,26 @@ class MLEngine:
                 weather_penalties += min(40.0, ((low - val) / max(1.0, low)) * 30.0)
             elif val > high:
                 weather_penalties += min(40.0, ((val - high) / max(1.0, high)) * 25.0)
-        weather_fit = round(max(35.0, 100.0 - (weather_penalties * 0.7)), 1)
+        weather_fit = round(max(25.0, 100.0 - (weather_penalties * 0.7)), 1)
+
+        # 2.1 Irrigation Facility Impact
+        meta = CROP_METADATA.get(crop, {})
+        water_lvl = meta.get("water_level", "Medium")
+        if irrigation == "Rainfed":
+            if water_lvl == "High":
+                weather_fit = max(12.0, weather_fit * 0.38) # Severe penalty for heavy water crops under rainfed
+            elif water_lvl == "Low":
+                weather_fit = min(99.0, weather_fit * 1.25) # Large boost for drought-tolerant crops
+            else:
+                weather_fit = weather_fit * 0.85
+        elif irrigation == "Drip":
+            if crop in ["grapes", "pomegranate", "banana", "sugarcane", "cotton", "watermelon", "muskmelon", "papaya", "orange"]:
+                weather_fit = min(99.0, weather_fit * 1.25) # Boost micro-irrigation high value horticulture
+        elif irrigation in ["Canal", "Borewell"]:
+            if water_lvl in ["High", "Medium"]:
+                weather_fit = min(99.0, weather_fit * 1.10)
 
         # 3. Market Profitability
-        meta = CROP_METADATA.get(crop, {})
         trend = meta.get("trend", "stable")
         market_fit = 92.0 if trend == "up" else (78.0 if trend == "stable" else 62.0)
 
@@ -525,16 +541,20 @@ class MLEngine:
         cand_family = CROP_FAMILIES.get(crop, "General")
         prev_family = CROP_FAMILIES.get(prev, "")
 
-        if not prev or prev == "none" or prev == "fallow":
-            rotation_fit = 85.0
-        elif cand_family == prev_family:
-            rotation_fit = 52.0  # Monoculture pest penalty
-        elif "Legume" in prev_family and "Cereal" in cand_family:
-            rotation_fit = 98.0  # Legume residual nitrogen boost
-        elif "Cereal" in prev_family and "Legume" in cand_family:
-            rotation_fit = 95.0  # Cereal break crop benefit
-        else:
+        if not prev or prev in ["none", "fallow", "परती"]:
             rotation_fit = 88.0
+        elif prev.lower() == crop.lower():
+            rotation_fit = 38.0  # Same crop severe monoculture penalty
+        elif cand_family == prev_family:
+            rotation_fit = 48.0  # Monoculture family pest penalty
+        elif "Legume" in prev_family and "Cereal" in cand_family:
+            rotation_fit = 99.0  # Legume residual nitrogen boost
+        elif "Cereal" in prev_family and "Legume" in cand_family:
+            rotation_fit = 99.0  # Cereal break crop benefit
+        elif "Fiber" in prev_family and "Legume" in cand_family:
+            rotation_fit = 98.0  # Cotton rotation with pulse boost
+        else:
+            rotation_fit = 85.0
 
         return {
             "soil_fit_pct": min(99.0, soil_fit),
@@ -671,9 +691,21 @@ class MLEngine:
         cost_per_acre = round(meta["base_cost_acre"] * (0.9 + 0.1 * fit_multiplier), -2)
         net_profit_acre = round(max(5000.0, gross_revenue_acre - cost_per_acre), -2)
 
+        # Farm Size Scaled Totals
+        total_yield_min = round(min_yield * farm_size_acres, 1)
+        total_yield_max = round(max_yield * farm_size_acres, 1)
+        total_gross_rev = round(gross_revenue_acre * farm_size_acres)
+        total_cost = round(cost_per_acre * farm_size_acres)
+        total_net_profit = round(net_profit_acre * farm_size_acres)
+
         return {
+            "farm_size_acres": farm_size_acres,
             "expected_yield_per_acre": yield_str,
             "estimated_revenue_per_acre": f"₹{int(gross_revenue_acre):,} / Acre",
+            "total_expected_yield": f"{total_yield_min} - {total_yield_max} {unit} ({farm_size_acres} Acres)",
+            "total_estimated_revenue": f"₹{int(total_gross_rev):,}",
+            "total_production_cost": f"₹{int(total_cost):,}",
+            "total_net_profit": f"₹{int(total_net_profit):,}",
             "estimated_cost_per_acre_rs": float(cost_per_acre),
             "estimated_net_profit_per_acre_rs": float(net_profit_acre),
             "mandi_price_per_quintal": mandi_str,
@@ -892,6 +924,7 @@ class MLEngine:
                 "sustainability_score_pct": sust_score,
                 "sustainability_rating": sust_rating,
                 "sustainability_factors": sust_factors,
+                "dynamic_economics": econ,
                 "why_this_crop_summary_en": why_en,
                 "why_this_crop_summary_hi": why_hi,
                 "shap_contributions": shap_contributions,

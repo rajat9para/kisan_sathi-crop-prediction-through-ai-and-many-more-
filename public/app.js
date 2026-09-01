@@ -12,8 +12,7 @@
 
 // =========================================================================
 // 1. ALL 22 INDIAN BENCHMARK CROPS AGRONOMIC ML KNOWLEDGE BASE
-// =========================================================================
-const CROP_DATABASE = [
+// ======================================================const CROP_DATABASE = [
   {
     id: "wheat",
     name_en: "🌾 Wheat (Gehun / Kanak)", name_hi: "🌾 गेहूं",
@@ -23,9 +22,8 @@ const CROP_DATABASE = [
     ph_opt: [5.8, 8.0], ph_range: [5.5, 8.5],
     temp_opt: [12, 27], humidity_opt: [40, 78], rain_opt: [35, 95],
     water_req: "Medium", duration_days: 120,
-    yield_en: "18 - 25 Quintals / Acre", yield_hi: "१८ - २५ क्विंटल / एकड़",
-    rev_en: "₹45,000 - ₹62,000", rev_hi: "₹४५,००० - ₹६२,०००",
-    mandi_price: 2425, trend: "up",
+    yield_min: 18, yield_max: 25, unit_en: "Quintals", unit_hi: "क्विंटल",
+    base_cost_acre: 17000, mandi_price: 2425, trend: "up",
     sowing_en: "October - November (Rabi)", sowing_hi: "अक्टूबर - नवंबर (रबी)"
   },
   {
@@ -37,9 +35,8 @@ const CROP_DATABASE = [
     ph_opt: [6.0, 7.8], ph_range: [5.5, 8.2],
     temp_opt: [18, 33], humidity_opt: [50, 85], rain_opt: [55, 125],
     water_req: "Medium", duration_days: 95,
-    yield_en: "10 - 15 Quintals / Acre", yield_hi: "१० - १५ क्विंटल / एकड़",
-    rev_en: "₹48,000 - ₹70,000", rev_hi: "₹४८,००० - ₹७०,०००",
-    mandi_price: 4680, trend: "up",
+    yield_min: 10, yield_max: 15, unit_en: "Quintals", unit_hi: "क्विंटल",
+    base_cost_acre: 16000, mandi_price: 4680, trend: "up",
     sowing_en: "June - July (Kharif)", sowing_hi: "जून - जुलाई (खरीफ)"
   },
   {
@@ -51,9 +48,8 @@ const CROP_DATABASE = [
     ph_opt: [5.8, 8.2], ph_range: [5.5, 8.8],
     temp_opt: [10, 26], humidity_opt: [35, 75], rain_opt: [20, 65],
     water_req: "Low", duration_days: 115,
-    yield_en: "8 - 14 Quintals / Acre", yield_hi: "८ - १४ क्विंटल / एकड़",
-    rev_en: "₹45,000 - ₹78,000", rev_hi: "₹४५,००० - ₹७८,०००",
-    mandi_price: 5650, trend: "up",
+    yield_min: 8, yield_max: 14, unit_en: "Quintals", unit_hi: "क्विंटल",
+    base_cost_acre: 14000, mandi_price: 5650, trend: "up",
     sowing_en: "October - November (Rabi)", sowing_hi: "अक्टूबर - नवंबर (रबी)"
   },
   {
@@ -65,9 +61,8 @@ const CROP_DATABASE = [
     ph_opt: [5.8, 8.2], ph_range: [5.5, 8.5],
     temp_opt: [18, 36], humidity_opt: [55, 85], rain_opt: [90, 190],
     water_req: "High", duration_days: 330,
-    yield_en: "30 - 45 Tonnes / Acre", yield_hi: "३० - ४५ टन / एकड़",
-    rev_en: "₹1,20,000 - ₹1,80,000", rev_hi: "₹१,२०,००० - ₹१,८०,०००",
-    mandi_price: 380, trend: "up",
+    yield_min: 30, yield_max: 45, unit_en: "Tonnes", unit_hi: "टन",
+    base_cost_acre: 65000, mandi_price: 380, trend: "up",
     sowing_en: "October - March (Spring/Autumn)", sowing_hi: "अक्टूबर - मार्च"
   },
   {
@@ -79,9 +74,8 @@ const CROP_DATABASE = [
     ph_opt: [5.8, 7.6], ph_range: [5.2, 8.0],
     temp_opt: [20, 33], humidity_opt: [50, 80], rain_opt: [45, 95],
     water_req: "Medium", duration_days: 110,
-    yield_en: "10 - 16 Quintals / Acre", yield_hi: "१० - १६ क्विंटल / एकड़",
-    rev_en: "₹64,000 - ₹1,02,000", rev_hi: "₹६४,००० - ₹१,०२,०००",
-    mandi_price: 6400, trend: "up",
+    yield_min: 10, yield_max: 16, unit_en: "Quintals", unit_hi: "क्विंटल",
+    base_cost_acre: 20000, mandi_price: 6400, trend: "up",
     sowing_en: "June - July (Kharif)", sowing_hi: "जून - जुलाई (खरीफ)"
   },
   {
@@ -93,9 +87,8 @@ const CROP_DATABASE = [
     ph_opt: [5.8, 7.2], ph_range: [5.2, 7.5],
     temp_opt: [15, 35], humidity_opt: [55, 85], rain_opt: [45, 85],
     water_req: "Medium", duration_days: 135,
-    yield_en: "8 - 12 Tonnes / Acre", yield_hi: "८ - १२ टन / एकड़",
-    rev_en: "₹3,50,000 - ₹5,00,000", rev_hi: "₹३,५०,००० - ₹५,००,०००",
-    mandi_price: 6200, trend: "up",
+    yield_min: 8, yield_max: 12, unit_en: "Tonnes", unit_hi: "टन",
+    base_cost_acre: 120000, mandi_price: 6200, trend: "up",
     sowing_en: "October - November (Pruning)", sowing_hi: "अक्टूबर - नवंबर (छंटाई)"
   },
   {
@@ -107,9 +100,8 @@ const CROP_DATABASE = [
     ph_opt: [5.5, 7.5], ph_range: [5.0, 7.8],
     temp_opt: [18, 32], humidity_opt: [60, 95], rain_opt: [60, 120],
     water_req: "Low", duration_days: 180,
-    yield_en: "4 - 6 Tonnes / Acre", yield_hi: "४ - ६ टन / एकड़",
-    rev_en: "₹2,80,000 - ₹4,20,000", rev_hi: "₹२,८०,००० - ₹४,२०,०००",
-    mandi_price: 8400, trend: "up",
+    yield_min: 4, yield_max: 6, unit_en: "Tonnes", unit_hi: "टन",
+    base_cost_acre: 90000, mandi_price: 8400, trend: "up",
     sowing_en: "June - July (Mrig Bahar)", sowing_hi: "जून - जुलाई (मृग बहार)"
   },
   {
@@ -121,9 +113,8 @@ const CROP_DATABASE = [
     ph_opt: [6.0, 8.2], ph_range: [5.8, 8.8],
     temp_opt: [21, 33], humidity_opt: [55, 85], rain_opt: [55, 110],
     water_req: "Medium", duration_days: 160,
-    yield_en: "10 - 14 Quintals / Acre", yield_hi: "१० - १४ क्विंटल / एकड़",
-    rev_en: "₹75,000 - ₹1,05,000", rev_hi: "₹७५,००० - ₹१,०५,०००",
-    mandi_price: 7450, trend: "stable",
+    yield_min: 10, yield_max: 14, unit_en: "Quintals", unit_hi: "क्विंटल",
+    base_cost_acre: 28000, mandi_price: 7450, trend: "stable",
     sowing_en: "May - June (Kharif)", sowing_hi: "मई - जून (खरीफ)"
   },
   {
@@ -135,9 +126,8 @@ const CROP_DATABASE = [
     ph_opt: [6.0, 8.5], ph_range: [5.5, 9.0],
     temp_opt: [14, 26], humidity_opt: [30, 75], rain_opt: [45, 95],
     water_req: "Low", duration_days: 110,
-    yield_en: "8 - 12 Quintals / Acre", yield_hi: "८ - १२ क्विंटल / एकड़",
-    rev_en: "₹50,000 - ₹74,000", rev_hi: "₹५०,००० - ₹७४,०००",
-    mandi_price: 6150, trend: "up",
+    yield_min: 8, yield_max: 12, unit_en: "Quintals", unit_hi: "क्विंटल",
+    base_cost_acre: 16000, mandi_price: 6150, trend: "up",
     sowing_en: "October - November (Rabi)", sowing_hi: "अक्टूबर - नवंबर (रबी)"
   },
   {
@@ -149,9 +139,8 @@ const CROP_DATABASE = [
     ph_opt: [4.8, 7.2], ph_range: [4.2, 7.8],
     temp_opt: [20, 29], humidity_opt: [78, 88], rain_opt: [170, 300],
     water_req: "High", duration_days: 130,
-    yield_en: "22 - 28 Quintals / Acre", yield_hi: "२२ - २८ क्विंटल / एकड़",
-    rev_en: "₹85,000 - ₹1,10,000", rev_hi: "₹८५,००० - ₹१,१०,०००",
-    mandi_price: 3950, trend: "up",
+    yield_min: 22, yield_max: 28, unit_en: "Quintals", unit_hi: "क्विंटल",
+    base_cost_acre: 26000, mandi_price: 3950, trend: "up",
     sowing_en: "June - July (Kharif)", sowing_hi: "जून - जुलाई (खरीफ)"
   },
   {
@@ -163,9 +152,8 @@ const CROP_DATABASE = [
     ph_opt: [5.5, 7.5], ph_range: [5.0, 8.2],
     temp_opt: [18, 29], humidity_opt: [55, 78], rain_opt: [60, 115],
     water_req: "Medium", duration_days: 105,
-    yield_en: "25 - 32 Quintals / Acre", yield_hi: "२५ - ३२ क्विंटल / एकड़",
-    rev_en: "₹55,000 - ₹72,000", rev_hi: "₹५५,००० - ₹७२,०००",
-    mandi_price: 2280, trend: "up",
+    yield_min: 25, yield_max: 32, unit_en: "Quintals", unit_hi: "क्विंटल",
+    base_cost_acre: 18000, mandi_price: 2280, trend: "up",
     sowing_en: "June - July / Oct - Nov", sowing_hi: "जून - जुलाई / अक्टूबर - नवंबर"
   },
   {
@@ -177,9 +165,8 @@ const CROP_DATABASE = [
     ph_opt: [3.5, 9.5], ph_range: [3.5, 9.5],
     temp_opt: [24, 34], humidity_opt: [38, 68], rain_opt: [25, 75],
     water_req: "Low", duration_days: 75,
-    yield_en: "4 - 7 Quintals / Acre", yield_hi: "४ - ७ क्विंटल / एकड़",
-    rev_en: "₹30,000 - ₹48,000", rev_hi: "₹३०,००० - ₹४८,०००",
-    mandi_price: 7200, trend: "stable",
+    yield_min: 4, yield_max: 7, unit_en: "Quintals", unit_hi: "क्विंटल",
+    base_cost_acre: 11000, mandi_price: 7200, trend: "stable",
     sowing_en: "July (Rainfed / Arid)", sowing_hi: "जुलाई (शुष्क वर्षा आधारित)"
   },
   {
@@ -191,9 +178,8 @@ const CROP_DATABASE = [
     ph_opt: [5.2, 6.6], ph_range: [4.8, 7.0],
     temp_opt: [12, 24], humidity_opt: [85, 98], rain_opt: [95, 130],
     water_req: "Medium", duration_days: 180,
-    yield_en: "8 - 14 Tonnes / Acre", yield_hi: "८ - १४ टन / एकड़",
-    rev_en: "₹4,00,000 - ₹6,50,000", rev_hi: "₹४,००,००० - ₹६,५०,०००",
-    mandi_price: 7500, trend: "up",
+    yield_min: 8, yield_max: 14, unit_en: "Tonnes", unit_hi: "टन",
+    base_cost_acre: 95000, mandi_price: 7500, trend: "up",
     sowing_en: "December - February", sowing_hi: "दिसंबर - फरवरी"
   },
   {
@@ -205,9 +191,8 @@ const CROP_DATABASE = [
     ph_opt: [4.5, 6.2], ph_range: [4.0, 6.8],
     temp_opt: [20, 29], humidity_opt: [55, 75], rain_opt: [115, 210],
     water_req: "Medium", duration_days: 270,
-    yield_en: "600 - 900 kg / Acre", yield_hi: "६०० - ९०० किग्रा / एकड़",
-    rev_en: "₹1,80,000 - ₹2,60,000", rev_hi: "₹१,८०,००० - ₹२,६०,०००",
-    mandi_price: 24000, trend: "up",
+    yield_min: 6, yield_max: 9, unit_en: "Quintals", unit_hi: "क्विंटल",
+    base_cost_acre: 45000, mandi_price: 24000, trend: "up",
     sowing_en: "June - August", sowing_hi: "जून - अगस्त"
   },
   {
@@ -219,9 +204,8 @@ const CROP_DATABASE = [
     ph_opt: [5.5, 6.8], ph_range: [5.0, 7.5],
     temp_opt: [24, 32], humidity_opt: [75, 88], rain_opt: [90, 125],
     water_req: "High", duration_days: 300,
-    yield_en: "25 - 35 Tonnes / Acre", yield_hi: "२५ - ३५ टन / एकड़",
-    rev_en: "₹2,50,000 - ₹3,80,000", rev_hi: "₹२,५०,००० - ₹३,८०,०००",
-    mandi_price: 1850, trend: "up",
+    yield_min: 25, yield_max: 35, unit_en: "Tonnes", unit_hi: "टन",
+    base_cost_acre: 85000, mandi_price: 1850, trend: "up",
     sowing_en: "June - July / Oct - Nov", sowing_hi: "जून - जुलाई / अक्टूबर - नवंबर"
   },
   {
@@ -233,9 +217,8 @@ const CROP_DATABASE = [
     ph_opt: [5.2, 6.8], ph_range: [4.8, 7.5],
     temp_opt: [24, 30], humidity_opt: [88, 100], rain_opt: [130, 240],
     water_req: "Medium", duration_days: 365,
-    yield_en: "8,000 - 12,000 Nuts / Acre", yield_hi: "८,००० - १२,००० फल / एकड़",
-    rev_en: "₹1,60,000 - ₹2,40,000", rev_hi: "₹१,६०,००० - ₹२,४०,०००",
-    mandi_price: 3400, trend: "stable",
+    yield_min: 80, yield_max: 120, unit_en: "Hundred Nuts", unit_hi: "सैकड़ा नारियल",
+    base_cost_acre: 35000, mandi_price: 2500, trend: "stable",
     sowing_en: "May - June (Coastal)", sowing_hi: "मई - जून (तटीय क्षेत्र)"
   },
   {
@@ -247,9 +230,8 @@ const CROP_DATABASE = [
     ph_opt: [6.0, 7.6], ph_range: [5.5, 8.0],
     temp_opt: [23, 28], humidity_opt: [70, 92], rain_opt: [150, 210],
     water_req: "High", duration_days: 120,
-    yield_en: "12 - 16 Quintals / Acre", yield_hi: "१२ - १६ क्विंटल / एकड़",
-    rev_en: "₹55,000 - ₹75,000", rev_hi: "₹५५,००० - ₹७५,०००",
-    mandi_price: 5200, trend: "stable",
+    yield_min: 12, yield_max: 16, unit_en: "Quintals", unit_hi: "क्विंटल",
+    base_cost_acre: 18000, mandi_price: 5200, trend: "stable",
     sowing_en: "March - May", sowing_hi: "मार्च - मई"
   },
   {
@@ -259,11 +241,10 @@ const CROP_DATABASE = [
     botanical_family: "Fabaceae",
     n_opt: [10, 40], p_opt: [55, 85], k_opt: [15, 30],
     ph_opt: [5.2, 6.2], ph_range: [4.8, 6.8],
-    temp_opt: [15, 25], humidity_opt: [18, 28], rain_opt: [60, 150],
+    temp_opt: [15, 25], humidity_opt: [35, 75], rain_opt: [60, 150],
     water_req: "Medium", duration_days: 110,
-    yield_en: "5 - 8 Quintals / Acre", yield_hi: "५ - ८ क्विंटल / एकड़",
-    rev_en: "₹45,000 - ₹65,000", rev_hi: "₹४५,००० - ₹६५,०००",
-    mandi_price: 8600, trend: "up",
+    yield_min: 5, yield_max: 8, unit_en: "Quintals", unit_hi: "क्विंटल",
+    base_cost_acre: 22000, mandi_price: 8600, trend: "up",
     sowing_en: "October - November", sowing_hi: "अक्टूबर - नवंबर"
   },
   {
@@ -275,9 +256,8 @@ const CROP_DATABASE = [
     ph_opt: [5.0, 7.5], ph_range: [4.5, 8.0],
     temp_opt: [25, 38], humidity_opt: [30, 70], rain_opt: [90, 200],
     water_req: "Low", duration_days: 170,
-    yield_en: "6 - 9 Quintals / Acre", yield_hi: "६ - ९ क्विंटल / एकड़",
-    rev_en: "₹50,000 - ₹72,000", rev_hi: "₹५०,००० - ₹७२,०००",
-    mandi_price: 7800, trend: "up",
+    yield_min: 6, yield_max: 9, unit_en: "Quintals", unit_hi: "क्विंटल",
+    base_cost_acre: 18000, mandi_price: 7800, trend: "up",
     sowing_en: "June - July (Kharif)", sowing_hi: "जून - जुलाई (खरीफ)"
   },
   {
@@ -289,9 +269,8 @@ const CROP_DATABASE = [
     ph_opt: [6.2, 7.4], ph_range: [5.5, 8.0],
     temp_opt: [26, 32], humidity_opt: [80, 92], rain_opt: [35, 65],
     water_req: "Low", duration_days: 65,
-    yield_en: "4 - 6 Quintals / Acre", yield_hi: "४ - ६ क्विंटल / एकड़",
-    rev_en: "₹32,000 - ₹46,000", rev_hi: "₹३२,००० - ₹४६,०००",
-    mandi_price: 8200, trend: "up",
+    yield_min: 4, yield_max: 6, unit_en: "Quintals", unit_hi: "क्विंटल",
+    base_cost_acre: 13500, mandi_price: 8200, trend: "up",
     sowing_en: "March - April (Zaid) / July", sowing_hi: "मार्च - अप्रैल / जुलाई"
   },
   {
@@ -303,9 +282,8 @@ const CROP_DATABASE = [
     ph_opt: [6.5, 7.8], ph_range: [5.8, 8.2],
     temp_opt: [25, 36], humidity_opt: [60, 75], rain_opt: [60, 80],
     water_req: "Low", duration_days: 80,
-    yield_en: "4 - 7 Quintals / Acre", yield_hi: "४ - ७ क्विंटल / एकड़",
-    rev_en: "₹32,000 - ₹50,000", rev_hi: "₹३२,००० - ₹५०,०००",
-    mandi_price: 7600, trend: "up",
+    yield_min: 4, yield_max: 7, unit_en: "Quintals", unit_hi: "क्विंटल",
+    base_cost_acre: 14000, mandi_price: 7600, trend: "up",
     sowing_en: "June - July (Kharif)", sowing_hi: "जून - जुलाई (खरीफ)"
   },
   {
@@ -317,9 +295,8 @@ const CROP_DATABASE = [
     ph_opt: [6.0, 7.8], ph_range: [5.5, 8.2],
     temp_opt: [16, 28], humidity_opt: [55, 72], rain_opt: [35, 60],
     water_req: "Low", duration_days: 95,
-    yield_en: "5 - 8 Quintals / Acre", yield_hi: "५ - ८ क्विंटल / एकड़",
-    rev_en: "₹35,000 - ₹52,000", rev_hi: "₹३५,००० - ₹५२,०००",
-    mandi_price: 6600, trend: "stable",
+    yield_min: 5, yield_max: 8, unit_en: "Quintals", unit_hi: "क्विंटल",
+    base_cost_acre: 14500, mandi_price: 6600, trend: "stable",
     sowing_en: "October - November (Rabi)", sowing_hi: "अक्टूबर - नवंबर (रबी)"
   },
   {
@@ -331,9 +308,8 @@ const CROP_DATABASE = [
     ph_opt: [6.0, 7.2], ph_range: [5.5, 7.8],
     temp_opt: [24, 29], humidity_opt: [80, 92], rain_opt: [40, 65],
     water_req: "Medium", duration_days: 85,
-    yield_en: "15 - 22 Tonnes / Acre", yield_hi: "१५ - २२ टन / एकड़",
-    rev_en: "₹1,20,000 - ₹1,80,000", rev_hi: "₹१,२०,००० - ₹१,८०,०००",
-    mandi_price: 1200, trend: "up",
+    yield_min: 15, yield_max: 22, unit_en: "Tonnes", unit_hi: "टन",
+    base_cost_acre: 32000, mandi_price: 1200, trend: "up",
     sowing_en: "January - February (Zaid)", sowing_hi: "जनवरी - फरवरी (जायद)"
   },
   {
@@ -345,9 +321,8 @@ const CROP_DATABASE = [
     ph_opt: [6.0, 7.0], ph_range: [5.5, 7.5],
     temp_opt: [26, 32], humidity_opt: [88, 96], rain_opt: [20, 35],
     water_req: "Medium", duration_days: 80,
-    yield_en: "8 - 12 Tonnes / Acre", yield_hi: "८ - १२ टन / एकड़",
-    rev_en: "₹90,000 - ₹1,40,000", rev_hi: "₹९०,००० - ₹१,४०,०००",
-    mandi_price: 1600, trend: "up",
+    yield_min: 8, yield_max: 12, unit_en: "Tonnes", unit_hi: "टन",
+    base_cost_acre: 28000, mandi_price: 1600, trend: "up",
     sowing_en: "January - February (Zaid)", sowing_hi: "जनवरी - फरवरी (जायद)"
   },
   {
@@ -359,9 +334,8 @@ const CROP_DATABASE = [
     ph_opt: [6.2, 7.2], ph_range: [5.8, 7.8],
     temp_opt: [23, 40], humidity_opt: [88, 98], rain_opt: [40, 240],
     water_req: "Medium", duration_days: 270,
-    yield_en: "25 - 40 Tonnes / Acre", yield_hi: "२५ - ४० टन / एकड़",
-    rev_en: "₹2,00,000 - ₹3,20,000", rev_hi: "₹२,००,००० - ₹३,२०,०००",
-    mandi_price: 1400, trend: "stable",
+    yield_min: 25, yield_max: 40, unit_en: "Tonnes", unit_hi: "टन",
+    base_cost_acre: 42000, mandi_price: 1400, trend: "stable",
     sowing_en: "June - September", sowing_hi: "जून - सितंबर"
   },
   {
@@ -373,9 +347,8 @@ const CROP_DATABASE = [
     ph_opt: [6.0, 8.0], ph_range: [5.5, 8.5],
     temp_opt: [10, 35], humidity_opt: [88, 98], rain_opt: [95, 125],
     water_req: "Medium", duration_days: 240,
-    yield_en: "6 - 10 Tonnes / Acre", yield_hi: "६ - १० टन / एकड़",
-    rev_en: "₹2,00,000 - ₹3,20,000", rev_hi: "₹२,००,००० - ₹३,२०,०००",
-    mandi_price: 3800, trend: "up",
+    yield_min: 6, yield_max: 10, unit_en: "Tonnes", unit_hi: "टन",
+    base_cost_acre: 60000, mandi_price: 3800, trend: "up",
     sowing_en: "July - August", sowing_hi: "जुलाई - अगस्त"
   },
   {
@@ -387,9 +360,8 @@ const CROP_DATABASE = [
     ph_opt: [4.8, 7.2], ph_range: [4.5, 7.8],
     temp_opt: [26, 38], humidity_opt: [45, 60], rain_opt: [80, 110],
     water_req: "Low", duration_days: 365,
-    yield_en: "5 - 8 Tonnes / Acre", yield_hi: "५ - ८ टन / एकड़",
-    rev_en: "₹2,00,000 - ₹3,50,000", rev_hi: "₹२,००,००० - ₹३,५०,०००",
-    mandi_price: 5200, trend: "up",
+    yield_min: 5, yield_max: 8, unit_en: "Tonnes", unit_hi: "टन",
+    base_cost_acre: 50000, mandi_price: 5200, trend: "up",
     sowing_en: "July - August", sowing_hi: "जुलाई - अगस्त"
   }
 ];
@@ -398,7 +370,8 @@ const CROP_DATABASE = [
 // 2. REAL-TIME MATHEMATICAL DECISION VECTOR ML ENGINE
 // =========================================================================
 function evaluateAgronomicModel(params) {
-  const { n, p, k, ph, temp, humidity, rain, irrigation, prevCrop } = params;
+  const { n, p, k, ph, temp, humidity, rain, irrigation, prevCrop, farmSize } = params;
+  const size = Math.max(0.5, parseFloat(farmSize) || 2.5);
 
   // Smooth Gaussian bell-curve tolerance for realistic agronomic responses
   function agronomicFit(val, optLow, optHigh, hardMin, hardMax) {
@@ -433,10 +406,23 @@ function evaluateAgronomicModel(params) {
     const rScore = agronomicFit(rain, crop.rain_opt[0], crop.rain_opt[1]);
     let weatherFit = (tScore * 0.35 + hScore * 0.35 + rScore * 0.30) * 100.0;
 
-    if (irrigation === "Rainfed" && crop.water_req === "High") {
-      weatherFit = Math.max(20.0, weatherFit * 0.45);
-    } else if (irrigation === "Drip" && (crop.id === "grapes" || crop.id === "pomegranate" || crop.id === "banana" || crop.id === "sugarcane")) {
-      weatherFit = Math.min(99.0, weatherFit * 1.12);
+    // --- IRRIGATION FACILITY IMPACT ---
+    if (irrigation === "Rainfed") {
+      if (crop.water_req === "High") {
+        weatherFit = Math.max(12.0, weatherFit * 0.35); // Severe penalty for heavy water crops (Rice/Banana/Sugarcane) under Rainfed
+      } else if (crop.water_req === "Low") {
+        weatherFit = Math.min(99.0, weatherFit * 1.25); // Large boost for drought-hardy pulses/oilseeds
+      } else {
+        weatherFit = weatherFit * 0.85;
+      }
+    } else if (irrigation === "Drip") {
+      if (["grapes", "pomegranate", "banana", "sugarcane", "cotton", "watermelon", "muskmelon", "papaya", "orange"].includes(crop.id)) {
+        weatherFit = Math.min(99.0, weatherFit * 1.25); // Major boost for micro-irrigation high value crops
+      }
+    } else if (irrigation === "Canal" || irrigation === "Borewell") {
+      if (crop.water_req === "High" || crop.water_req === "Medium") {
+        weatherFit = Math.min(99.0, weatherFit * 1.10); // Assured irrigation support
+      }
     }
 
     // 3. Market Fit Pillar
@@ -450,7 +436,7 @@ function evaluateAgronomicModel(params) {
     const currFam = (crop.botanical_family || "").toLowerCase();
     const currId = crop.id.toLowerCase();
 
-    const isPrevLegume = prev.includes("soybean") || prev.includes("सोयाबीन") || prev.includes("chickpea") || prev.includes("चना") || prev.includes("lentil") || prev.includes("मूंगा") || prev.includes("दलहन");
+    const isPrevLegume = prev.includes("soybean") || prev.includes("सोयाबीन") || prev.includes("chickpea") || prev.includes("चना") || prev.includes("lentil") || prev.includes("मूंगा") || prev.includes("दलहन") || prev.includes("pulse");
     const isPrevCereal = prev.includes("wheat") || prev.includes("गेहूं") || prev.includes("rice") || prev.includes("धान") || prev.includes("maize") || prev.includes("मक्का");
     const isPrevCotton = prev.includes("cotton") || prev.includes("कपास");
 
@@ -460,27 +446,49 @@ function evaluateAgronomicModel(params) {
     if (isPrevCereal || isPrevCotton) {
       if (isCurrLegume) {
         rotationFit = 99.0; // Excellent N-fixing break
+      } else if (prev.includes(currId)) {
+        rotationFit = 38.0; // Same crop monoculture penalty
       } else if (currFam.includes("poaceae") || currFam.includes("malvaceae")) {
-        rotationFit = 55.0; // Heavy-feeder after heavy-feeder penalty
+        rotationFit = 52.0; // Heavy-feeder after heavy-feeder penalty
       }
     } else if (isPrevLegume) {
       if (isCurrCerealOrHeavy) {
         rotationFit = 98.0; // Beneficial nitrogen utilization
       } else if (isCurrLegume) {
-        rotationFit = 60.0; // Consecutive legume disease risk
+        rotationFit = 48.0; // Consecutive legume disease risk
       }
+    } else if (prev.includes("fallow") || prev.includes("परती")) {
+      rotationFit = 90.0;
     }
 
-    // Total Multi-Criteria Agronomic Fit (Soil: 42%, Weather: 28%, Market: 14%, Rotation: 16%)
-    const totalScore = (soilFit * 0.42 + weatherFit * 0.28 + marketFit * 0.14 + rotationFit * 0.16);
+    // Total Multi-Criteria Agronomic Fit (Soil: 40%, Weather/Water: 30%, Market: 12%, Rotation: 18%)
+    const totalScore = (soilFit * 0.40 + weatherFit * 0.30 + marketFit * 0.12 + rotationFit * 0.18);
+
+    // --- DYNAMIC YIELD & REVENUE SCALING BASED ON FARM SIZE & SOIL FIT ---
+    const fitMultiplier = Math.max(0.70, Math.min(1.25, 0.70 + 0.30 * (soilFit / 100.0)));
+    const totalYieldMin = (crop.yield_min * fitMultiplier * size);
+    const totalYieldMax = (crop.yield_max * fitMultiplier * size);
+    const unitMultiplier = crop.unit_en === "Tonnes" ? 10 : 1; // 1 Tonne = 10 Quintals
+    const totalRevMin = Math.round(totalYieldMin * unitMultiplier * crop.mandi_price);
+    const totalRevMax = Math.round(totalYieldMax * unitMultiplier * crop.mandi_price);
+
+    const formattedYieldEn = `${totalYieldMin.toFixed(totalYieldMin >= 10 ? 0 : 1)} - ${totalYieldMax.toFixed(totalYieldMax >= 10 ? 0 : 1)} ${crop.unit_en}`;
+    const formattedYieldHi = `${totalYieldMin.toFixed(totalYieldMin >= 10 ? 0 : 1)} - ${totalYieldMax.toFixed(totalYieldMax >= 10 ? 0 : 1)} ${crop.unit_hi}`;
+    const formattedRevEn = `₹${totalRevMin.toLocaleString('en-IN')} - ₹${totalRevMax.toLocaleString('en-IN')}`;
+    const formattedRevHi = `₹${totalRevMin.toLocaleString('hi-IN')} - ₹${totalRevMax.toLocaleString('hi-IN')}`;
 
     return {
       ...crop,
-      soilFit: Math.round(Math.min(99, Math.max(25, soilFit))),
-      weatherFit: Math.round(Math.min(99, Math.max(25, weatherFit))),
+      soilFit: Math.round(Math.min(99, Math.max(20, soilFit))),
+      weatherFit: Math.round(Math.min(99, Math.max(15, weatherFit))),
       marketFit: Math.round(marketFit),
       rotationFit: Math.round(rotationFit),
-      totalScore: Math.round(Math.min(99, Math.max(35, totalScore))),
+      totalScore: Math.round(Math.min(99, Math.max(25, totalScore))),
+      dynamicYieldEn: formattedYieldEn,
+      dynamicYieldHi: formattedYieldHi,
+      dynamicRevEn: formattedRevEn,
+      dynamicRevHi: formattedRevHi,
+      farmSizeUsed: size,
       rawNScore: nScore,
       rawPScore: pScore,
       rawKScore: kScore,
@@ -506,20 +514,20 @@ function evaluateAgronomicModel(params) {
       pos: top.rawNScore >= 0.65
     },
     {
-      name_en: `Potassium (K: ${k} kg/ha)`,
-      name_hi: `पोटाश (K: ${k} किग्रा/हे.)`,
-      pct: Math.round(top.rawKScore * 88),
-      val_en: top.rawKScore >= 0.65 ? `+${Math.round(top.rawKScore * 24)}%` : `-${Math.round((1 - top.rawKScore) * 22)}%`,
-      val_hi: top.rawKScore >= 0.65 ? `+${Math.round(top.rawKScore * 24)}%` : `-${Math.round((1 - top.rawKScore) * 22)}%`,
-      pos: top.rawKScore >= 0.65
+      name_en: `Irrigation & Water (${irrigation})`,
+      name_hi: `सिंचाई व जल प्रबंधन (${irrigation === 'Rainfed' ? 'वर्षा आधारित' : (irrigation === 'Drip' ? 'ड्रिप सिंचाई' : 'नलकूप / नहर')})`,
+      pct: Math.round((top.weatherFit / 100.0) * 88),
+      val_en: top.weatherFit >= 65 ? `+${Math.round(top.weatherFit * 0.28)}%` : `-${Math.round((100 - top.weatherFit) * 0.3)}%`,
+      val_hi: top.weatherFit >= 65 ? `+${Math.round(top.weatherFit * 0.28)}%` : `-${Math.round((100 - top.weatherFit) * 0.3)}%`,
+      pos: top.weatherFit >= 65
     },
     {
-      name_en: `Phosphorus (P: ${p} kg/ha)`,
-      name_hi: `फॉस्फोरस (P: ${p} किग्रा/हे.)`,
-      pct: Math.round(top.rawPScore * 88),
-      val_en: top.rawPScore >= 0.65 ? `+${Math.round(top.rawPScore * 20)}%` : `-${Math.round((1 - top.rawPScore) * 18)}%`,
-      val_hi: top.rawPScore >= 0.65 ? `+${Math.round(top.rawPScore * 20)}%` : `-${Math.round((1 - top.rawPScore) * 18)}%`,
-      pos: top.rawPScore >= 0.65
+      name_en: `Crop Rotation (Prev: ${prevCrop || 'None'})`,
+      name_hi: `फसल चक्र (पिछली फसल: ${prevCrop || 'कोई नहीं'})`,
+      pct: Math.round((top.rotationFit / 100.0) * 88),
+      val_en: top.rotationFit >= 70 ? `+${Math.round(top.rotationFit * 0.26)}%` : `-${Math.round((100 - top.rotationFit) * 0.3)}%`,
+      val_hi: top.rotationFit >= 70 ? `+${Math.round(top.rotationFit * 0.26)}%` : `-${Math.round((100 - top.rotationFit) * 0.3)}%`,
+      pos: top.rotationFit >= 70
     },
     {
       name_en: `Soil pH (${ph} ${ph < 6.0 ? 'Acidic' : (ph > 7.5 ? 'Alkaline' : 'Neutral')})`,
@@ -528,14 +536,6 @@ function evaluateAgronomicModel(params) {
       val_en: top.rawPHScore >= 0.7 ? `+${Math.round(top.rawPHScore * 22)}%` : `-${Math.round((1 - top.rawPHScore) * 22)}%`,
       val_hi: top.rawPHScore >= 0.7 ? `+${Math.round(top.rawPHScore * 22)}%` : `-${Math.round((1 - top.rawPHScore) * 22)}%`,
       pos: top.rawPHScore >= 0.7
-    },
-    {
-      name_en: `Crop Rotation (${prevCrop || 'Standard'})`,
-      name_hi: `फसल चक्र (${prevCrop || 'सामान्य'})`,
-      pct: Math.round((top.rotationFit / 100) * 85),
-      val_en: top.rotationFit >= 80 ? `+${Math.round((top.rotationFit - 70) * 0.45)}%` : `-${Math.round((80 - top.rotationFit) * 0.45)}%`,
-      val_hi: top.rotationFit >= 80 ? `+${Math.round((top.rotationFit - 70) * 0.45)}%` : `-${Math.round((80 - top.rotationFit) * 0.45)}%`,
-      pos: top.rotationFit >= 80
     }
   ];
 
@@ -543,23 +543,20 @@ function evaluateAgronomicModel(params) {
   let expHi = "";
 
   if (n > 110) {
-    expEn = `High nitrogen reserves (${n} kg/ha) with balanced pH (${ph}) strongly boost rapid vegetative growth, tillering, and boll/ear formation for ${top.name_en}.`;
-    expHi = `आपकी मिट्टी में उच्च नाइट्रोजन (${n} किग्रा/हे.) और संतुलित pH (${ph}) ${top.name_hi} की तीव्र वानस्पतिक वृद्धि और उच्च पैदावार के लिए सर्वाधिक अनुकूल हैं।`;
+    expEn = `High nitrogen reserves (${n} kg/ha) with balanced pH (${ph}) on ${size} acres strongly boost rapid vegetative growth and yield for ${top.name_en} (${top.dynamicYieldEn} / ${top.dynamicRevEn}).`;
+    expHi = `आपकी मिट्टी में उच्च नाइट्रोजन (${n} किग्रा/हे.) और ${size} एकड़ रकबे पर ${top.name_hi} की बंपर पैदावार (${top.dynamicYieldHi}) और कुल आय (${top.dynamicRevHi}) अनुमानित है।`;
   } else if (n < 45 && top.botanical_family.toLowerCase().includes("fabaceae")) {
-    expEn = `Low soil nitrogen (${n} kg/ha) combined with adequate phosphorus (${p} kg/ha) makes nitrogen-fixing legume ${top.name_en} the most profitable soil-enriching choice.`;
-    expHi = `कम नाइट्रोजन (${n} किग्रा/हे.) और पर्याप्त फॉस्फोरस (${p} किग्रा/हे.) की स्थिति में दलहनी फसल ${top.name_hi} मिट्टी में प्राकृतिक नाइट्रोजन जोड़ती है और बंपर लाभ देती है।`;
+    expEn = `Low soil nitrogen (${n} kg/ha) combined with adequate phosphorus makes nitrogen-fixing ${top.name_en} the most profitable choice for ${size} acres (${top.dynamicYieldEn} / ${top.dynamicRevEn}).`;
+    expHi = `कम नाइट्रोजन (${n} किग्रा/हे.) में दलहनी फसल ${top.name_hi} मिट्टी में प्राकृतिक नाइट्रोजन जोड़ती है और ${size} एकड़ पर ${top.dynamicYieldHi} उपज व ${top.dynamicRevHi} आय देती है।`;
   } else if (k > 150) {
-    expEn = `High potassium reserves (${k} kg/ha) with balanced pH (${ph}) strongly boost yield, fruit sweetness, and market premium quality for ${top.name_en}.`;
-    expHi = `आपकी मिट्टी में उच्च पोटाश (${k} किग्रा/हे.) और संतुलित pH (${ph}) ${top.name_hi} की गुणवत्ता, मिठास और बेहतर मंडी भाव के लिए सर्वोत्तम हैं।`;
-  } else if (ph < 5.8) {
-    expEn = `Your acidic soil pH (${ph}) coupled with nutrient levels makes ${top.name_en} the most acid-tolerant and productive crop.`;
-    expHi = `आपकी मिट्टी का अम्लीय सामू pH (${ph}) ${top.name_hi} की अम्लता-सहनशील एवं टिकाऊ पैदावार के लिए सर्वाधिक अनुकूल है।`;
-  } else if (ph > 7.5) {
-    expEn = `Your calcareous/alkaline soil pH (${ph}) matches the drought and salt tolerance profile of ${top.name_en} with top net returns.`;
-    expHi = `आपकी मिट्टी का क्षारीय सामू pH (${ph}) ${top.name_hi} की लवण-सहनशीलता और मंडी मुनाफे के लिए सर्वाधिक उत्तम है।`;
+    expEn = `High potassium (${k} kg/ha) with balanced pH (${ph}) boosts fruit/grain quality for ${top.name_en} on ${size} acres (${top.dynamicYieldEn} / ${top.dynamicRevEn}).`;
+    expHi = `उच्च पोटाश (${k} किग्रा/हे.) ${size} एकड़ पर ${top.name_hi} की गुणवत्ता और उच्च मंडी भाव (${top.dynamicRevHi}) सुनिश्चित करता है।`;
+  } else if (irrigation === "Rainfed" && top.water_req === "Low") {
+    expEn = `Under rainfed conditions, drought-hardy ${top.name_en} delivers high resilience and strong returns on ${size} acres (${top.dynamicYieldEn} / ${top.dynamicRevEn}).`;
+    expHi = `वर्षा आधारित खेती में कम पानी वाली फसल ${top.name_hi} सबसे सुरक्षित विकल्प है जो ${size} एकड़ पर ${top.dynamicYieldHi} पैदावार देती है।`;
   } else {
-    expEn = `The nutrient balance (N: ${n}, P: ${p}, K: ${k}, pH: ${ph}) and crop rotation synergy perfectly fulfill the growth requirements of ${top.name_en}.`;
-    expHi = `मृदा पोषक तत्वों (नाइट्रोजन: ${n}, फॉस्फोरस: ${p}, पोटाश: ${k}, pH: ${ph}) और फसल चक्र का संतुलन ${top.name_hi} की फसल के लिए शत-प्रतिशत अनुकूल है।`;
+    expEn = `Nutrient levels (N: ${n}, P: ${p}, K: ${k}, pH: ${ph}), ${irrigation} irrigation, and previous ${prevCrop || 'none'} rotation on ${size} acres make ${top.name_en} the #1 best match (${top.totalScore}% fit).`;
+    expHi = `मृदा पोषक तत्वों (N: ${n}, P: ${p}, K: ${k}, pH: ${ph}), ${irrigation === 'Rainfed' ? 'वर्षा आधारित' : 'सिंचाई'} और ${size} एकड़ रकबे पर ${top.name_hi} सर्वश्रेष्ठ विकल्प (${top.totalScore}% मैच) है।`;
   }
 
   return { top, runners, shapBars, expEn, expHi };
@@ -1547,6 +1544,12 @@ function selectHub(key, overrideInputs = true) {
   const hub = DEMO_HUBS[key] || DEMO_HUBS.nashik;
   const isEn = (currentLang === "en");
 
+  // Synchronize Soil Health Card Preset Dropdown to match selected hub
+  const cardSelect = document.getElementById("soilCardPresetSelect");
+  if (cardSelect) {
+    cardSelect.value = "sample_" + key;
+  }
+
   // Weather Card
   const hubNameEl = document.getElementById("weatherHubName");
   const condEl = document.getElementById("weatherCondition");
@@ -1637,6 +1640,7 @@ function runDynamicCropPrediction() {
   const ph = parseFloat(document.getElementById("inputPH")?.value) || 6.8;
   const irrigation = document.getElementById("inputIrrigation")?.value || "Borewell";
   const prevCrop = document.getElementById("inputPrevCrop")?.value || "Cotton";
+  const farmSize = parseFloat(document.getElementById("inputFarmSize")?.value) || 2.5;
 
   const hub = DEMO_HUBS[currentHub] || DEMO_HUBS.nashik;
   const temp = parseFloat(hub.weather.temp_en) || 26.5;
@@ -1645,7 +1649,7 @@ function runDynamicCropPrediction() {
 
   // Run Real-Time 22-Crop ML Engine
   const mlResult = evaluateAgronomicModel({
-    n, p, k, ph, temp, humidity, rain, irrigation, prevCrop
+    n, p, k, ph, temp, humidity, rain, irrigation, prevCrop, farmSize
   });
 
   // Render Top Recommendation & SHAP Attributions Immediately
@@ -1667,8 +1671,8 @@ function renderDynamicCropResult(result) {
   if (nameEl) nameEl.textContent = isEn ? top.name_en : top.name_hi;
   if (familyEl) familyEl.textContent = isEn ? `${top.family_en} • ${top.duration_days} Days Duration` : `${top.family_hi} • परिपक्वता अवधि ${top.duration_days} दिन`;
   if (scoreEl) scoreEl.textContent = `${top.totalScore}%`;
-  if (yieldEl) yieldEl.textContent = isEn ? top.yield_en : top.yield_hi;
-  if (revEl) revEl.textContent = isEn ? top.rev_en : top.rev_hi;
+  if (yieldEl) yieldEl.textContent = isEn ? `${top.dynamicYieldEn} (${top.farmSizeUsed} Acres)` : `${top.dynamicYieldHi} (${top.farmSizeUsed} एकड़)`;
+  if (revEl) revEl.textContent = isEn ? top.dynamicRevEn : top.dynamicRevHi;
   if (rateEl) rateEl.textContent = isEn ? `₹${top.mandi_price.toLocaleString()} / Qtl ↗` : `₹${top.mandi_price.toLocaleString('hi-IN')} प्रति क्विंटल ↗`;
   if (sowingEl) sowingEl.textContent = isEn ? top.sowing_en : top.sowing_hi;
 
@@ -1709,7 +1713,7 @@ function renderDynamicCropResult(result) {
     `).join("");
   }
 
-  // Runners Up (Display top 3 alternative crops with complete metrics)
+  // Runners Up (Display top 3 alternative crops with complete metrics scaled to farm size)
   const runnersContainer = document.getElementById("runnersList");
   if (runnersContainer && result.runners) {
     runnersContainer.innerHTML = result.runners.map((r, idx) => `
@@ -1718,7 +1722,7 @@ function renderDynamicCropResult(result) {
           <span class="runner-name"><span class="runner-rank-badge">#${idx + 2}</span> ${isEn ? r.name_en : r.name_hi}</span>
           <span class="runner-score">${r.totalScore}% ${isEn ? 'Match' : 'अनुकूल'}</span>
         </div>
-        <div class="runner-meta">${isEn ? `Est. Yield: ${r.yield_en} • Est. Income: ${r.rev_en}` : `अपेक्षित उपज: ${r.yield_hi} • अपेक्षित आय: ${r.rev_hi}`}</div>
+        <div class="runner-meta">${isEn ? `Est. Yield: ${r.dynamicYieldEn} (${r.farmSizeUsed} Ac) • Income: ${r.dynamicRevEn}` : `अपेक्षित उपज: ${r.dynamicYieldHi} (${r.farmSizeUsed} एकड़) • आय: ${r.dynamicRevHi}`}</div>
         <div class="runner-footer" style="font-size:0.8rem; color:#15803D; font-weight:600; margin-top:4px;">
           ${isEn ? `Mandi: ₹${r.mandi_price.toLocaleString()}/Qtl • Soil: ${r.soilFit}% • Weather: ${r.weatherFit}%` : `मंडी: ₹${r.mandi_price.toLocaleString('hi-IN')}/क्विंटल • मृदा: ${r.soilFit}% • मौसम: ${r.weatherFit}%`}
         </div>
