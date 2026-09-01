@@ -151,8 +151,11 @@ class VoiceQueryResponse(BaseModel):
     query: str
     detected_intent: str
     intent_type: Optional[str] = "GENERAL_AGRONOMY"
+    model_used: Optional[str] = "kisaan_sathi_multilingual_engine"
+    language: Optional[str] = "hi"
     response_text_hi: str
     response_text_en: str
+    response_text_regional: Optional[str] = ""
     tts_audio_text: str
     confidence: float
     suggested_followups: List[str]

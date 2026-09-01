@@ -2272,6 +2272,7 @@ async function sendVoiceQuery(query) {
   const gStatusText = document.getElementById("gStatusText");
   const gStatusDot = document.getElementById("gStatusDot");
   const isEn = (currentLang === "en");
+  const hub = DEMO_HUBS[currentHub] || DEMO_HUBS.nashik;
 
   // Show user query bubble
   if (userTextEl) userTextEl.textContent = query;
@@ -2280,47 +2281,70 @@ async function sendVoiceQuery(query) {
   if (gStatusDot) gStatusDot.className = "g-status-dot pulse-thinking";
   if (gStatusText) {
     gStatusText.textContent = isEn
-      ? "Querying ICAR Agronomic AI Knowledge Base..."
-      : "राष्ट्रीय कृषि ज्ञान केंद्र व ICAR से परामर्श जारी...";
+      ? "🤖 AI is analyzing your question..."
+      : "🤖 AI आपके प्रश्न का विश्लेषण कर रहा है...";
   }
 
   if (resEl) {
     resEl.textContent = isEn
-      ? "⏳ Searching scientific agronomy database..."
-      : "⏳ वैज्ञानिक कृषि अनुसंधान केंद्र से उत्तर प्राप्त किया जा रहा है...";
+      ? "⏳ Connecting to Kisaan_Sathi AI..."
+      : "⏳ किसान साथी AI से जुड़ रहे हैं...";
   }
+
+  // Use AbortController for 15 second timeout
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 15000);
 
   try {
     const res = await fetch("/api/voice/query", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      signal: controller.signal,
       body: JSON.stringify({
         query_text: query,
         language: currentLang,
-        crop_context: DEMO_HUBS[currentHub]?.district_en || "General Farming",
-        location_context: DEMO_HUBS[currentHub]?.name_en || "India"
+        crop_context: hub?.district_en || "General Farming",
+        location_context: `${hub?.district_en || "India"}, ${hub?.state_en || "India"}`
       })
     });
 
+    clearTimeout(timeoutId);
+
     if (res.ok) {
       const data = await res.json();
-      const answer = isEn
-        ? (data.response_text_en || data.tts_audio_text)
-        : (data.response_text_hi || data.response_text_regional || data.tts_audio_text);
+
+      // Pick the best response text based on language
+      let answer = "";
+      if (isEn) {
+        answer = data.response_text_en || data.response_text_regional || data.tts_audio_text || "";
+      } else {
+        answer = data.response_text_regional || data.response_text_hi || data.tts_audio_text || "";
+      }
 
       const intentType = data.intent_type || detectClientIntentType(query);
       updateVoiceIntentBadge(intentType, isEn);
 
+      // Show AI-powered vs offline indicator
+      const isAIPowered = data.model_used && !data.model_used.includes("multilingual_engine");
+      const sourceLabel = isAIPowered
+        ? (isEn ? "🤖 AI-Powered Response" : "🤖 AI संचालित उत्तर")
+        : (isEn ? "📚 Offline Knowledge Base" : "📚 ऑफलाइन ज्ञान भंडार");
+
       if (resEl && answer) {
-        resEl.textContent = `"${answer}"`;
+        resEl.innerHTML = `<span style="font-size:0.75rem;opacity:0.7;display:block;margin-bottom:4px;">${sourceLabel}</span>"${answer}"`;
         toggleVoiceAudioPlayback();
+
+        // Render suggested follow-ups
+        renderSuggestedFollowups(data.suggested_followups || [], isEn);
       } else {
         fallbackDynamicVoiceQuery(query, isEn);
       }
     } else {
       fallbackDynamicVoiceQuery(query, isEn);
     }
-  } catch (_) {
+  } catch (err) {
+    clearTimeout(timeoutId);
+    console.warn("[VoiceSaathi] API error, using fallback:", err.message);
     fallbackDynamicVoiceQuery(query, isEn);
   } finally {
     if (gStatusDot) gStatusDot.className = "g-status-dot pulse-idle";
@@ -2328,6 +2352,14 @@ async function sendVoiceQuery(query) {
       gStatusText.textContent = isEn ? "Ready • Tap mic to speak" : "तैयार • पूछने के लिए माइक दबाएं";
     }
   }
+}
+
+function renderSuggestedFollowups(followups, isEn) {
+  const container = document.getElementById("suggestedFollowups");
+  if (!container || !followups || followups.length === 0) return;
+  container.innerHTML = followups.map(f =>
+    `<button class="followup-chip" onclick="document.getElementById('voiceInputText').value='${f.replace(/'/g, "\\'")}'; sendVoiceQuery('${f.replace(/'/g, "\\'")}');">${f}</button>`
+  ).join("");
 }
 
 function detectClientIntentType(query) {

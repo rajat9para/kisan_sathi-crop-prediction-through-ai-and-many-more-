@@ -220,7 +220,7 @@ class ApiService {
               headers: {'Content-Type': 'application/json'},
               body: jsonEncode({"query_text": text, "language": lang}),
             )
-            .timeout(timeoutDuration);
+            .timeout(const Duration(seconds: 15));
         if (response.statusCode == 200) {
           return jsonDecode(response.body);
         }

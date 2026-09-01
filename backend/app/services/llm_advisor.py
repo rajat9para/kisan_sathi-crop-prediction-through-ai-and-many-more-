@@ -197,12 +197,20 @@ MULTILINGUAL_KNOWLEDGE_BASE = {
 }
 
 class LLMAdvisor:
+    # Currently working Groq models (verified 2026-09)
+    WORKING_MODELS = [
+        "openai/gpt-oss-120b",       # Best quality, detailed answers
+        "qwen/qwen3.8-27b",          # Excellent multilingual Hindi/English
+        "openai/gpt-oss-20b",        # Fast, good quality
+        "qwen/qwen3.6-27b",          # Alternate multilingual
+    ]
+
     def __init__(self):
         self.client = None
         try:
             if config.GROQ_API_KEY:
                 self.client = Groq(api_key=config.GROQ_API_KEY)
-                print("[+] Groq LLM client initialized successfully.")
+                print(f"[+] Groq LLM client initialized. Models: {self.WORKING_MODELS}")
         except Exception as e:
             print(f"[!] Warning: Could not initialize Groq client: {e}")
             self.client = None
@@ -237,43 +245,48 @@ class LLMAdvisor:
         intent_type = self._classify_intent(query_text)
 
         if not self.client:
+            print(f"[LLM] No Groq client available. Using fallback for: {query_text[:60]}")
             return self._fallback_response(query_text, language, intent_type=intent_type)
 
-        models_to_try = [
-            "llama-3.3-70b-versatile",
-            "llama-3.1-8b-instant",
-            "llama3-70b-8192",
-            "llama3-8b-8192",
-            "mixtral-8x7b-32768"
-        ]
+        # Build a comprehensive system prompt that answers ANY farming question intelligently
+        system_prompt = (
+            f"You are Kisaan_Sathi (किसान साथी), India's most knowledgeable AI Agricultural Scientist. "
+            f"The farmer is located in {location} and may be growing {crop_context}. "
+            f"The farmer's question may be in any Indian language, Romanized Hindi (Hinglish), or English. "
+            f"\n\nIMPORTANT RULES:\n"
+            f"1. ALWAYS respond in clear, natural {target_lang}.\n"
+            f"2. Answer the SPECIFIC question the farmer asked — do NOT give generic advice.\n"
+            f"3. If they ask about a specific crop (e.g. maize, wheat, rice, cotton, tomato), give advice ONLY for that crop.\n"
+            f"4. Include exact dosages (kg/acre or g/L), timings (days after sowing), and product names.\n"
+            f"5. Keep your answer to 3-5 concise, actionable sentences.\n"
+            f"6. If the question is about nutrients/fertilizer, specify exact N-P-K ratios and application schedule.\n"
+            f"7. If the question is about disease/pest, name the disease, recommend both organic (neem, trichoderma) and chemical solutions.\n"
+            f"8. If the question is about irrigation, specify exact timing (morning 6-9AM or evening after 5PM) and method.\n"
+            f"9. If the question is about crop selection, recommend top 2-3 crops for the region's soil and climate.\n"
+            f"10. Never say 'I don't know' — always provide the best agricultural guidance you can.\n"
+        )
 
-        for model_name in models_to_try:
+        last_error = None
+        for model_name in self.WORKING_MODELS:
             try:
+                print(f"[LLM] Trying model={model_name} for query: {query_text[:80]}")
                 chat_completion = self.client.chat.completions.create(
                     messages=[
-                        {
-                            "role": "system",
-                            "content": (
-                                f"You are Kisaan_Sathi, India's leading AI Agricultural Scientist advising farmers ({location}). "
-                                f"The farmer asks a query (which may be in {target_lang} or Romanized Hindi/Hinglish). "
-                                f"Respond strictly in clear, natural, respectful {target_lang}. "
-                                "Give direct, practical organic and chemical recommendations with exact timings/dosages in 2-3 concise sentences. "
-                                "If the question is about watering/irrigation timing, explain early morning vs late evening watering and why afternoon watering causes damage. "
-                                "If the question is about crop selection, recommend suitable high-value crops for their soil. "
-                                "Focus on immediate actionable agricultural steps."
-                            )
-                        },
+                        {"role": "system", "content": system_prompt},
                         {"role": "user", "content": query_text}
                     ],
                     model=model_name,
-                    temperature=0.25,
-                    max_tokens=250,
-                    timeout=2.8
+                    temperature=0.3,
+                    max_tokens=400,
+                    timeout=12.0
                 )
                 raw_text = chat_completion.choices[0].message.content.strip()
                 if raw_text:
+                    # Clean up any thinking tags from qwen models
+                    raw_text = re.sub(r'<think>.*?</think>', '', raw_text, flags=re.DOTALL).strip()
                     resp_hi = raw_text if language == "hi" else ""
                     resp_en = raw_text if language == "en" else ""
+                    print(f"[LLM] ✅ Success with {model_name}: {raw_text[:100]}...")
                     return {
                         "query": query_text,
                         "detected_intent": f"groq_{intent_type}",
@@ -285,16 +298,50 @@ class LLMAdvisor:
                         "response_text_regional": raw_text,
                         "tts_audio_text": raw_text,
                         "confidence": 0.98,
-                        "suggested_followups": (
-                            ["Water schedule?", "Recommended spray timing?", "Mandi market rates?"]
-                            if language == "en" else
-                            ["सिंचाई की सही मात्रा?", "कीटनाशक छिड़काव का समय?", "स्थानीय मंडी भाव?"]
-                        )
+                        "suggested_followups": self._get_smart_followups(intent_type, language)
                     }
-            except Exception:
+            except Exception as e:
+                last_error = str(e)
+                print(f"[LLM] ❌ Model {model_name} failed: {last_error[:120]}")
                 continue
 
+        print(f"[LLM] All models failed. Last error: {last_error}. Using fallback.")
         return self._fallback_response(query_text, language, intent_type=intent_type)
+
+    def _get_smart_followups(self, intent_type: str, language: str) -> List[str]:
+        """Generate contextual follow-up suggestions based on the detected intent."""
+        followup_map = {
+            "ML_CROP_RECOMMENDATION": {
+                "en": ["What fertilizer dose for this crop?", "Irrigation schedule?", "Expected market price?"],
+                "hi": ["इस फसल में कौनसी खाद डालें?", "सिंचाई कब करें?", "मंडी में भाव कितना मिलेगा?"]
+            },
+            "IRRIGATION_WATER": {
+                "en": ["Best fertilizer for my crop?", "Disease prevention tips?", "Drip irrigation subsidy?"],
+                "hi": ["मेरी फसल के लिए खाद?", "रोग से बचाव कैसे करें?", "ड्रिप सिंचाई पर सब्सिडी?"]
+            },
+            "FERTILIZER_NPK": {
+                "en": ["When to apply second dose?", "Organic alternatives?", "Water schedule after fertilizer?"],
+                "hi": ["दूसरी खुराक कब दें?", "जैविक खाद के विकल्प?", "खाद के बाद पानी कब दें?"]
+            },
+            "PLANT_DOCTOR": {
+                "en": ["Organic remedy available?", "Spray timing advice?", "Prevention for next season?"],
+                "hi": ["जैविक उपचार बताएं?", "छिड़काव का सही समय?", "अगली बार रोकथाम कैसे करें?"]
+            },
+            "MANDI_RATES": {
+                "en": ["Best time to sell?", "Nearby mandi rates?", "Storage tips for better price?"],
+                "hi": ["बेचने का सही समय?", "नजदीकी मंडी भाव?", "अच्छे भाव के लिए भंडारण?"]
+            },
+            "GOVT_SCHEMES": {
+                "en": ["How to apply for PM-KISAN?", "Crop insurance details?", "Drip irrigation subsidy?"],
+                "hi": ["PM-KISAN के लिए आवेदन कैसे करें?", "फसल बीमा की जानकारी?", "ड्रिप सिंचाई सब्सिडी?"]
+            },
+        }
+        default = {
+            "en": ["Crop recommendation?", "Fertilizer dosage?", "Mandi market rates?"],
+            "hi": ["कौनसी फसल लगाएं?", "यूरिया व डीएपी की खुराक?", "स्थानीय मंडी भाव?"]
+        }
+        lang_key = "en" if language == "en" else "hi"
+        return followup_map.get(intent_type, default).get(lang_key, default["hi"])
 
     def _classify_intent(self, query_text: str) -> str:
         q = (query_text or "").lower()
@@ -422,17 +469,19 @@ class LLMAdvisor:
             "Output JSON with keys 'hi' and 'en'."
         )
 
-        for model_name in ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama3-8b-8192"]:
+        for model_name in self.WORKING_MODELS[:3]:
             try:
                 res = self.client.chat.completions.create(
                     messages=[{"role": "user", "content": prompt}],
                     model=model_name,
                     temperature=0.2,
                     max_tokens=200,
-                    timeout=3.0,
+                    timeout=10.0,
                     response_format={"type": "json_object"}
                 )
-                return json.loads(res.choices[0].message.content)
+                parsed = json.loads(res.choices[0].message.content)
+                if "hi" in parsed and "en" in parsed:
+                    return parsed
             except Exception:
                 continue
 
@@ -464,14 +513,14 @@ class LLMAdvisor:
             "Output JSON with keys 'hi' and 'en'."
         )
 
-        for model_name in ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama3-8b-8192"]:
+        for model_name in self.WORKING_MODELS[:3]:
             try:
                 res = self.client.chat.completions.create(
                     messages=[{"role": "user", "content": prompt}],
                     model=model_name,
                     temperature=0.2,
                     max_tokens=250,
-                    timeout=3.0,
+                    timeout=10.0,
                     response_format={"type": "json_object"}
                 )
                 return json.loads(res.choices[0].message.content)
