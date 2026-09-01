@@ -2832,104 +2832,252 @@ body {
    ========================================================================== */
 
 .google-voice-container {
-  max-width: 920px;
+  max-width: 860px;
   margin: 0 auto;
-  padding: 1.5rem 1rem 2.5rem;
+  padding: 1.5rem 1rem 3rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.75rem;
+  gap: 1.5rem;
 }
 
-/* Google-Style Hero & Big Pulsing Mic */
-.google-voice-hero {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* Google-Style Branding */
+.google-voice-branding {
   text-align: center;
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
 }
 
-.google-mic-wrapper {
-  position: relative;
-  width: 100px;
-  height: 100px;
+.google-logo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.g-leaf-icon {
+  font-size: 2.2rem;
+  filter: drop-shadow(0 2px 8px rgba(22, 163, 74, 0.3));
+}
+
+.google-voice-heading {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #14532D;
+  margin: 0;
+  letter-spacing: -0.5px;
+}
+
+.g-sub-text {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #16A34A;
+  background: #DCFCE7;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  vertical-align: middle;
+  border: 1px solid #86EFAC;
+}
+
+.google-voice-tagline {
+  font-size: 0.92rem;
+  color: #475569;
+  max-width: 600px;
+  margin: 0;
+}
+
+/* Google-Style Unified Search Bar Container */
+.google-search-bar-wrap {
+  width: 100%;
+  max-width: 780px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.google-search-bar {
   display: flex;
   align-items: center;
-  justify-content: center;
+  background: #FFFFFF;
+  border: 2px solid #CBD5E1;
+  border-radius: 36px;
+  padding: 0.4rem 0.5rem 0.4rem 1.25rem;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.07);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 0.5rem;
+  position: relative;
 }
 
-.google-mic-btn {
-  width: 80px;
-  height: 80px;
+.google-search-bar:hover {
+  box-shadow: 0 8px 28px rgba(22, 163, 74, 0.15);
+  border-color: #86EFAC;
+}
+
+.google-search-bar:focus-within {
+  border-color: #16A34A;
+  box-shadow: 0 8px 32px rgba(22, 163, 74, 0.22);
+}
+
+.google-search-bar.listening-active {
+  border-color: #EF4444;
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.18), 0 8px 30px rgba(239, 68, 68, 0.25);
+  animation: barListeningGlow 1.5s infinite alternate;
+}
+
+@keyframes barListeningGlow {
+  0% { border-color: #EF4444; }
+  100% { border-color: #DC2626; box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.28), 0 8px 35px rgba(220, 38, 38, 0.35); }
+}
+
+.g-search-icon {
+  font-size: 1.2rem;
+  color: #94A3B8;
+  flex-shrink: 0;
+}
+
+.google-voice-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #0F172A;
+  background: transparent;
+  padding: 0.45rem 0;
+  min-width: 0;
+}
+
+.google-voice-input::placeholder {
+  color: #94A3B8;
+  font-size: 0.92rem;
+}
+
+/* Clear Button */
+.g-bar-clear-btn {
+  background: #F1F5F9;
+  border: none;
   border-radius: 50%;
-  background: linear-gradient(135deg, #15803D 0%, #16A34A 50%, #22C55E 100%);
-  color: #FFFFFF;
-  border: 3px solid #FFFFFF;
-  box-shadow: 0 8px 25px rgba(22, 163, 74, 0.35);
-  font-size: 2.2rem;
+  width: 28px;
+  height: 28px;
+  font-size: 0.85rem;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  z-index: 2;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  outline: none;
+  color: #64748B;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
-.google-mic-btn:hover {
-  transform: scale(1.08);
-  box-shadow: 0 12px 30px rgba(22, 163, 74, 0.45);
+.g-bar-clear-btn:hover {
+  background: #E2E8F0;
+  color: #0F172A;
 }
 
-.google-mic-btn:active, .google-mic-btn.recording {
-  background: linear-gradient(135deg, #DC2626 0%, #EF4444 50%, #F87171 100%);
-  box-shadow: 0 0 0 12px rgba(239, 68, 68, 0.25), 0 12px 30px rgba(220, 38, 38, 0.5);
-  transform: scale(1.12);
-}
-
-.g-mic-pulse-ring {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+/* Interactive Mic Button Inside Bar */
+.g-bar-mic-btn {
+  background: linear-gradient(135deg, #15803D 0%, #16A34A 100%);
+  border: none;
   border-radius: 50%;
-  border: 2px solid rgba(34, 197, 94, 0.4);
-  animation: gPulseRing 2.4s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
-  pointer-events: none;
+  width: 44px;
+  height: 44px;
+  font-size: 1.3rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  color: #FFFFFF;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.3);
+  position: relative;
+  flex-shrink: 0;
 }
 
-.g-mic-pulse-ring.delay-1 {
-  animation-delay: 1.2s;
+.g-bar-mic-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.45);
 }
 
-@keyframes gPulseRing {
-  0% { transform: scale(0.8); opacity: 0.8; }
-  70% { transform: scale(1.5); opacity: 0; }
-  100% { transform: scale(1.6); opacity: 0; }
+.g-bar-mic-btn.recording {
+  background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
+  box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.25), 0 4px 14px rgba(220, 38, 38, 0.4);
+  transform: scale(1.1);
 }
 
-.google-voice-status {
+/* Mic Live Waves */
+.g-mic-live-waves {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  position: absolute;
+  bottom: 4px;
+}
+
+.g-mic-live-waves span {
+  width: 3px;
+  height: 8px;
+  background: #FFFFFF;
+  border-radius: 2px;
+  animation: waveBar 0.6s infinite alternate;
+}
+
+.g-mic-live-waves span:nth-child(2) {
+  animation-delay: 0.2s;
+  height: 12px;
+}
+
+.g-mic-live-waves span:nth-child(3) {
+  animation-delay: 0.4s;
+  height: 6px;
+}
+
+@keyframes waveBar {
+  0% { height: 4px; }
+  100% { height: 14px; }
+}
+
+/* Submit / Search Button */
+.g-bar-submit-btn {
+  background: #14532D;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 24px;
+  padding: 0.6rem 1.15rem;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 0.6rem;
-  background: #FFFFFF;
-  border: 1px solid #E2E8F0;
-  padding: 0.45rem 1.1rem;
-  border-radius: 9999px;
-  font-size: 0.9rem;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(20, 83, 45, 0.25);
+}
+
+.g-bar-submit-btn:hover {
+  background: #15803D;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.35);
+}
+
+/* Live Status Indicator Bar */
+.google-voice-live-status {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 0.5rem;
+  font-size: 0.84rem;
   font-weight: 600;
-  color: #334155;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  color: #475569;
 }
 
 .g-status-dot {
-  width: 10px;
-  height: 10px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   display: inline-block;
+  flex-shrink: 0;
 }
 
 .g-status-dot.pulse-idle {
@@ -2939,102 +3087,19 @@ body {
 
 .g-status-dot.pulse-listening {
   background: #EF4444;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.3);
   animation: pulseDot 1s infinite;
 }
 
 .g-status-dot.pulse-thinking {
   background: #F59E0B;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.3);
   animation: pulseDot 0.8s infinite;
 }
 
 @keyframes pulseDot {
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.4; transform: scale(0.85); }
-}
-
-/* Google-Style Search Bar */
-.google-search-bar-wrap {
-  width: 100%;
-  max-width: 680px;
-}
-
-.google-search-bar {
-  display: flex;
-  align-items: center;
-  background: #FFFFFF;
-  border: 1.5px solid #CBD5E1;
-  border-radius: 32px;
-  padding: 0.5rem 0.8rem 0.5rem 1.25rem;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  transition: all 0.2s ease;
-  gap: 0.6rem;
-}
-
-.google-search-bar:focus-within {
-  border-color: #16A34A;
-  box-shadow: 0 6px 24px rgba(22, 163, 74, 0.18);
-}
-
-.g-search-icon {
-  font-size: 1.1rem;
-  color: #94A3B8;
-}
-
-.google-voice-input {
-  flex: 1;
-  border: none;
-  outline: none;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #0F172A;
-  background: transparent;
-  padding: 0.4rem 0;
-}
-
-.google-voice-input::placeholder {
-  color: #94A3B8;
-  font-size: 0.92rem;
-}
-
-.g-bar-mic-btn {
-  background: #F1F5F9;
-  border: none;
-  border-radius: 50%;
-  width: 38px;
-  height: 38px;
-  font-size: 1.15rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-  color: #1E293B;
-}
-
-.g-bar-mic-btn:hover {
-  background: #E2E8F0;
-  transform: scale(1.05);
-}
-
-.g-bar-submit-btn {
-  background: #16A34A;
-  color: #FFFFFF;
-  border: none;
-  border-radius: 50%;
-  width: 38px;
-  height: 38px;
-  font-size: 1.1rem;
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.g-bar-submit-btn:hover {
-  background: #15803D;
-  transform: scale(1.05);
 }
 
 /* Smart Quick Chips */
@@ -3049,7 +3114,7 @@ body {
 .g-chips-title {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #475569;
+  color: #14532D;
 }
 
 .google-chips-scroll {
@@ -3062,7 +3127,7 @@ body {
 
 .g-chip {
   background: #FFFFFF;
-  border: 1.5px solid #E2E8F0;
+  border: 1.5px solid #CBD5E1;
   border-radius: 20px;
   padding: 0.45rem 0.95rem;
   font-size: 0.84rem;
@@ -3098,12 +3163,12 @@ body {
   background: linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%);
   border: 1.5px solid #E2E8F0;
   border-radius: 16px;
-  padding: 0.9rem 1.25rem;
+  padding: 0.85rem 1.25rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
 }
 
 .user-query-label {
-  font-size: 0.76rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: #64748B;
   text-transform: uppercase;
@@ -3146,15 +3211,23 @@ body {
 }
 
 .g-avatar-badge {
-  width: 42px;
-  height: 42px;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
   background: #DCFCE7;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   border: 1px solid #86EFAC;
+  flex-shrink: 0;
+}
+
+.g-ai-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
 }
 
 .g-ai-title {
@@ -3164,9 +3237,65 @@ body {
   color: #14532D;
 }
 
+/* Intent Classification Badges */
+.intent-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  letter-spacing: 0.2px;
+}
+
+.intent-badge.badge-ml {
+  background: #EDE9FE;
+  color: #6D28D9;
+  border: 1px solid #C4B5FD;
+}
+
+.intent-badge.badge-water {
+  background: #E0F2FE;
+  color: #0369A1;
+  border: 1px solid #7DD3FC;
+}
+
+.intent-badge.badge-fertilizer {
+  background: #DCFCE7;
+  color: #15803D;
+  border: 1px solid #86EFAC;
+}
+
+.intent-badge.badge-doctor {
+  background: #FFE4E6;
+  color: #E11D48;
+  border: 1px solid #FDA4AF;
+}
+
+.intent-badge.badge-mandi {
+  background: #FEF3C7;
+  color: #B45309;
+  border: 1px solid #FCD34D;
+}
+
+.intent-badge.badge-schemes {
+  background: #DBEAFE;
+  color: #1D4ED8;
+  border: 1px solid #93C5FD;
+}
+
+.intent-badge.badge-general {
+  background: #F1F5F9;
+  color: #334155;
+  border: 1px solid #CBD5E1;
+}
+
 .g-ai-sub {
   font-size: 0.78rem;
   color: #475569;
+  margin-top: 0.15rem;
+  display: block;
 }
 
 .g-btn-read-aloud {
@@ -3183,6 +3312,7 @@ body {
   gap: 0.5rem;
   box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
   transition: all 0.2s ease;
+  flex-shrink: 0;
 }
 
 .g-btn-read-aloud:hover {
@@ -3194,6 +3324,12 @@ body {
 .g-btn-read-aloud.speaking {
   background: #DC2626;
   box-shadow: 0 4px 12px rgba(220, 38, 38, 0.35);
+  animation: speakingPulse 1.2s infinite;
+}
+
+@keyframes speakingPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(0.98); }
 }
 
 .g-speaker-icon {
@@ -3206,6 +3342,37 @@ body {
   color: #1E293B;
   font-weight: 500;
   white-space: pre-line;
+}
+
+/* ML Prediction Highlight Banner */
+.g-ml-prediction-highlight {
+  background: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 100%);
+  border: 1.5px solid #C4B5FD;
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ml-highlight-icon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.ml-highlight-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #6D28D9;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.ml-highlight-desc {
+  font-size: 0.95rem;
+  color: #1E1B4B;
+  font-weight: 600;
+  margin-top: 0.15rem;
 }
 
 /* Follow-ups */

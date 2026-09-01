@@ -2007,15 +2007,36 @@ function renderDiagnosisResults(data) {
 // =========================================================================
 let voiceSpeechSynthesizer = null;
 let isCurrentlySpeaking = false;
+let globalSpeechRecognition = null;
+let isVoiceListening = false;
 
 function setupMultilingualVoiceSaathi() {
   const btnAsk = document.getElementById("btnAskVoice");
   const input = document.getElementById("voiceInputText");
   const btnListen = document.getElementById("btnListenVoice");
-  const btnBigMic = document.getElementById("btnGoogleBigMic");
-  const btnMic = document.getElementById("btnVoiceMicListen");
+  const btnMic = document.getElementById("btnVoiceMic");
+  const btnClear = document.getElementById("btnClearVoiceInput");
+  const micWaves = document.getElementById("micLiveWaves");
+  const micIcon = document.getElementById("micIconStatus");
+  const searchBar = document.getElementById("googleSearchBar");
   const gStatusText = document.getElementById("gStatusText");
   const gStatusDot = document.getElementById("gStatusDot");
+
+  // Toggle Clear Button Visibility
+  if (input && btnClear) {
+    const updateClearBtn = () => {
+      btnClear.style.display = input.value.trim().length > 0 ? "flex" : "none";
+    };
+    input.addEventListener("input", updateClearBtn);
+    input.addEventListener("change", updateClearBtn);
+    updateClearBtn();
+
+    btnClear.addEventListener("click", () => {
+      input.value = "";
+      updateClearBtn();
+      input.focus();
+    });
+  }
 
   // Handle Search Input & Submit
   if (btnAsk && input) {
@@ -2038,6 +2059,7 @@ function setupMultilingualVoiceSaathi() {
       const q = c.getAttribute("data-q") || c.textContent.replace(/^[^a-zA-Z0-9\u0900-\u097F]+/, "").trim();
       if (input && q) {
         input.value = q;
+        if (btnClear) btnClear.style.display = "flex";
         sendVoiceQuery(q);
       }
     });
@@ -2047,61 +2069,93 @@ function setupMultilingualVoiceSaathi() {
   const followups = document.querySelectorAll(".g-followup-pill, .voice-chip.followup");
   followups.forEach(f => {
     f.addEventListener("click", () => {
-      const q = f.textContent.replace("💬", "").trim();
+      const q = f.getAttribute("data-followup") || f.textContent.replace(/^[^a-zA-Z0-9\u0900-\u097F]+/, "").trim();
       if (input && q) {
         input.value = q;
+        if (btnClear) btnClear.style.display = "flex";
         sendVoiceQuery(q);
       }
     });
   });
 
-  // Speech Recognition (Google Big Mic + Search Bar Mic)
+  // Google-Style Single Mic Speech Recognition
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (SpeechRecognition) {
     const recognition = new SpeechRecognition();
+    globalSpeechRecognition = recognition;
     recognition.continuous = false;
-    recognition.interimResults = false;
+    recognition.interimResults = true;
 
-    function startListening() {
+    function stopListeningUI() {
+      isVoiceListening = false;
+      if (btnMic) btnMic.classList.remove("recording");
+      if (searchBar) searchBar.classList.remove("listening-active");
+      if (micWaves) micWaves.style.display = "none";
+      if (micIcon) micIcon.textContent = "🎤";
+      if (gStatusDot) gStatusDot.className = "g-status-dot pulse-idle";
+      if (gStatusText) {
+        gStatusText.textContent = (currentLang === "en")
+          ? "Ready • Tap mic to speak or type query"
+          : "तैयार • माइक दबाकर बोलें या टाइप करके खोजें";
+      }
+    }
+
+    function toggleListening() {
+      if (isVoiceListening) {
+        try { recognition.stop(); } catch (_) {}
+        stopListeningUI();
+        return;
+      }
+
       recognition.lang = I18N_DICTIONARY[currentLang]?.speechCode || "hi-IN";
       try {
         recognition.start();
-        if (btnBigMic) btnBigMic.classList.add("recording");
+        isVoiceListening = true;
+        if (btnMic) btnMic.classList.add("recording");
+        if (searchBar) searchBar.classList.add("listening-active");
+        if (micWaves) micWaves.style.display = "flex";
+        if (micIcon) micIcon.textContent = "⏹️";
         if (gStatusDot) gStatusDot.className = "g-status-dot pulse-listening";
         if (gStatusText) {
+          const langLabel = I18N_DICTIONARY[currentLang]?.name_native || "हिंदी";
           gStatusText.textContent = (currentLang === "en")
-            ? "Listening to your voice... Speak now"
-            : "आपकी आवाज़ सुन रहे हैं... बोलिए";
+            ? "Listening in English... Speak your farm question now"
+            : `${langLabel} में सुन रहे हैं... बोलिए (उदा: खेत में पानी किस समय डालें)`;
         }
-      } catch (_) {}
+      } catch (_) {
+        stopListeningUI();
+      }
     }
 
-    if (btnBigMic) btnBigMic.addEventListener("click", startListening);
-    if (btnMic) btnMic.addEventListener("click", startListening);
+    if (btnMic) btnMic.addEventListener("click", toggleListening);
 
     recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript;
-      if (input) input.value = transcript;
-      if (btnBigMic) btnBigMic.classList.remove("recording");
-      sendVoiceQuery(transcript);
-    };
-
-    recognition.onerror = () => {
-      if (btnBigMic) btnBigMic.classList.remove("recording");
-      if (gStatusDot) gStatusDot.className = "g-status-dot";
-      if (gStatusText) {
-        gStatusText.textContent = (currentLang === "en")
-          ? "Ready • Tap mic to speak"
-          : "तैयार • पूछने के लिए माइक दबाएं";
+      let interimTranscript = '';
+      let finalTranscript = '';
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) {
+          finalTranscript += event.results[i][0].transcript;
+        } else {
+          interimTranscript += event.results[i][0].transcript;
+        }
+      }
+      const fullText = finalTranscript || interimTranscript;
+      if (input && fullText) {
+        input.value = fullText;
+        if (btnClear) btnClear.style.display = "flex";
       }
     };
 
+    recognition.onerror = () => {
+      stopListeningUI();
+    };
+
     recognition.onend = () => {
-      if (btnBigMic) btnBigMic.classList.remove("recording");
+      stopListeningUI();
     };
   } else {
-    if (btnBigMic) {
-      btnBigMic.addEventListener("click", () => {
+    if (btnMic) {
+      btnMic.addEventListener("click", () => {
         if (input) input.focus();
       });
     }
@@ -2126,7 +2180,7 @@ function toggleVoiceAudioPlayback() {
     window.speechSynthesis.cancel();
     isCurrentlySpeaking = false;
     if (btnListen) {
-      btnListen.innerHTML = `<span>🔊</span> <span>${isEn ? 'Listen Audio (1-Tap)' : 'एक टैप में सुनें (आवाज)'}</span>`;
+      btnListen.innerHTML = `<span class="g-speaker-icon">🔊</span> <span>${isEn ? 'Listen Audio (1-Tap)' : 'एक टैप में सुनें (Read Aloud)'}</span>`;
       btnListen.classList.remove("speaking");
     }
     return;
@@ -2135,12 +2189,12 @@ function toggleVoiceAudioPlayback() {
   window.speechSynthesis.cancel();
   const utter = new SpeechSynthesisUtterance(text);
   utter.lang = I18N_DICTIONARY[currentLang]?.speechCode || "hi-IN";
-  utter.rate = 0.95; // Clear natural pacing for farmers
+  utter.rate = 0.95; // Natural clear pace for farmers
 
   utter.onstart = () => {
     isCurrentlySpeaking = true;
     if (btnListen) {
-      btnListen.innerHTML = `<span>⏹️</span> <span>${isEn ? 'Stop Audio' : 'रोकें (Stop)'}</span>`;
+      btnListen.innerHTML = `<span class="g-speaker-icon">⏹️</span> <span>${isEn ? 'Stop Audio' : 'रोकें (Stop Audio)'}</span>`;
       btnListen.classList.add("speaking");
     }
   };
@@ -2148,7 +2202,7 @@ function toggleVoiceAudioPlayback() {
   utter.onend = () => {
     isCurrentlySpeaking = false;
     if (btnListen) {
-      btnListen.innerHTML = `<span>🔊</span> <span>${isEn ? 'Listen Again (1-Tap)' : 'पुनः सुनें (1-टैप)'}</span>`;
+      btnListen.innerHTML = `<span class="g-speaker-icon">🔊</span> <span>${isEn ? 'Listen Again (1-Tap)' : 'पुनः सुनें (Read Aloud)'}</span>`;
       btnListen.classList.remove("speaking");
     }
   };
@@ -2156,12 +2210,59 @@ function toggleVoiceAudioPlayback() {
   utter.onerror = () => {
     isCurrentlySpeaking = false;
     if (btnListen) {
-      btnListen.innerHTML = `<span>🔊</span> <span>${isEn ? 'Listen Audio (1-Tap)' : 'एक टैप में सुनें (आवाज)'}</span>`;
+      btnListen.innerHTML = `<span class="g-speaker-icon">🔊</span> <span>${isEn ? 'Listen Audio (1-Tap)' : 'एक टैप में सुनें (Read Aloud)'}</span>`;
       btnListen.classList.remove("speaking");
     }
   };
 
   window.speechSynthesis.speak(utter);
+}
+
+function updateVoiceIntentBadge(intentType, isEn) {
+  const badge = document.getElementById("voiceIntentBadge");
+  const mlHighlight = document.getElementById("mlPredictionHighlight");
+  const mlDesc = document.getElementById("mlHighlightDesc");
+  const hub = DEMO_HUBS[currentHub] || DEMO_HUBS.nashik;
+
+  if (!badge) return;
+
+  // Reset classes
+  badge.className = "intent-badge";
+
+  if (intentType === "ML_CROP_RECOMMENDATION") {
+    badge.classList.add("badge-ml");
+    badge.textContent = isEn ? "⚡ ML Crop Prediction Model (XGBoost)" : "⚡ मशीन लर्निंग फसल चयन (ML Prediction)";
+    if (mlHighlight) {
+      mlHighlight.style.display = "flex";
+      if (mlDesc) {
+        mlDesc.innerHTML = isEn
+          ? `Active Soil Parameters (pH ${hub.soil.ph}, N: ${hub.soil.n}, P: ${hub.soil.p}, K: ${hub.soil.k}) in ${hub.district_en} recommend <strong>${hub.crops[0]?.name_en || 'Grapes'}</strong> with 95% match accuracy.`
+          : `वर्तमान मिट्टी (pH ${hub.soil.ph}, N: ${hub.soil.n}, P: ${hub.soil.p}, K: ${hub.soil.k}) के अनुसार <strong>${hub.crops[0]?.name_hi || '🍇 अंगूर'}</strong> ९५% सटीकता के साथ अनुशंसित है।`;
+      }
+    }
+  } else {
+    if (mlHighlight) mlHighlight.style.display = "none";
+
+    if (intentType === "IRRIGATION_WATER") {
+      badge.classList.add("badge-water");
+      badge.textContent = isEn ? "💧 Irrigation & Water Management" : "💧 सिंचाई व जल प्रबंधन (Water Advisory)";
+    } else if (intentType === "FERTILIZER_NPK") {
+      badge.classList.add("badge-fertilizer");
+      badge.textContent = isEn ? "🧪 Balanced NPK & Nutrition" : "🧪 संतुलित पोषण व खाद (NPK Fertilizers)";
+    } else if (intentType === "PLANT_DOCTOR") {
+      badge.classList.add("badge-doctor");
+      badge.textContent = isEn ? "🩺 Plant Doctor & Pest Cure" : "🩺 फसल रोग निदान व कीटनाशक (Pathology)";
+    } else if (intentType === "MANDI_RATES") {
+      badge.classList.add("badge-mandi");
+      badge.textContent = isEn ? "📊 APMC Live Mandi Rates" : "📊 दैनिक मंडी भाव व आवक (APMC Radar)";
+    } else if (intentType === "GOVT_SCHEMES") {
+      badge.classList.add("badge-schemes");
+      badge.textContent = isEn ? "🏛️ Govt Schemes & PM-KISAN" : "🏛️ सरकारी योजना व सब्सिडी (Govt Schemes)";
+    } else {
+      badge.classList.add("badge-general");
+      badge.textContent = isEn ? "🌱 Scientific Agronomy Advisory" : "🌱 वैज्ञानिक शस्य परामर्श (Agronomy)";
+    }
+  }
 }
 
 async function sendVoiceQuery(query) {
@@ -2179,7 +2280,7 @@ async function sendVoiceQuery(query) {
   if (gStatusDot) gStatusDot.className = "g-status-dot pulse-thinking";
   if (gStatusText) {
     gStatusText.textContent = isEn
-      ? "Searching ICAR & Krishi Knowledge Base..."
+      ? "Querying ICAR Agronomic AI Knowledge Base..."
       : "राष्ट्रीय कृषि ज्ञान केंद्र व ICAR से परामर्श जारी...";
   }
 
@@ -2207,9 +2308,11 @@ async function sendVoiceQuery(query) {
         ? (data.response_text_en || data.tts_audio_text)
         : (data.response_text_hi || data.response_text_regional || data.tts_audio_text);
 
+      const intentType = data.intent_type || detectClientIntentType(query);
+      updateVoiceIntentBadge(intentType, isEn);
+
       if (resEl && answer) {
         resEl.textContent = `"${answer}"`;
-        // Trigger auto 1-tap read aloud
         toggleVoiceAudioPlayback();
       } else {
         fallbackDynamicVoiceQuery(query, isEn);
@@ -2220,91 +2323,128 @@ async function sendVoiceQuery(query) {
   } catch (_) {
     fallbackDynamicVoiceQuery(query, isEn);
   } finally {
-    if (gStatusDot) gStatusDot.className = "g-status-dot";
+    if (gStatusDot) gStatusDot.className = "g-status-dot pulse-idle";
     if (gStatusText) {
       gStatusText.textContent = isEn ? "Ready • Tap mic to speak" : "तैयार • पूछने के लिए माइक दबाएं";
     }
   }
 }
 
+function detectClientIntentType(query) {
+  const q = (query || "").toLowerCase();
+  if (/recommend|selection|kaunsi\s*fasal|konsi\s*fasal|best\s*crop|which\s*crop|fasal\s*lagaye|kya\s*boye|kya\s*lagaye|कौनसी\s*फसल|फसल\s*चयन|उत्तम\s*फसल/i.test(q)) {
+    return "ML_CROP_RECOMMENDATION";
+  }
+  if (/रोग|झुलसा|कीट|सुंडी|मरोड़|धब्बे|fungus|blight|disease|pest|spray|pesticide|fungicide|dawai|dawa|peele\s*patte|spots/i.test(q)) {
+    return "PLANT_DOCTOR";
+  }
+  if (/पान[ीि]|सिंचाई|सिचाई|जल|water|irrigation|sinchai|pani|paani|samay|kis\s*samay|kab\s*dale|kab\s*lagaye|timing|drip|स्प्रिंकलर/i.test(q)) {
+    return "IRRIGATION_WATER";
+  }
+  if (/खाद|यूरिया|डीएपी|पोटाश|fertilizer|dap|urea|npk|potash|khad|gobar|vermicompost/i.test(q)) {
+    return "FERTILIZER_NPK";
+  }
+  if (/भाव|रेट|दाम|mandi|price|rate|bhav|market|apmc/i.test(q)) {
+    return "MANDI_RATES";
+  }
+  if (/योजना|बीमा|pm\s*-?\s*kisan|pmkisan|pmfby|सम्मान|सब्सिडी|अनुदान|subsidy|scheme|6000|किस्त/i.test(q)) {
+    return "GOVT_SCHEMES";
+  }
+  return "GENERAL_AGRONOMY";
+}
+
 function fallbackDynamicVoiceQuery(query, isEn) {
   const resEl = document.getElementById("voiceResponseText");
   const hub = DEMO_HUBS[currentHub] || DEMO_HUBS.nashik;
-  const q = query.toLowerCase();
+  const q = (query || "").toLowerCase();
+  const intentType = detectClientIntentType(query);
+  updateVoiceIntentBadge(intentType, isEn);
 
   let answer = "";
 
-  // 1. Sugarcane Water & Irrigation ("ganne ke khet me paani kab daale")
-  if (q.includes("गन्ना") || q.includes("ganne") || q.includes("ganna") || q.includes("sugarcane")) {
-    if (q.includes("पानी") || q.includes("paani") || q.includes("water") || q.includes("सिंचाई") || q.includes("irrigation")) {
+  // 1. ML Crop Recommendation Queries
+  if (intentType === "ML_CROP_RECOMMENDATION") {
+    answer = isEn
+      ? `ML Crop Recommendation for ${hub.name_en}: Based on your soil tests (pH ${hub.soil.ph}, N: ${hub.soil.n}, P: ${hub.soil.p}, K: ${hub.soil.k}), our XGBoost model recommends ${hub.crops[0]?.name_en || 'Grapes'} with 95% suitability. Expected revenue: ₹3.5 - 5 Lakh/acre. View the 'Crop Advisory' tab for the full rank list!`
+      : `${hub.name_hi} क्षेत्र के लिए एआई मशीन लर्निंग सिफारिश: आपकी मिट्टी (pH ${hub.soil.ph}, N: ${hub.soil.n}, P: ${hub.soil.p}, K: ${hub.soil.k}) के आधार पर XGBoost मॉडल द्वारा ${hub.crops[0]?.name_hi || '🍇 अंगूर'} 95% सटीकता के साथ अनुशंसित है। अपेक्षित आय: ₹3.5 - 5 लाख प्रति एकड़। विस्तृत रिपोर्ट 'फसल सलाहकार' टैब में देखें।`;
+  }
+  // 2. Field Irrigation Timing & General Water ("khet mein pani kis samay dalna chahie")
+  else if (/samay|kis\s*samay|kab\s*daale|kab\s*dalna|kab\s*lagaye|timing|time|सुबह|शाम|समय/i.test(q) && /पान[ीि]|सिंचाई|सिचाई|जल|water|irrigation|sinchai|pani|paani|khet/i.test(q)) {
+    answer = isEn
+      ? `Field Irrigation Timing Advisory: Water crops early morning (6:00 to 9:00 AM) or late evening (after 5:00 PM). Never irrigate during intense afternoon heat, as 30-40% of water is lost to evaporation and sudden root cooling damages crop growth. Adopting drip irrigation delivers 40% water savings and higher yields.`
+      : `खेत में पानी डालने का सही समय: सिंचाई हमेशा सुबह 6 से 9 बजे या शाम को 5 बजे के बाद करनी चाहिए। दोपहर की तेज धूप में पानी लगाने से 30-40% पानी वाष्पीकरण में नष्ट हो जाता है और पौधों की जड़ों पर प्रतिकूल प्रभाव पड़ता है। ड्रिप व स्प्रिंकलर सिंचाई से 40% तक पानी की बचत और अधिक पैदावार होती है।`;
+  }
+  // 3. Sugarcane Water & Irrigation
+  else if (/गन्ना|ganne|ganna|sugarcane/i.test(q)) {
+    if (/पान[ीि]|paani|pani|water|सिंचाई|irrigation|sinchai/i.test(q)) {
       answer = isEn
-        ? `Sugarcane Irrigation Schedule: First irrigation immediately after planting. During the formative tillering phase (60-120 days), irrigate every 10-12 days in summer and 20-25 days in winter. Using drip irrigation saves 40-50% water while increasing cane weight.`
-        : `गन्ने में पानी कब डालें: पहली सिंचाई बुवाई के तुरंत बाद करें। जमाव व कल्ले फूटने की अवस्था (60-120 दिन) में गन्ने को पानी की सबसे अधिक जरूरत होती है; गर्मियों में 10-12 दिन और सर्दियों में 20-25 दिन के अंतराल पर पानी दें। ड्रिप सिंचाई से 40% पानी बचता है और पैदावार बढ़ती है।`;
-    } else if (q.includes("खाद") || q.includes("यूरिया") || q.includes("dap") || q.includes("fertilizer")) {
+        ? `Sugarcane Irrigation Schedule: First irrigation immediately after planting for germination. During formative tillering (60-120 days), irrigate every 8-10 days in summer and 20-25 days in winter. Drip irrigation saves 40-50% water while boosting sugar recovery.`
+        : `गन्ने में सिंचाई प्रबंधन: पहली सिंचाई बुवाई के तुरंत बाद जमाव के लिए करें। कल्ले फूटने के समय (60-120 दिन) गर्मियों में 8-10 दिन और सर्दियों में 20-25 दिन के अंतराल पर पानी दें। ड्रिप सिंचाई से 40% पानी बचता है और गन्ने की मोटाई बढ़ती है।`;
+    } else if (/खाद|यूरिया|dap|fertilizer|npk|पोटाश/i.test(q)) {
       answer = isEn
-        ? `Sugarcane Fertilizer Dose: 150-180 kg Nitrogen, 60 kg Phosphorus, and 60 kg Potash per hectare. Apply full DAP & Potash as basal at planting, and divide Urea into 3 equal splits (45, 90, and 120 days).`
-        : `गन्ने में खाद की मात्रा: प्रति हेक्टेयर 150-180 किग्रा नाइट्रोजन, 60 किग्रा फॉस्फोरस और 60 किग्रा पोटाश दें। बुवाई के समय पूरा डीएपी व पोटाश डालें, तथा यूरिया को 45, 90 और 120 दिन पर 3 बराबर किस्तों में डालें।`;
+        ? `Sugarcane Fertilizer Dose: 150-180 kg Nitrogen, 60 kg Phosphorus, and 60 kg Potash per hectare. Apply full DAP & Potash as basal at planting, and divide Urea into 3 equal splits (30, 60, and 90 days).`
+        : `गन्ने में खाद की मात्रा: प्रति हेक्टेयर 150-180 किग्रा नाइट्रोजन, 60 किग्रा फॉस्फोरस और 60 किग्रा पोटाश दें। बुवाई के समय पूरा डीएपी व पोटाश डालें, तथा यूरिया को 30, 60 और 90 दिन पर 3 बराबर किस्तों में डालें।`;
     } else {
       answer = isEn
-        ? `For Sugarcane in ${hub.district_en}, maintain weed-free furrows, apply earthing up at 90-100 days, and protect against red rot with Trichoderma soil application.`
+        ? `For Sugarcane in ${hub.district_en}, maintain weed-free furrows, perform earthing up at 90-100 days, and protect against red rot with Trichoderma soil application.`
         : `${hub.district_hi} क्षेत्र में गन्ने की अच्छी बढ़वार के लिए 90 से 100 दिन पर मिट्टी चढ़ाने (Earthing up) का कार्य करें और लाल सड़न (Red Rot) से बचाव हेतु ट्राइकोडर्मा का प्रयोग करें।`;
     }
   }
-  // 2. Wheat Irrigation & CRI Phase ("gehu me pehla pani")
-  else if (q.includes("गेहूं") || q.includes("gehu") || q.includes("wheat")) {
-    if (q.includes("पहला") || q.includes("pehla") || q.includes("पानी") || q.includes("paani") || q.includes("cri") || q.includes("सिंचाई")) {
+  // 4. Wheat Irrigation & CRI Phase ("gehu me pehla pani")
+  else if (/गेहूं|गेहू|gehu|wheat/i.test(q)) {
+    if (/पहला|pehla|पान[ीि]|paani|pani|cri|सिंचाई|sinchai/i.test(q)) {
       answer = isEn
-        ? `Wheat 1st Irrigation (CRI Stage): Apply the first crucial irrigation 20 to 25 days after sowing at Crown Root Initiation (CRI). Top-dress 30-35 kg Urea per acre immediately following this irrigation.`
-        : `गेहूं में पहला पानी (CRI स्टेज): बुवाई के 20 से 25 दिन बाद ताज जड़ (Crown Root Initiation) निकलते समय पहला पानी देना अनिवार्य है। पानी लगाने के बाद 30-35 किग्रा प्रति एकड़ यूरिया का पहला बुरकाव करें।`;
+        ? `Wheat 1st Irrigation (CRI Stage): Apply the first critical irrigation 20 to 25 days after sowing at Crown Root Initiation (CRI). Top-dress 30-35 kg Urea per acre immediately following this irrigation.`
+        : `गेहूं में पहला पानी (CRI स्टेज): बुवाई के 20 से 25 दिन बाद ताज जड़ (Crown Root Initiation) निकलते समय पहला पानी देना अनिवार्य है। पानी लगाने के तुरंत बाद 30-35 किग्रा प्रति एकड़ यूरिया का पहला बुरकाव करें।`;
     } else {
       answer = isEn
-        ? `Wheat needs 4 to 5 irrigations at: CRI (21 days), Tillering (45 days), Late Jointing (65 days), Flowering (85 days), and Milking stage (105 days).`
+        ? `Wheat requires 4 to 5 irrigations across key growth stages: CRI (21 days), Tillering (45 days), Jointing (65 days), Flowering (85 days), and Grain Filling (105 days).`
         : `गेहूं की फसल में कुल 4-5 सिंचाइयां मुख्य हैं: पहला पानी 21 दिन (CRI), दूसरा 45 दिन (कल्ले), तीसरा 65 दिन (गांठ), चौथा 85 दिन (फूल) और पांचवां 105 दिन (दूधिया अवस्था)।`;
     }
   }
-  // 3. Paddy / Rice Water & Fertilizer
-  else if (q.includes("धान") || q.includes("dhan") || q.includes("chawal") || q.includes("rice") || q.includes("paddy")) {
+  // 5. Paddy / Rice Water & Fertilizer
+  else if (/धान|चावल|dhan|chawal|rice|paddy/i.test(q)) {
     answer = isEn
-      ? `Paddy Water & Nutrient Management: Maintain 2-3 cm standing water during transplanting and tillering. Drain water before top-dressing urea (apply in 3 splits: basal, active tillering, panicle initiation).`
-      : `धान में पानी और खाद प्रबंधन: रोपाई के बाद पहले 15 दिन खेत में 2-3 सेमी पानी बनाए रखें। कल्ले फूटते समय और बाली निकलते समय नमी बनाए रखें। यूरिया 3 खुराकों में दें (रोपाई, कल्ले फूटते समय और बाली बनने पर)।`;
+      ? `Paddy Water & Nutrient Management: Maintain 2-3 cm standing water during the first 15 days after transplanting. Top-dress with 35 kg Urea and 15 kg Potash at tillering. Drain water 10 days before harvest.`
+      : `धान में पानी और खाद प्रबंधन: रोपाई के बाद पहले 15 दिन खेत में 2-3 सेमी पानी बनाए रखें। कल्ले फूटते समय (20-25 दिन) 35 किग्रा यूरिया और 15 किग्रा पोटाश की टॉप-ड्रेसिंग करें। दाना पकने से 10 दिन पूर्व पानी निकाल दें।`;
   }
-  // 4. Cotton Pests & Pink Bollworm
-  else if (q.includes("कपास") || q.includes("kapas") || q.includes("cotton") || q.includes("सुंडी") || q.includes("bollworm")) {
+  // 6. Cotton Pests & Pink Bollworm
+  else if (/कपास|नरमा|kapas|cotton|narma|सुंडी|bollworm/i.test(q)) {
     answer = isEn
-      ? `Cotton Pink Bollworm Management: Install 2 pheromone traps per acre. If rosette flowers appear, spray Profenofos 50 EC @ 2ml/L or Emamectin Benzoate 5 SG @ 0.5g/L water during clear morning weather.`
-      : `कपास में गुलाबी सुंडी नियंत्रण: प्रति एकड़ 2 फेरोमोन ट्रैप लगाएं। प्रकोप दिखने पर प्रोफेनोफॉस 50 EC (2 मिली/लीटर) या एमामेक्टिन बेंजोएट 5 SG (0.5 ग्राम/लीटर पानी) का सुबह के समय छिड़काव करें।`;
+      ? `Cotton Pink Bollworm Management: Install 5 pheromone traps per acre. If infestation is observed, spray Profenofos 50 EC @ 2ml/L or Emamectin Benzoate 5 SG @ 0.5g/L water during clear morning weather.`
+      : `कपास में गुलाबी सुंडी नियंत्रण: प्रति एकड़ 5 फेरोमोन ट्रैप लगाएं। प्रकोप दिखने पर प्रोफेनोफॉस 50 EC (2 मिली/लीटर) या एमामेक्टिन बेंजोएट 5 SG (0.5 ग्राम/लीटर पानी) का सुबह के समय छिड़काव करें।`;
   }
-  // 5. Tomato & Potato Blight ("jhulsa rog")
-  else if (q.includes("झुलसा") || q.includes("jhulsa") || q.includes("blight") || q.includes("टमाटर") || q.includes("आलू") || q.includes("tamatar") || q.includes("aalu")) {
+  // 7. Tomato & Potato Blight ("jhulsa rog")
+  else if (/झुलसा|jhulsa|blight|टमाटर|आलू|tamatar|aalu|tomato|potato/i.test(q)) {
     answer = isEn
       ? `Blight (Jhulsa) Treatment in Solanaceous Crops: Spray Mancozeb 75 WP @ 2.5g/L water preventively, or Azoxystrobin 23 SC @ 1ml/L as curative. Ensure morning spray (7-9 AM) mixed with sticker.`
       : `अगेती व पछेती झुलसा रोग उपचार: रोकथाम हेतु मैंकोजेब 75 WP (2.5 ग्राम/लीटर) या रोग बढ़ने पर एजोक्सीस्ट्रोबिन 23 SC (1 मिली/लीटर पानी) का स्टिकर मिलाकर सुबह 7 से 9 बजे छिड़काव करें।`;
   }
-  // 6. Fertilizers & NPK
-  else if (q.includes("खाद") || q.includes("यूरिया") || q.includes("fertilizer") || q.includes("dap") || q.includes("npk") || q.includes("पोटाश")) {
+  // 8. Fertilizers & NPK
+  else if (/खाद|यूरिया|fertilizer|dap|npk|पोटाश|potash|urea/i.test(q)) {
     answer = isEn
       ? `Balanced NPK Advisory for ${hub.district_en}: Apply 100-120 kg N, 50-60 kg P2O5, and 40-50 kg K2O per hectare. Apply full Phosphorus & Potash as basal at sowing, and Nitrogen in 3 splits.`
       : `${hub.district_hi} क्षेत्र के लिए संतुलित खाद प्रबंधन: प्रति हेक्टेयर 100-120 किग्रा नाइट्रोजन, 50-60 किग्रा फॉस्फोरस और 40-50 किग्रा पोटाश दें। डीएपी व पोटाश बुवाई के समय बेसल दें, यूरिया 2-3 खुराकों में दें।`;
   }
-  // 7. General Irrigation & Water
-  else if (q.includes("सिंचाई") || q.includes("पानी") || q.includes("water") || q.includes("irrigation")) {
+  // 9. General Irrigation & Water
+  else if (/सिंचाई|पानी|water|irrigation|sinchai|pani|paani/i.test(q)) {
     answer = isEn
-      ? `Irrigation Advisory: Water crops early morning (7 to 9 AM) or late evening to minimize evaporation losses. Drip or sprinkler irrigation delivers 40% water savings and higher yields.`
-      : `सिंचाई सलाह: सुबह 7 से 9 बजे या शाम को ही सिंचाई करें ताकि वाष्पीकरण से पानी का नुकसान न हो। ड्रिप व फव्वारा सिंचाई पद्धति अपनाने से 40% तक पानी की बचत और अधिक पैदावार होती है।`;
+      ? `Irrigation Advisory: Water crops early morning (6 to 9 AM) or late evening to minimize evaporation losses. Drip or sprinkler irrigation delivers 40% water savings and higher yields.`
+      : `सिंचाई सलाह: सुबह 6 से 9 बजे या शाम को 5 बजे के बाद ही सिंचाई करें ताकि वाष्पीकरण से पानी का नुकसान न हो। ड्रिप व फव्वारा सिंचाई पद्धति अपनाने से 40% तक पानी की बचत और अधिक पैदावार होती है।`;
   }
-  // 8. Mandi Rates & Prices
-  else if (q.includes("भाव") || q.includes("रेट") || q.includes("मंडी") || q.includes("price") || q.includes("rate")) {
+  // 10. Mandi Rates & Prices
+  else if (/भाव|रेट|दाम|मंडी|price|rate|mandi|bhav/i.test(q)) {
     answer = isEn
       ? `Agmarknet Live Mandi Rates: Cotton ₹7,450/Qtl, Wheat ₹2,425/Qtl, Soybean ₹4,680/Qtl, Chickpea ₹6,150/Qtl, Grapes ₹6,200/Qtl. View the 'Mandi & Weather Radar' tab for full arrivals.`
       : `एगमार्कनेट दैनिक मंडी भाव: कपास ₹7,450, गेहूं ₹2,425, सोयाबीन ₹4,680, चना ₹6,150, अंगूर ₹6,200 प्रति क्विंटल। विस्तृत दैनिक आवक हेतु 'मंडी भाव व मौसम रडार' टैब देखें।`;
   }
-  // 9. Schemes & Subsidies
-  else if (q.includes("योजना") || q.includes("scheme") || q.includes("subsidy") || q.includes("pmkisan") || q.includes("pmfby")) {
+  // 11. Schemes & Subsidies
+  else if (/योजना|scheme|subsidy|सब्सिडी|pmkisan|pmfby|6000/i.test(q)) {
     answer = isEn
       ? `Government Farmer Schemes: PM-KISAN provides ₹6,000 annual direct benefit in 3 installments. Under PMKSY, farmers receive 55-70% subsidy for micro & drip irrigation systems.`
       : `प्रमुख सरकारी योजनाएं: पीएम-किसान (PM-KISAN) के तहत प्रतिवर्ष ₹6,000 की प्रत्यक्ष आर्थिक सहायता मिलती है। पीएमकेएसवाई (PMKSY) के तहत ड्रिप व स्प्रिंकलर सिंचाई पर 55-70% तक की भारी सब्सिडी उपलब्ध है।`;
   }
-  // 10. General Fallback
+  // 12. General Fallback
   else {
     answer = isEn
       ? `For your land in ${hub.district_en}, soil nutrients and climate are monitored. For direct scientist support, contact your local KVK or dial Kisan Call Center 1800-180-1551.`

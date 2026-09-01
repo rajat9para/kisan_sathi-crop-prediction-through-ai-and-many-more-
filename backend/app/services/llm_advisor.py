@@ -12,6 +12,32 @@ from groq import Groq
 from app.config import config
 
 MULTILINGUAL_KNOWLEDGE_BASE = {
+    "khet_irrigation_timing": {
+        "hi": "खेत में सिंचाई हमेशा सुबह (6 से 9 बजे) या शाम को (5 बजे के बाद) करनी चाहिए। दोपहर की तेज धूप में पानी लगाने से 30-40% पानी वाष्पीकरण में नष्ट हो जाता है और जड़ों पर विपरीत प्रभाव पड़ता है। ड्रिप व स्प्रिंकलर सिंचाई से 40% तक पानी की बचत होती है।",
+        "en": "Irrigate fields early in the morning (6:00 to 9:00 AM) or late evening (after 5:00 PM). Avoid irrigating during hot afternoons as 30-40% water is lost to evaporation and causes root shock. Micro-drip irrigation saves 40% water while maximizing yields.",
+        "gu": "ખેતરમાં પિયત હંમેશા સવારે (6 થી 9 વાગ્યે) અથવા સાંજે (5 વાગ્યા પછી) આપવું જોઈએ. બપોરના તડકામાં પાણી આપવાથી 30-40% પાણી બાષ્પીભવનમાં વેડફાય છે.",
+        "bn": "জমিতে সেচ সর্বদা সকালে (৬টা থেকে ৯টা) বা বিকেলে (৫টার পরে) দেওয়া উচিত। দুপুরের রোদে জল দিলে ৩০-৪০% জল বাষ্পীভূত হয়ে নষ্ট হয়।",
+        "pa": "ਖੇਤ ਵਿੱਚ ਪਾਣੀ ਹਮੇਸ਼ਾ ਸਵੇਰੇ (6 ਤੋਂ 9 ਵਜੇ) ਜਾਂ ਸ਼ਾਮ ਨੂੰ (5 ਵਜੇ ਤੋਂ ਬਾਅਦ) ਲਾਓ। ਦੁਪਹਿਰ ਦੀ ਧੁੱਪ ਵਿੱਚ ਪਾਣੀ ਲਾਉਣ ਨਾਲ 30-40% ਪਾਣੀ ਉੱਡ ਜਾਂਦਾ ਹੈ।",
+        "mr": "शेतात पाणी नेहमी सकाळी (६ ते ९ वाजता) किंवा संध्याकाळी (५ नंतर) द्यावे. दुपारच्या उन्हात पाणी दिल्यास ३०-४०% पाण्याचे बाष्पीभवन होते व मुळांना धक्का बसतो.",
+        "te": "పొలంలో నీటిపారుదల ఎల్లప్పుడూ ఉదయం (6 నుండి 9 వరకు) లేదా సాయంత్రం (5 తర్వాత) చేయాలి. మధ్యాహ్నం ఎండలో నీరు పెట్టడం వల్ల 30-40% నీరు ఆవిరైపోతుంది.",
+        "ta": "வயலில் எப்போதும் அதிகாலை (6 முதல் 9 மணி வரை) அல்லது மாலை (5 மணிக்கு மேல்) பாசனம் செய்ய வேண்டும். நண்பகல் வெயிலில் பாசனம் செய்வதை தவிர்க்கவும்.",
+        "kn": "ಹೊಲದಲ್ಲಿ ನೀರಾವರಿಯನ್ನು ಯಾವಾಗಲೂ ಬೆಳಿಗ್ಗೆ (6 ರಿಂದ 9 ಗಂಟೆ) ಅಥವಾ ಸಂಜೆ (5 ಗಂಟೆಯ ನಂತರ) ಮಾಡಬೇಕು. ಮಧ್ಯಾಹ್ನದ ಬಿಸಿಲಿನಲ್ಲಿ ನೀರುಣಿಸುವುದನ್ನು ತಪ್ಪಿಸಿ.",
+        "ml": "പാടത്ത് നനയ്ക്കുന്നത് എപ്പോഴും രാവിലെ (6 മുതൽ 9 വരെ) അല്ലെങ്കിൽ വൈകുന്നേരം (5 ന് ശേഷം) ആയിരിക്കണം. ഉച്ചവെയിലിൽ നനയ്ക്കുന്നത് ഒഴിവാക്കുക.",
+        "or": "ଜମିରେ ଜଳସେଚନ ସର୍ବଦା ସକାଳେ (୬ ରୁ ୯ ଟା) କିମ୍ବା ସନ୍ଧ୍ୟାରେ (୫ ଟା ପରେ) କରନ୍ତୁ। ଦ୍ୱିପ୍ରହର ଖରାରେ ପାଣି ଦେବାରୁ ନିବୃତ୍ତ ରୁହନ୍ତୁ।"
+    },
+    "crop_recommendation_ml": {
+        "hi": "आपकी मिट्टी (N-P-K, pH) व मौसम के आधार पर एआई मशीन लर्निंग (XGBoost + SHAP) मॉडल द्वारा सर्वोत्तम फसल की सिफारिश की जाती है। अपनी जमीन के अनुकूलतम फसल चयन, 99.09% सटीकता व लाभ विश्लेषण हेतु 'फसल सलाहकार (Crop Advisory)' टैब देखें।",
+        "en": "Based on your soil testing parameters (N-P-K, pH) and weather, our XGBoost AI & SHAP Machine Learning Engine evaluates 22 crops to recommend the highest yielding, highest revenue crop for your farm. Check the 'Crop Advisory' tab for full ranking.",
+        "gu": "તમારી જમીન (N-P-K, pH) અને હવામાનના આધારે AI મશીન લર્નિંગ મોડેલ દ્વારા શ્રેષ્ઠ પાકની ભલામણ કરવામાં આવે છે. 'પાક સલાહકાર' ટેબ જુઓ.",
+        "bn": "আপনার মাটির স্বাস্থ্য ও আবহাওয়ার তথ্যের ভিত্তিতে এআই মেশিন লার্নিং মডেল সেরা ফসলের সুপারিশ প্রদান করে। 'ফসল পরামর্শ' ট্যাব দেখুন।",
+        "pa": "ਤੁਹਾਡੀ ਜ਼ਮੀਨ ਦੇ ਨਾਈਟ੍ਰੋਜਨ, ਫਾਸਫੋਰਸ, ਪੋਟਾਸ਼ ਅਤੇ ਪੀਐਚ ਅਨੁਸਾਰ ਏਆਈ ਮਸ਼ੀਨ ਲਰਨਿੰਗ ਮਾਡਲ ਵੱਲੋਂ ਸਭ ਤੋਂ ਵੱਧ ਮੁਨਾਫੇ ਵਾਲੀ ਫ਼ਸਲ ਦੀ ਚੋਣ ਕੀਤੀ ਜਾਂਦੀ ਹੈ।",
+        "mr": "तुमच्या मातीतील N-P-K व pH नुसार AI मशीन लर्निंग मॉडेलद्वारे सर्वाधिक उत्पादन देणाऱ्या पिकाची शिफारस केली जाते. 'पीक सल्लागार' टॅब पहा.",
+        "te": "మీ నేల పరీక్ష ఫలితాల ఆధారంగా AI మెషిన్ లెర్నింగ్ మోడల్ అత్యధిక లాభదాయకమైన పంటను సిఫార్సు చేస్తుంది.",
+        "ta": "உங்கள் மண் பரிசோதனை மற்றும் தட்பவெப்பநிலை அடிப்படையில் AI மெஷின் லேர்னிங் சிறந்த பயிரை பரிந்துரைக்கிறது.",
+        "kn": "ನಿಮ್ಮ ಮಣ್ಣಿನ ಫಲವತ್ತತೆ ಆಧಾರದ ಮೇಲೆ AI ಮೆಷಿನ್ ಲರ್ನಿಂಗ್ ಮಾದರಿಯು ಉತ್ತಮ ಇಳುವರಿ ನೀಡುವ ಬೆಳೆಯನ್ನು ಶಿಫಾರಸು ಮಾಡುತ್ತದೆ.",
+        "ml": "മണ്ണിന്റെ ഘടനയും കാലാവസ്ഥയും വിലയിരുത്തി AI മെഷീൻ ലേണിംഗ് ഉയർന്ന വിളവ് നൽകുന്ന വിളകൾ നിർദ്ദേശിക്കുന്നു.",
+        "or": "ଆପଣଙ୍କ ମୃତ୍ତିକା ପରୀକ୍ଷଣ ଆଧାରରେ AI ମେସିନ୍ ଲର୍ଣ୍ଣିଂ ସର୍ବୋତ୍ତମ ଫସଲ ସୁପାରିଶ କରେ।"
+    },
     "sugarcane_water": {
         "hi": "गन्ने में बुवाई के बाद पहली सिंचाई 10-15 दिन के अंतराल पर अंकुरण हेतु करें। इसके बाद कल्ले निकलते समय (Tillering) 8-10 दिन के अंतर पर पानी दें। तेज धूप में सुबह या शाम ही सिंचाई करें और जलभराव न होने दें।",
         "en": "For sugarcane, apply the first irrigation 10-15 days after planting for germination. During the tillering phase, irrigate every 8-10 days. Avoid waterlogging and irrigate early morning or evening.",
@@ -91,17 +117,17 @@ MULTILINGUAL_KNOWLEDGE_BASE = {
         "or": "ଟମାଟୋ ଏବଂ ଆଳୁରେ ଝାଉଁଳା ରୋଗ ପାଇଁ ମ୍ୟାଙ୍କୋଜେବ୍ ସ୍ପ୍ରେ କରନ୍ତୁ।"
     },
     "water": {
-        "hi": "फसल के लिए 3 से 4 सिंचाइयों की आवश्यकता होती है। पहली सिंचाई बुवाई के 20-25 दिन बाद और दूसरी फूल आने के समय सबसे महत्वपूर्ण है। अधिक जलभराव से बचें।",
-        "en": "Crops require 3 to 4 irrigations across their lifecycle. Critical stages are active vegetative branching (20-25 days) and flowering. Use drip irrigation early in the morning.",
-        "gu": "પાક માટે સમગ્ર ઋતુમાં 3 થી 4 પિયતની જરૂર હોય છે. પ્રથમ પિયત વાવણીના 20-25 દિવસ પછી અને બીજું ફૂલ આવવાના સમયે ખૂબ મહત્વનું છે.",
-        "bn": "ফসলের জন্য সমগ্র মরসুমে ৩ থেকে ৪ বার সেচের প্রয়োজন হয়। প্রথম সেচ বপনের ২০-২৫ দিন পরে এবং দ্বিতীয় সেচ ফুল আসার সময় অত্যন্ত গুরুত্বপূর্ণ।",
-        "pa": "ਫ਼ਸਲ ਲਈ ਪੂਰੇ ਸੀਜ਼ਨ ਵਿੱਚ 3 ਤੋਂ 4 ਸਿੰਚਾਈਆਂ ਦੀ ਲੋੜ ਹੁੰਦੀ ਹੈ। ਪਹਿਲੀ ਸਿੰਚਾਈ ਬਿਜਾਈ ਦੇ 20-25 ਦਿਨਾਂ ਬਾਅਦ ਜ਼ਰੂਰੀ ਹੈ।",
-        "mr": "पिकासाठी संपूर्ण हंगामात ३ ते ४ पाण्याच्या पाळ्यांची आवश्यकता असते. पहिली पाणी पाळी पेरणीनंतर २०-२५ दिवसांनी द्यावी.",
-        "te": "పంటకు మొత్తం కాలంలో 3 నుండి 4 తడులు అవసరం. మొదటి తడి విత్తిన 20-25 రోజులకు చాలా కీలకం.",
-        "ta": "பயிருக்கு 3 முதல் 4 முறை நீர்ப்பாசனம் தேவை. விதைத்த 20-25 நாட்களுக்குப் பிறகு முதல் பாசனம் முக்கியம்.",
-        "kn": "ಬೆಳೆಗೆ ಒಟ್ಟು 3 ರಿಂದ 4 ನೀರಾವರಿ ಅಗತ್ಯವಿದೆ. ಬಿತ್ತನೆಯ 20-25 ದಿನಗಳ ನಂತರ ಮೊದಲ ನೀರಾವರಿ ಮುಖ್ಯ.",
-        "ml": "വിളയ്ക്ക് മൊത്തം 3 മുതൽ 4 നനകൾ ആവശ്യമാണ്. വിതച്ച് 20-25 ദിവസങ്ങൾക്ക് ശേഷമുള്ള ആദ്യ നന പ്രധാനമാണ്.",
-        "or": "ଫସଲ ପାଇଁ ସମଗ୍ର ଋତୁରେ ୩ ରୁ ୪ ଥର ଜଳସେଚନ ଆବଶ୍ୟକ।"
+        "hi": "फसल में सिंचाई हमेशा सुबह 6 से 9 बजे या शाम को 5 बजे के बाद करें। कल्ले फूटते समय और फूल आने के समय नमी बनाए रखें। अधिक जलभराव से बचें।",
+        "en": "Irrigate crops during early morning (6-9 AM) or late evening. Maintain optimal soil moisture during tillering and flowering stages while avoiding waterlogging.",
+        "gu": "પાક માટે સમગ્ર ઋતુમાં સવારે કે સાંજે પિયત આપો. ફૂલ આવવાના સમયે પૂરતી ભેજ જાળવો.",
+        "bn": "ফসলে সেচ সকালে বা সন্ধ্যায় দিন। ফুল আসার সময় ও দানার পুষ্টিকালে মাটিতে পর্যাপ্ত আর্দ্রতা বজায় রাখুন।",
+        "pa": "ਫ਼ਸਲ ਨੂੰ ਪਾਣੀ ਸਵੇਰੇ ਜਾਂ ਸ਼ਾਮ ਨੂੰ ਲਾਓ। ਫੁੱਲ ਪੈਣ ਵੇਲੇ ਖੇਤ ਵਿੱਚ ਸਹੀ ਨਮੀ ਰੱਖੋ।",
+        "mr": "पिकास पाणी सकाळी किंवा संध्याकाळी द्यावे. फुलधारणा अवस्थेत जमिनीत ओल कायम ठेवावी.",
+        "te": "పంటకు ఉదయం లేదా సాయంత్రం వేళల్లో నీరు పెట్టండి. పూత దశలో తేమ ఉండేలా చూసుకోండి.",
+        "ta": "பயிருக்கு காலை அல்லது மாலை வேளையில் பாசனம் செய்யவும். பூக்கும் தருணத்தில் ஈரப்பதம் காக்கவும்.",
+        "kn": "ಬೆಳೆಗೆ ಬೆಳಿಗ್ಗೆ ಅಥವಾ ಸಂಜೆ ನೀರುಣಿಸಿ. ಹೂಬಿಡುವ ಹಂತದಲ್ಲಿ ತೇವಾಂಶ ಕಾಪಾಡಿಕೊಳ್ಳಿ.",
+        "ml": "വിളയ്ക്ക് രാവിലെ അല്ലെങ്കിൽ വൈകുന്നേരം നനയ്ക്കുക. പൂവിടുന്ന സമയത്ത് ആവശ്യത്തിന് ഈർപ്പം നിലനിർത്തുക.",
+        "or": "ଫସଲରେ ସକାଳେ କିମ୍ବା ସନ୍ଧ୍ୟାରେ ଜଳସେଚନ କରନ୍ତୁ।"
     },
     "fertilizer": {
         "hi": "बुवाई के समय प्रति एकड़ 50 किग्रा डीएपी और 25 किग्रा पोटाश डालें। फसल 25-30 दिन की होने पर 35 किग्रा नीम कोटेड यूरिया और 5 किग्रा जिंक सल्फेट का छिड़काव करें।",
@@ -207,8 +233,11 @@ class LLMAdvisor:
         }
         target_lang = lang_names.get(language, "Hindi (हिंदी)")
 
+        # Determine Intent Type
+        intent_type = self._classify_intent(query_text)
+
         if not self.client:
-            return self._fallback_response(query_text, language)
+            return self._fallback_response(query_text, language, intent_type=intent_type)
 
         models_to_try = [
             "llama-3.3-70b-versatile",
@@ -225,10 +254,13 @@ class LLMAdvisor:
                         {
                             "role": "system",
                             "content": (
-                                f"You are Kisaan_Sathi, an expert AI Agricultural Scientist advising farmers in India ({location}). "
-                                f"Respond strictly in fluent, natural, respectful {target_lang}. "
-                                "Give direct, practical organic and chemical recommendations with exact dosages in 2-3 concise sentences. "
-                                "Focus on immediate actionable agricultural steps (sowing, irrigation, NPK dosage, disease cure)."
+                                f"You are Kisaan_Sathi, India's leading AI Agricultural Scientist advising farmers ({location}). "
+                                f"The farmer asks a query (which may be in {target_lang} or Romanized Hindi/Hinglish). "
+                                f"Respond strictly in clear, natural, respectful {target_lang}. "
+                                "Give direct, practical organic and chemical recommendations with exact timings/dosages in 2-3 concise sentences. "
+                                "If the question is about watering/irrigation timing, explain early morning vs late evening watering and why afternoon watering causes damage. "
+                                "If the question is about crop selection, recommend suitable high-value crops for their soil. "
+                                "Focus on immediate actionable agricultural steps."
                             )
                         },
                         {"role": "user", "content": query_text}
@@ -236,7 +268,7 @@ class LLMAdvisor:
                     model=model_name,
                     temperature=0.25,
                     max_tokens=250,
-                    timeout=2.5
+                    timeout=2.8
                 )
                 raw_text = chat_completion.choices[0].message.content.strip()
                 if raw_text:
@@ -244,7 +276,8 @@ class LLMAdvisor:
                     resp_en = raw_text if language == "en" else ""
                     return {
                         "query": query_text,
-                        "detected_intent": "groq_llm_intelligence",
+                        "detected_intent": f"groq_{intent_type}",
+                        "intent_type": intent_type,
                         "model_used": model_name,
                         "language": language,
                         "response_text_hi": resp_hi,
@@ -252,35 +285,141 @@ class LLMAdvisor:
                         "response_text_regional": raw_text,
                         "tts_audio_text": raw_text,
                         "confidence": 0.98,
-                        "suggested_followups": ["How much water is needed?", "Recommended spray timing?"] if language == "en" else ["पानी कितना देना है?", "छिड़काव का सही समय?"]
+                        "suggested_followups": (
+                            ["Water schedule?", "Recommended spray timing?", "Mandi market rates?"]
+                            if language == "en" else
+                            ["सिंचाई की सही मात्रा?", "कीटनाशक छिड़काव का समय?", "स्थानीय मंडी भाव?"]
+                        )
                     }
             except Exception:
                 continue
 
-        return self._fallback_response(query_text, language)
+        return self._fallback_response(query_text, language, intent_type=intent_type)
 
-    def generate_weather_actionable_advice(
+    def _classify_intent(self, query_text: str) -> str:
+        q = (query_text or "").lower()
+
+        # ML Crop Recommendation Intent
+        if re.search(r"recommend|selection|kaunsi\s*fasal|konsi\s*fasal|best\s*crop|which\s*crop|fasal\s*lagaye|khet\s*me\s*kya\s*boye|kya\s*lagaye|कौनसी\s*फसल|फसल\s*चयन|उत्तम\s*फसल|पीक\s*निवડ|કયો\s*પાક|எந்த\s*பயிர்|ఏ\s*పంట", q):
+            return "ML_CROP_RECOMMENDATION"
+
+        # Plant Pathology / Leaf Disease
+        if re.search(r"रोग|झुलसा|कीट|सुंडी|मरोड़|धब्बे|fungus|blight|disease|pest|spray|pesticide|fungicide|dawai|dawa|peele\s*patte|spots|कीड़े|કપાસ|બટાકા|ઈયળ|తెగులు|புழு|ಕೀಟ", q):
+            return "PLANT_DOCTOR"
+
+        # Irrigation & Water Management (field watering, timing, CRI stage)
+        if re.search(r"पान[ीि]|सिंचाई|सिचाई|जल|water|irrigation|sinchai|pani|paani|samay|kis\s*samay|kab\s*dale|kab\s*lagaye|timing|drip|स्प्रिंकलर|તડી|પાણી|সেচ|ਸਿੰਚਾਈ|నీరు|పాசனம்|ನೀರಾವರಿ|നന|ସେଚନ", q):
+            return "IRRIGATION_WATER"
+
+        # Fertilizer / NPK / Soil Nutrients
+        if re.search(r"खाद|यूरिया|डीएपी|पोटाश|fertilizer|dap|urea|npk|potash|khad|gobar|vermicompost|ઝીંક|ખાતર|সার|ਖਾਦ|ఎరువు|உரம்|ಗೊಬ್ಬರ|വളം|ଖତ", q):
+            return "FERTILIZER_NPK"
+
+        # Market Mandi Prices
+        if re.search(r"भाव|रेट|दाम|mandi|price|rate|bhav|market|apmc|આવક|દર|ਭਾਅ|ధర|விலை|ಬೆಲೆ|വില|ଦର", q):
+            return "MANDI_RATES"
+
+        # Govt Schemes & Insurance
+        if re.search(r"योजना|बीमा|pm\s*-?\s*kisan|pmkisan|pmfby|सम्मान|सब्सिडी|अनुदान|subsidy|scheme|6000|किस्त|યોજના|திட்டம்|పథకం|ಯೋಜನೆ|പദ്ധതി|ଯୋଜନା", q):
+            return "GOVT_SCHEMES"
+
+        return "GENERAL_AGRONOMY"
+
+    def _fallback_response(self, query_text: str, language: str = "hi", intent_type: Optional[str] = None) -> Dict[str, Any]:
+        q = (query_text or "").lower()
+        if not intent_type:
+            intent_type = self._classify_intent(query_text)
+
+        # Multi-crop, Multi-Intent Keyword Regex Matching (Devanagari, Regional Scripts, English & Hinglish)
+        is_sugarcane = bool(re.search(r"गन्न[ाे]|gann[ae]|sugar\s*cane|ikshu|शेरडी|আখ|ਕਮਾਦ|उसात|ऊस|చెరకు|கரும்பு|ಕಬ್ಬು|കരിമ്പ്|ଆଖୁ", q))
+        is_wheat = bool(re.search(r"गेहूँ|गेहू|gehu|wheat|kanak|godhumai|ઘઉં|গম|ਕਣਕ|गव्हा|गहू|గోధుమ|கோதுமை|ಗೋಧಿ|ಗೋತമ്പ്|ଗହମ", q))
+        is_paddy = bool(re.search(r"धान|चावल|dhan|chawal|paddy|rice|bhat|ડાંગર|ধান|ਝੋਨਾ|भात|వరి|நெல்|ಭತ್ತ|നെല്ല്|ଧାନ", q))
+        is_cotton = bool(re.search(r"कपास|नरम[ाे]|kapas|cotton|narma|patti|કપાસ|তুলা|ਨਰਮਾ|काਪੂਸ|పత్తి|பருத்தி|ಹತ್ತಿ|പരുത്തി|କପା", q))
+        is_blight = bool(re.search(r"झुलसा|blight|टमाटर|आलू|potato|tomato|aalu|tamatar|ટામેટા|બટાકા|টমেটো|আলু|ਟਮਾਟਰ|ਆਲੂ|टोमॅटो|बटाटा|టమోటా|బంగాళాదుంప|தக்காளி|உருளைக்கிழங்கு|ಟೊಮೆಟೊ|ಆಲೂಗಡ್ಡೆ|തക്കാളി|ഉരുളക്കിഴങ്ങ്|ଟମାଟୋ|ଆଳୁ", q))
+        is_timing = bool(re.search(r"samay|kis\s*samay|kab\s*daale|kab\s*dalna|kab\s*lagaye|timing|time|सुबह|शाम|समय", q))
+        is_water = bool(re.search(r"पान[ीि]|सिंचाई|सिचाई|जल|water|irrigation|sinchai|pani|paani|સિંચાઈ|সেচ|ਸਿੰਚਾਈ|પાણી|জল|నీరు|పాசனம்|ನೀರು|വെള്ളം|ଜଳ|तडी|பாசனம்|ನೀರಾವರಿ|നന|ସେଚନ", q))
+        is_fert = bool(re.search(r"खाद|यूरिया|डीएपी|पोटाश|fertilizer|dap|urea|npk|potash|khad|ખાતર|યુરિયા|সার|ইউরিয়া|ਖਾਦ|ਯੂਰੀਆ|ఎరువు|యూరియా|உரம்|யூரியா|ಗೊಬ್ಬರ|ಯೂರಿಯಾ|വളം|യൂറിയ|ଖତ|ୟୁରିଆ", q))
+        is_pest = bool(re.search(r"कीट|रोग|सुंडी|मरोड़|pest|disease|spray|fungus|insects|dawai|dawa|દવા|રોગ|কীট|জীবাণু|ਕੀੜੇ|ਦਵਾਈ|పురుగు|మందు|பூச்சி|மருந்து|ಕೀಟ|ಔಷಧ|കീട|ପୋକ|ଔଷଧ", q))
+        is_mandi = bool(re.search(r"भाव|रेट|दाम|mandi|price|rate|bhav|market|ભાવ|દર|ਭਾਅ|ధర|விலை|ಬೆಲೆ|ವില|ଦର", q))
+        is_schemes = bool(re.search(r"योजना|बीमा|pm\s*-?\s*kisan|pmkisan|pmfby|सम्मान|सब्सिडी|अनुदान|subsidy|scheme|योजनाएं|યોજના|સબસિડી|ଯୋଜନା|திட்டம்|పథకం|ಯೋಜನೆ|ಸಬ್ಸಿಡಿ|പദ്ധതി|സബ്‌സിഡി|6000|किस्त", q))
+
+        # Precision Agronomic Routing
+        if intent_type == "ML_CROP_RECOMMENDATION":
+            topic = "crop_recommendation_ml"
+        elif is_sugarcane and (is_water or "kab" in q or "sinchai" in q or "kare" in q or "paani" in q):
+            topic = "sugarcane_water"
+        elif is_sugarcane and is_fert:
+            topic = "sugarcane_fertilizer"
+        elif is_wheat and (is_water or "cri" in q or "pehla" in q or "lagaye" in q):
+            topic = "wheat_water"
+        elif is_paddy:
+            topic = "paddy_water_fertilizer"
+        elif is_cotton:
+            topic = "cotton_pest"
+        elif is_blight:
+            topic = "blight_disease"
+        elif (is_water or "khet" in q) and is_timing:
+            topic = "khet_irrigation_timing"
+        elif is_schemes:
+            topic = "schemes"
+        elif is_mandi:
+            topic = "market"
+        elif is_water:
+            topic = "water"
+        elif is_fert:
+            topic = "fertilizer"
+        elif is_pest:
+            topic = "pest"
+        else:
+            topic = "general"
+
+        dict_entry = MULTILINGUAL_KNOWLEDGE_BASE.get(topic, MULTILINGUAL_KNOWLEDGE_BASE["general"])
+        text = dict_entry.get(language, dict_entry.get("hi", dict_entry["en"]))
+
+        is_en = (language == "en")
+        resp_hi = dict_entry.get("hi", "")
+        resp_en = dict_entry.get("en", "")
+
+        followups = (
+            ["Water schedule?", "Recommended fertilizer dosage?", "Mandi market rates?"]
+            if is_en else
+            ["सिंचाई की सही मात्रा?", "यूरिया व डीएपी की खुराक?", "स्थानीय मंडी भाव?"]
+        )
+
+        return {
+            "query": query_text,
+            "detected_intent": f"agronomic_{topic}",
+            "intent_type": intent_type,
+            "model_used": "kisaan_sathi_multilingual_engine",
+            "language": language,
+            "response_text_hi": resp_hi,
+            "response_text_en": resp_en,
+            "response_text_regional": text,
+            "tts_audio_text": text,
+            "confidence": 0.98,
+            "suggested_followups": followups
+        }
+
+    def generate_irrigation_advice(
         self,
         crop: str,
-        stage: str,
         temp_c: float,
         humidity_pct: float,
-        rainfall_forecast_mm: float,
-        language: str = "hi"
-    ) -> Dict[str, Any]:
+        rain_prob: float
+    ) -> Dict[str, str]:
         """
-        Generates immediate weather-actionable agronomic advice (e.g. spray timing, irrigation pause).
+        Synthesizes real-time irrigation schedule in Hindi and English.
         """
         if not self.client:
             return {
-                "hi": f"{crop} फसल में मौसम अनुसार समय पर हल्की सिंचाई करें।",
-                "en": f"Perform timely light irrigation in {crop} according to current weather."
+                "hi": f"{crop} के लिए वर्तमान तापमान {temp_c}°C को देखते हुए सुबह के समय सिंचाई करना सर्वोत्तम है।",
+                "en": f"For {crop} at {temp_c}°C, irrigate early morning to prevent evaporation losses."
             }
 
         prompt = (
-            f"Generate a 2-sentence actionable farming advisory for {crop} at {stage} stage. "
-            f"Current weather: Temp {temp_c}°C, Humidity {humidity_pct}%, 24h Rain forecast {rainfall_forecast_mm}mm. "
-            "Output JSON with keys 'hi' (in Hindi) and 'en' (in English)."
+            f"A farmer is growing {crop}. Current temperature is {temp_c}°C, humidity {humidity_pct}%, rain probability {rain_prob}%. "
+            "Give a clear, practical 2-sentence irrigation schedule advisory in both Hindi and English. "
+            "Output JSON with keys 'hi' and 'en'."
         )
 
         for model_name in ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "llama3-8b-8192"]:
@@ -288,8 +427,8 @@ class LLMAdvisor:
                 res = self.client.chat.completions.create(
                     messages=[{"role": "user", "content": prompt}],
                     model=model_name,
-                    temperature=0.3,
-                    max_tokens=250,
+                    temperature=0.2,
+                    max_tokens=200,
                     timeout=3.0,
                     response_format={"type": "json_object"}
                 )
@@ -340,75 +479,8 @@ class LLMAdvisor:
                 continue
 
         return {
-            "hi": f"कीटनाशक का छिड़काव मौसम साफ रहने पर सुबह या शाम के समय करें।",
-            "en": f"Apply spray during clear weather conditions early in the morning."
-        }
-
-    def _fallback_response(self, query_text: str, language: str = "hi") -> Dict[str, Any]:
-        q = (query_text or "").lower()
-        
-        # Multi-crop, Multi-Intent Keyword Regex Matching (Devanagari, Regional Scripts, English & Hinglish)
-        is_sugarcane = bool(re.search(r"गन्न[ाे]|gann[ae]|sugar\s*cane|ikshu|शेरडी|আখ|ਕਮਾਦ|उसात|ऊस|చెరకు|கரும்பு|ಕಬ್ಬು|കരിമ്പ്|ଆଖୁ", q))
-        is_wheat = bool(re.search(r"गेहूँ|गेहू|gehu|wheat|kanak|godhumai|ઘઉં|গম|ਕਣਕ|गव्हा|गहू|గోధుమ|கோதுமை|ಗೋಧಿ|ಗೋತമ്പ്|ଗହମ", q))
-        is_paddy = bool(re.search(r"धान|चावल|dhan|chawal|paddy|rice|bhat|ડાંગર|ধান|ਝੋਨਾ|भात|వరి|நெல்|ಭತ್ತ|നെല്ല്|ଧାନ", q))
-        is_cotton = bool(re.search(r"कपास|नरम[ाे]|kapas|cotton|narma|patti|કપાસ|তুলা|ਨਰਮਾ|कापूस|పత్తి|பருத்தி|ಹತ್ತಿ|പരുത്തി|କପା", q))
-        is_blight = bool(re.search(r"झुलसा|blight|टमाटर|आलू|potato|tomato|aalu|tamatar|ટામેટા|બટાકા|টমেটো|আলু|ਟਮਾਟਰ|ਆਲੂ|टोमॅटो|बटाटा|టమోటా|బంగాళాదుంప|தக்காளி|உருளைக்கிழங்கு|ಟೊಮೆಟೊ|ಆಲೂಗಡ್ಡೆ|തക്കാളി|ഉരുളക്കിഴങ്ങ്|ଟମାଟୋ|ଆଳୁ", q))
-        is_water = bool(re.search(r"पान[ीि]|सिंचाई|सिचाई|जल|water|irrigation|sinchai|સિંચાઈ|সেচ|ਸਿੰਚਾਈ|પાણી|জল|నీరు|పాசனம்|ನೀರು|വെള്ളം|ଜଳ|तडी|பாசனம்|ನೀರಾವರಿ|നന|ସେଚନ", q))
-        is_fert = bool(re.search(r"खाद|यूरिया|डीएपी|पोटाश|fertilizer|dap|urea|npk|potash|khad|ખાતર|યુરિયા|সার|ইউরিয়া|ਖਾਦ|ਯੂਰੀਆ|ఎరువు|యూరియా|உரம்|யூரியா|ಗೊಬ್ಬರ|ಯೂರಿಯಾ|വളം|യൂറിയ|ଖତ|ୟୁରିଆ", q))
-        is_pest = bool(re.search(r"कीट|रोग|सुंडी|मरोड़|pest|disease|spray|fungus|insects|દવા|રોગ|কীট|জীবাণু|ਕੀੜੇ|ਦਵਾਈ|పురుగు|మందు|பூச்சி|மருந்து|ಕೀಟ|ಔಷಧ|കീട|ପୋକ|ଔଷଧ", q))
-        is_mandi = bool(re.search(r"भाव|रेट|दाम|mandi|price|rate|bhav|market|ભાવ|દર|ਭਾਅ|ధర|விலை|ಬೆಲೆ|ವില|ଦର", q))
-        is_schemes = bool(re.search(r"योजना|बीमा|pm\s*-?\s*kisan|pmkisan|pmfby|सम्मान|सब्सिडी|अनुदान|subsidy|scheme|योजनाएं|યોજના|સબસિડી|ଯୋଜନା|திட்டம்|పథకం|ಯೋಜನೆ|ಸಬ್ಸಿಡಿ|പദ്ധതി|സബ്‌സിഡി|6000|किस्त", q))
-
-        # Precision Agronomic Routing
-        if is_sugarcane and (is_water or "kab" in q or "sinchai" in q or "kare" in q or "paani" in q):
-            topic = "sugarcane_water"
-        elif is_sugarcane and is_fert:
-            topic = "sugarcane_fertilizer"
-        elif is_wheat and (is_water or "cri" in q or "pehla" in q or "lagaye" in q):
-            topic = "wheat_water"
-        elif is_paddy:
-            topic = "paddy_water_fertilizer"
-        elif is_cotton:
-            topic = "cotton_pest"
-        elif is_blight:
-            topic = "blight_disease"
-        elif is_schemes:
-            topic = "schemes"
-        elif is_mandi:
-            topic = "market"
-        elif is_water:
-            topic = "water"
-        elif is_fert:
-            topic = "fertilizer"
-        elif is_pest:
-            topic = "pest"
-        else:
-            topic = "general"
-
-        dict_entry = MULTILINGUAL_KNOWLEDGE_BASE.get(topic, MULTILINGUAL_KNOWLEDGE_BASE["general"])
-        text = dict_entry.get(language, dict_entry.get("hi", dict_entry["en"]))
-
-        is_en = (language == "en")
-        resp_hi = dict_entry.get("hi", "")
-        resp_en = dict_entry.get("en", "")
-
-        followups = (
-            ["Water schedule?", "Recommended fertilizer dosage?", "Mandi market rates?"]
-            if is_en else
-            ["सिंचाई की सही मात्रा?", "यूरिया व डीएपी की खुराक?", "स्थानीय मंडी भाव?"]
-        )
-
-        return {
-            "query": query_text,
-            "detected_intent": f"agronomic_{topic}",
-            "model_used": "kisaan_sathi_multilingual_engine",
-            "language": language,
-            "response_text_hi": resp_hi,
-            "response_text_en": resp_en,
-            "response_text_regional": text,
-            "tts_audio_text": text,
-            "confidence": 0.98,
-            "suggested_followups": followups
+            "hi": "कीटनाशक का छिड़काव मौसम साफ रहने पर सुबह या शाम के समय करें।",
+            "en": "Apply spray during clear weather conditions early in the morning."
         }
 
 

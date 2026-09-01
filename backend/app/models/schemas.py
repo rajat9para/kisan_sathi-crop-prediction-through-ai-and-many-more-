@@ -150,6 +150,7 @@ class VoiceQueryRequest(BaseModel):
 class VoiceQueryResponse(BaseModel):
     query: str
     detected_intent: str
+    intent_type: Optional[str] = "GENERAL_AGRONOMY"
     response_text_hi: str
     response_text_en: str
     tts_audio_text: str
