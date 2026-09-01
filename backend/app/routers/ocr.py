@@ -9,7 +9,7 @@ router = APIRouter(prefix="/api/ocr", tags=["Soil Health Card OCR"])
 SAMPLE_SOIL_CARDS = {
     "sample_1_nashik": {
         "scheme": "Govt of India - Soil Health Card Scheme (MahaSoil)",
-        "farmer": "Ramesh Kisan Patil",
+        "farmer": "#SHC-MH-4012",
         "lab": "Nashik District Agri Testing Lab #MH-4012",
         "date": "2026-05-18",
         "params": {
@@ -31,7 +31,7 @@ SAMPLE_SOIL_CARDS = {
     },
     "sample_2_indore": {
         "scheme": "MP Krishi Vigyan Kendra Soil Testing Mission",
-        "farmer": "Vikram Singh Chouhan",
+        "farmer": "#SHC-MP-8830",
         "lab": "Indore Regional Soil Laboratory #MP-8830",
         "date": "2026-06-12",
         "params": {
@@ -53,7 +53,7 @@ SAMPLE_SOIL_CARDS = {
     },
     "sample_3_ludhiana": {
         "scheme": "Punjab State Soil Testing & Fertilizer Wing",
-        "farmer": "Gurpreet Singh Dhillon",
+        "farmer": "#SHC-PB-1049",
         "lab": "PAU Ludhiana Testing Cell #PB-1049",
         "date": "2026-04-22",
         "params": {
@@ -96,7 +96,7 @@ async def parse_soil_health_card(req: OCRSoilCardRequest):
 
         return {
             "detected_scheme": "Soil Health Card (Govt of India / State Agriculture Mission)",
-            "farmer_name": "Extracted from Soil Card",
+            "farmer_name": "#SHC-2025-ONLINE",
             "lab_id": "Govt District Soil Testing Lab",
             "sample_date": "2026-06-20",
             "extraction_source": "OCR Image Recognition (OpenCV & Text Extraction)",

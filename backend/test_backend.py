@@ -98,8 +98,8 @@ def test_ocr_soil_card():
     res = client.post("/api/ocr/soil-card", json=payload)
     assert res.status_code == 200
     data = res.json()
-    assert data["farmer_name"] == "Ramesh Kisan Patil"
-    print(f"[PASS] POST /api/ocr/soil-card -> Farmer: {data['farmer_name']}")
+    assert data["farmer_name"] == "#SHC-MH-4012"
+    print(f"[PASS] POST /api/ocr/soil-card -> Soil Card ID: {data['farmer_name']}")
 
 if __name__ == "__main__":
     print("--- Running Kisaan_Sathi Backend Integration Tests ---")

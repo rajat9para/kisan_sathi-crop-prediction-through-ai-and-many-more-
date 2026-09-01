@@ -69,8 +69,8 @@ class _LocationSoilInputScreenState extends State<LocationSoilInputScreen> {
             backgroundColor: AppColors.primary,
             content: Text(
               AppStrings.isHindi
-                  ? "मृदा स्वास्थ्य कार्ड लोड हुआ: ${res['farmer_name']}"
-                  : "Soil Health Card loaded: ${res['farmer_name']}",
+                  ? "मृदा स्वास्थ्य कार्ड लोड हुआ: ${res['card_id'] ?? cardTitle}"
+                  : "Soil Health Card loaded: ${res['card_id'] ?? cardTitle}",
             ),
           ),
         );
@@ -98,8 +98,8 @@ class _LocationSoilInputScreenState extends State<LocationSoilInputScreen> {
               child: Text(
                 AppStrings.isHindi
                     ? "स्थान स्वतः पहचाना गया: ${selectedLoc['name_hi']} (GPS शुद्धता: ±10m)"
-                    : "Location Auto-Detected: ${selectedLoc['name_en']} (GPS accuracy: ±10m)",
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                    : "Location auto-detected: ${selectedLoc['name_en']} (GPS accuracy: ±10m)",
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
               ),
             ),
           ],
@@ -115,11 +115,9 @@ class _LocationSoilInputScreenState extends State<LocationSoilInputScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+        title: Text(AppStrings.isHindi ? "खेत व मिट्टी का विवरण" : "Farm & Soil Parameters"),
         backgroundColor: AppColors.primary,
-        title: Text(
-          AppStrings.isHindi ? "खेत का स्थान व मृदा विवरण" : "Farm Location & Soil Data",
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        elevation: 0,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -226,7 +224,7 @@ class _LocationSoilInputScreenState extends State<LocationSoilInputScreen> {
                         ),
                         icon: const Icon(Icons.description_outlined, size: 16, color: AppColors.primary),
                         label: Text(
-                          "${card['title']} (${card['farmer']})",
+                          "${card['title']} (${card['card_id'] ?? '#SHC-2025'})",
                           style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                         ),
                         onPressed: () => _scanPresetSoilCard(card['id'], card['title']),

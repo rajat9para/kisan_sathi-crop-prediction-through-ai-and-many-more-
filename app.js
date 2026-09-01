@@ -330,41 +330,44 @@ const CROP_DATABASE = [
 function evaluateAgronomicModel(params) {
   const { n, p, k, ph, temp, humidity, rain, irrigation, prevCrop } = params;
 
-  function gaussianFit(val, optLow, optHigh, hardMin, hardMax) {
+  // Steep exponential agronomic response curve for ultra-reactive sensitivity
+  function agronomicFit(val, optLow, optHigh, hardMin, hardMax) {
     if (val >= optLow && val <= optHigh) return 1.0;
+    const center = (optLow + optHigh) / 2.0;
+    const span = Math.max(8.0, (optHigh - optLow) / 2.0);
+    const dist = val < optLow ? (optLow - val) : (val - optHigh);
+    
+    // Penalize hard threshold breaches heavily (e.g. extreme pH or nitrogen toxicities/deficiencies)
     if (hardMin !== undefined && val < hardMin) {
-      const dist = hardMin - val;
-      return Math.max(0.05, 0.4 - dist * 0.2);
+      return Math.max(0.01, 0.25 - (hardMin - val) * 0.15);
     }
     if (hardMax !== undefined && val > hardMax) {
-      const dist = val - hardMax;
-      return Math.max(0.05, 0.4 - dist * 0.2);
+      return Math.max(0.01, 0.25 - (val - hardMax) * 0.15);
     }
-    const center = (optLow + optHigh) / 2.0;
-    const span = (optHigh - optLow) / 2.0;
-    const diff = Math.abs(val - center);
-    return Math.max(0.1, 1.0 - (diff - span) / (span * 2.5 + 1e-5));
+    
+    return Math.max(0.02, Math.exp(-Math.pow(dist / (span * 0.95), 1.85)));
   }
 
   const scoredCrops = CROP_DATABASE.map(crop => {
     // 1. Soil Fit Pillar (N, P, K, pH)
-    const nScore = gaussianFit(n, crop.n_opt[0], crop.n_opt[1]);
-    const pScore = gaussianFit(p, crop.p_opt[0], crop.p_opt[1]);
-    const kScore = gaussianFit(k, crop.k_opt[0], crop.k_opt[1]);
-    const phScore = gaussianFit(ph, crop.ph_opt[0], crop.ph_opt[1], crop.ph_range[0], crop.ph_range[1]);
+    const nScore = agronomicFit(n, crop.n_opt[0], crop.n_opt[1]);
+    const pScore = agronomicFit(p, crop.p_opt[0], crop.p_opt[1]);
+    const kScore = agronomicFit(k, crop.k_opt[0], crop.k_opt[1]);
+    const phScore = agronomicFit(ph, crop.ph_opt[0], crop.ph_opt[1], crop.ph_range[0], crop.ph_range[1]);
 
-    const soilFit = (nScore * 0.28 + pScore * 0.24 + kScore * 0.24 + phScore * 0.24) * 100.0;
+    // Soil Fit: weighted average of macronutrients and soil pH
+    const soilFit = (nScore * 0.32 + pScore * 0.24 + kScore * 0.24 + phScore * 0.20) * 100.0;
 
     // 2. Weather & Water Fit Pillar
-    const tScore = gaussianFit(temp, crop.temp_opt[0], crop.temp_opt[1]);
-    const hScore = gaussianFit(humidity, crop.humidity_opt[0], crop.humidity_opt[1]);
-    const rScore = gaussianFit(rain, crop.rain_opt[0], crop.rain_opt[1]);
+    const tScore = agronomicFit(temp, crop.temp_opt[0], crop.temp_opt[1]);
+    const hScore = agronomicFit(humidity, crop.humidity_opt[0], crop.humidity_opt[1]);
+    const rScore = agronomicFit(rain, crop.rain_opt[0], crop.rain_opt[1]);
     let weatherFit = (tScore * 0.35 + hScore * 0.35 + rScore * 0.30) * 100.0;
 
     if (irrigation === "Rainfed" && crop.water_req === "High") {
-      weatherFit = Math.max(25.0, weatherFit * 0.55);
-    } else if (irrigation === "Drip" && (crop.id === "grapes" || crop.id === "pomegranate" || crop.id === "banana")) {
-      weatherFit = Math.min(99.0, weatherFit * 1.15);
+      weatherFit = Math.max(20.0, weatherFit * 0.45);
+    } else if (irrigation === "Drip" && (crop.id === "grapes" || crop.id === "pomegranate" || crop.id === "banana" || crop.id === "sugarcane")) {
+      weatherFit = Math.min(99.0, weatherFit * 1.12);
     }
 
     // 3. Market Fit Pillar
@@ -372,31 +375,43 @@ function evaluateAgronomicModel(params) {
     if (crop.trend === "up") marketFit = 95.0;
     else if (crop.trend === "stable") marketFit = 85.0;
 
-    // 4. Crop Rotation Synergy Pillar
-    let rotationFit = 85.0;
+    // 4. Crop Rotation Synergy Pillar (Legume vs Cereal vs Mono-Cropping)
+    let rotationFit = 80.0;
     const prev = (prevCrop || "").toLowerCase();
-    const currFam = crop.botanical_family.toLowerCase();
+    const currFam = (crop.botanical_family || "").toLowerCase();
+    const currId = crop.id.toLowerCase();
 
-    if (prev.includes("cotton") || prev.includes("कपास")) {
-      if (currFam.includes("fabaceae")) rotationFit = 98.0;
-      else if (currFam.includes("malvaceae")) rotationFit = 55.0;
-    } else if (prev.includes("wheat") || prev.includes("गेहूं") || prev.includes("rice") || prev.includes("धान")) {
-      if (currFam.includes("fabaceae")) rotationFit = 99.0;
-      else if (currFam.includes("poaceae")) rotationFit = 65.0;
-    } else if (prev.includes("soybean") || prev.includes("सोयाबीन")) {
-      if (currFam.includes("poaceae")) rotationFit = 96.0;
+    const isPrevLegume = prev.includes("soybean") || prev.includes("सोयाबीन") || prev.includes("chickpea") || prev.includes("चना") || prev.includes("lentil") || prev.includes("मूंगा") || prev.includes("दलहन");
+    const isPrevCereal = prev.includes("wheat") || prev.includes("गेहूं") || prev.includes("rice") || prev.includes("धान") || prev.includes("maize") || prev.includes("मक्का");
+    const isPrevCotton = prev.includes("cotton") || prev.includes("कपास");
+
+    const isCurrLegume = currFam.includes("fabaceae") || ["chickpea", "lentil", "blackgram", "mungbean", "pigeonpeas", "kidneybeans", "mothbeans"].includes(currId);
+    const isCurrCerealOrHeavy = currFam.includes("poaceae") || currFam.includes("malvaceae") || ["rice", "wheat", "maize", "cotton", "sugarcane", "banana"].includes(currId);
+
+    if (isPrevCereal || isPrevCotton) {
+      if (isCurrLegume) {
+        rotationFit = 99.0; // Excellent N-fixing break
+      } else if (currFam.includes("poaceae") || currFam.includes("malvaceae")) {
+        rotationFit = 48.0; // Heavy-feeder after heavy-feeder penalty
+      }
+    } else if (isPrevLegume) {
+      if (isCurrCerealOrHeavy) {
+        rotationFit = 98.0; // Beneficial nitrogen utilization
+      } else if (isCurrLegume) {
+        rotationFit = 55.0; // Consecutive legume disease risk
+      }
     }
 
-    // Total Weighted Multi-Criteria Fit
-    const totalScore = (soilFit * 0.40 + weatherFit * 0.25 + marketFit * 0.15 + rotationFit * 0.20);
+    // Total Multi-Criteria Agronomic Fit (Soil: 45%, Weather: 25%, Market: 12%, Rotation: 18%)
+    const totalScore = (soilFit * 0.45 + weatherFit * 0.25 + marketFit * 0.12 + rotationFit * 0.18);
 
     return {
       ...crop,
-      soilFit: Math.round(Math.min(99, Math.max(30, soilFit))),
-      weatherFit: Math.round(Math.min(99, Math.max(30, weatherFit))),
+      soilFit: Math.round(Math.min(99, Math.max(15, soilFit))),
+      weatherFit: Math.round(Math.min(99, Math.max(20, weatherFit))),
       marketFit: Math.round(marketFit),
       rotationFit: Math.round(rotationFit),
-      totalScore: Math.round(Math.min(98, Math.max(35, totalScore))),
+      totalScore: Math.round(Math.min(99, Math.max(25, totalScore))),
       rawNScore: nScore,
       rawPScore: pScore,
       rawKScore: kScore,
@@ -414,43 +429,43 @@ function evaluateAgronomicModel(params) {
   // Dynamic SHAP Feature Contribution Bars
   const shapBars = [
     {
-      name_en: `Soil pH (${ph} ${ph < 6.0 ? 'Acidic' : (ph > 7.5 ? 'Alkaline' : 'Neutral')})`,
-      name_hi: `मिट्टी सामू pH (${ph} ${ph < 6.0 ? 'अम्लीय' : (ph > 7.5 ? 'क्षारीय' : 'संतुलित')})`,
-      pct: Math.round(top.rawPHScore * 85),
-      val_en: top.rawPHScore >= 0.7 ? `+${Math.round(top.rawPHScore * 28)}%` : `-${Math.round((1 - top.rawPHScore) * 22)}%`,
-      val_hi: top.rawPHScore >= 0.7 ? `+${Math.round(top.rawPHScore * 28)}%` : `-${Math.round((1 - top.rawPHScore) * 22)}%`,
-      pos: top.rawPHScore >= 0.7
-    },
-    {
       name_en: `Nitrogen (N: ${n} kg/ha)`,
       name_hi: `नाइट्रोजन (N: ${n} किग्रा/हे.)`,
-      pct: Math.round(top.rawNScore * 85),
-      val_en: top.rawNScore >= 0.65 ? `+${Math.round(top.rawNScore * 24)}%` : `-${Math.round((1 - top.rawNScore) * 18)}%`,
-      val_hi: top.rawNScore >= 0.65 ? `+${Math.round(top.rawNScore * 24)}%` : `-${Math.round((1 - top.rawNScore) * 18)}%`,
+      pct: Math.round(top.rawNScore * 88),
+      val_en: top.rawNScore >= 0.65 ? `+${Math.round(top.rawNScore * 28)}%` : `-${Math.round((1 - top.rawNScore) * 25)}%`,
+      val_hi: top.rawNScore >= 0.65 ? `+${Math.round(top.rawNScore * 28)}%` : `-${Math.round((1 - top.rawNScore) * 25)}%`,
       pos: top.rawNScore >= 0.65
     },
     {
       name_en: `Potassium (K: ${k} kg/ha)`,
       name_hi: `पोटाश (K: ${k} किग्रा/हे.)`,
-      pct: Math.round(top.rawKScore * 85),
-      val_en: top.rawKScore >= 0.65 ? `+${Math.round(top.rawKScore * 22)}%` : `-${Math.round((1 - top.rawKScore) * 16)}%`,
-      val_hi: top.rawKScore >= 0.65 ? `+${Math.round(top.rawKScore * 22)}%` : `-${Math.round((1 - top.rawKScore) * 16)}%`,
+      pct: Math.round(top.rawKScore * 88),
+      val_en: top.rawKScore >= 0.65 ? `+${Math.round(top.rawKScore * 24)}%` : `-${Math.round((1 - top.rawKScore) * 22)}%`,
+      val_hi: top.rawKScore >= 0.65 ? `+${Math.round(top.rawKScore * 24)}%` : `-${Math.round((1 - top.rawKScore) * 22)}%`,
       pos: top.rawKScore >= 0.65
     },
     {
       name_en: `Phosphorus (P: ${p} kg/ha)`,
       name_hi: `फॉस्फोरस (P: ${p} किग्रा/हे.)`,
-      pct: Math.round(top.rawPScore * 85),
-      val_en: top.rawPScore >= 0.65 ? `+${Math.round(top.rawPScore * 18)}%` : `-${Math.round((1 - top.rawPScore) * 12)}%`,
-      val_hi: top.rawPScore >= 0.65 ? `+${Math.round(top.rawPScore * 18)}%` : `-${Math.round((1 - top.rawPScore) * 12)}%`,
+      pct: Math.round(top.rawPScore * 88),
+      val_en: top.rawPScore >= 0.65 ? `+${Math.round(top.rawPScore * 20)}%` : `-${Math.round((1 - top.rawPScore) * 18)}%`,
+      val_hi: top.rawPScore >= 0.65 ? `+${Math.round(top.rawPScore * 20)}%` : `-${Math.round((1 - top.rawPScore) * 18)}%`,
       pos: top.rawPScore >= 0.65
+    },
+    {
+      name_en: `Soil pH (${ph} ${ph < 6.0 ? 'Acidic' : (ph > 7.5 ? 'Alkaline' : 'Neutral')})`,
+      name_hi: `मिट्टी सामू pH (${ph} ${ph < 6.0 ? 'अम्लीय' : (ph > 7.5 ? 'क्षारीय' : 'संतुलित')})`,
+      pct: Math.round(top.rawPHScore * 88),
+      val_en: top.rawPHScore >= 0.7 ? `+${Math.round(top.rawPHScore * 22)}%` : `-${Math.round((1 - top.rawPHScore) * 22)}%`,
+      val_hi: top.rawPHScore >= 0.7 ? `+${Math.round(top.rawPHScore * 22)}%` : `-${Math.round((1 - top.rawPHScore) * 22)}%`,
+      pos: top.rawPHScore >= 0.7
     },
     {
       name_en: `Crop Rotation (${prevCrop || 'Standard'})`,
       name_hi: `फसल चक्र (${prevCrop || 'सामान्य'})`,
-      pct: Math.round((top.rotationFit / 100) * 80),
-      val_en: top.rotationFit >= 80 ? `+${Math.round((top.rotationFit - 70) * 0.4)}%` : `-${Math.round((80 - top.rotationFit) * 0.4)}%`,
-      val_hi: top.rotationFit >= 80 ? `+${Math.round((top.rotationFit - 70) * 0.4)}%` : `-${Math.round((80 - top.rotationFit) * 0.4)}%`,
+      pct: Math.round((top.rotationFit / 100) * 85),
+      val_en: top.rotationFit >= 80 ? `+${Math.round((top.rotationFit - 70) * 0.45)}%` : `-${Math.round((80 - top.rotationFit) * 0.45)}%`,
+      val_hi: top.rotationFit >= 80 ? `+${Math.round((top.rotationFit - 70) * 0.45)}%` : `-${Math.round((80 - top.rotationFit) * 0.45)}%`,
       pos: top.rotationFit >= 80
     }
   ];
@@ -458,18 +473,24 @@ function evaluateAgronomicModel(params) {
   let expEn = "";
   let expHi = "";
 
-  if (ph < 5.8) {
-    expEn = `Your acidic soil pH (${ph}) coupled with nitrogen level (${n} kg/ha) makes ${top.name_en} the most acid-tolerant and productive choice.`;
-    expHi = `आपकी मिट्टी का अम्लीय सामू pH (${ph}) और नाइट्रोजन (${n} किग्रा/हे.) ${top.name_hi} की अम्लता-सहनशील एवं उच्च पैदावार के लिए सर्वाधिक अनुकूल हैं।`;
+  if (n > 110) {
+    expEn = `High nitrogen reserves (${n} kg/ha) with balanced pH (${ph}) strongly boost rapid vegetative growth, tillering, and boll/ear formation for ${top.name_en}.`;
+    expHi = `आपकी मिट्टी में उच्च नाइट्रोजन (${n} किग्रा/हे.) और संतुलित pH (${ph}) ${top.name_hi} की तीव्र वानस्पतिक वृद्धि और उच्च पैदावार के लिए सर्वाधिक अनुकूल हैं।`;
+  } else if (n < 45 && top.botanical_family.toLowerCase().includes("fabaceae")) {
+    expEn = `Low soil nitrogen (${n} kg/ha) combined with adequate phosphorus (${p} kg/ha) makes nitrogen-fixing legume ${top.name_en} the most profitable soil-enriching choice.`;
+    expHi = `कम नाइट्रोजन (${n} किग्रा/हे.) और पर्याप्त फॉस्फोरस (${p} किग्रा/हे.) की स्थिति में दलहनी फसल ${top.name_hi} मिट्टी में प्राकृतिक नाइट्रोजन जोड़ती है और बंपर लाभ देती है।`;
+  } else if (k > 150) {
+    expEn = `High potassium reserves (${k} kg/ha) with balanced pH (${ph}) strongly boost yield, fruit sweetness, and market premium quality for ${top.name_en}.`;
+    expHi = `आपकी मिट्टी में उच्च पोटाश (${k} किग्रा/हे.) और संतुलित pH (${ph}) ${top.name_hi} की गुणवत्ता, मिठास और बेहतर मंडी भाव के लिए सर्वोत्तम हैं।`;
+  } else if (ph < 5.8) {
+    expEn = `Your acidic soil pH (${ph}) coupled with nutrient levels makes ${top.name_en} the most acid-tolerant and productive crop.`;
+    expHi = `आपकी मिट्टी का अम्लीय सामू pH (${ph}) ${top.name_hi} की अम्लता-सहनशील एवं टिकाऊ पैदावार के लिए सर्वाधिक अनुकूल है।`;
   } else if (ph > 7.5) {
-    expEn = `Your calcareous/alkaline soil pH (${ph}) and drought-tolerant conditions make ${top.name_en} the superior resilient crop with highest net profit.`;
-    expHi = `आपकी मिट्टी का क्षारीय सामू pH (${ph}) और शुष्क परिस्थितियां ${top.name_hi} की पैदावार और मंडी मुनाफे के लिए सर्वाधिक उत्तम हैं।`;
-  } else if (k > 140) {
-    expEn = `High potassium reserves (${k} kg/ha) with balanced pH (${ph}) strongly boost yield, fruit sweetness, and market quality in ${top.name_en}.`;
-    expHi = `आपकी मिट्टी में उच्च पोटाश (${k} किग्रा/हे.) और संतुलित pH (${ph}) ${top.name_hi} की गुणवत्ता और उच्च मंडी भाव के लिए सर्वोत्तम हैं।`;
+    expEn = `Your calcareous/alkaline soil pH (${ph}) matches the drought and salt tolerance profile of ${top.name_en} with top net returns.`;
+    expHi = `आपकी मिट्टी का क्षारीय सामू pH (${ph}) ${top.name_hi} की लवण-सहनशीलता और मंडी मुनाफे के लिए सर्वाधिक उत्तम है।`;
   } else {
-    expEn = `The nutrient combination (N: ${n}, P: ${p}, K: ${k}, pH: ${ph}) perfectly satisfies the agronomic growth requirements of ${top.name_en}.`;
-    expHi = `मृदा पोषक तत्वों (नाइट्रोजन: ${n}, फॉस्फोरस: ${p}, पोटाश: ${k}, pH: ${ph}) का संतुलन ${top.name_hi} की फसल के लिए शत-प्रतिशत अनुकूल है।`;
+    expEn = `The nutrient balance (N: ${n}, P: ${p}, K: ${k}, pH: ${ph}) and crop rotation synergy perfectly fulfill the growth requirements of ${top.name_en}.`;
+    expHi = `मृदा पोषक तत्वों (नाइट्रोजन: ${n}, फॉस्फोरस: ${p}, पोटाश: ${k}, pH: ${ph}) और फसल चक्र का संतुलन ${top.name_hi} की फसल के लिए शत-प्रतिशत अनुकूल है।`;
   }
 
   return { top, runners, shapBars, expEn, expHi };
@@ -621,7 +642,7 @@ const DEMO_HUBS = {
     id: "dehradun", name_en: "Dehradun / Haridwar / Roorkee, Uttarakhand", name_hi: "देहरादून / हरिद्वार / रुड़की, उत्तराखंड",
     state_en: "Uttarakhand", state_hi: "उत्तराखंड", district_en: "Dehradun", district_hi: "देहरादून",
     lat: 30.3165, lon: 78.0322,
-    soil: { n: 72, p: 44, k: 135, ph: 6.5, oc: 0.95, type_en: "Doon Valley Alluvial & Terai Silty Loam", type_hi: "दून घाटी जलोढ़ व तराई गाद दोमट", farmer_en: "Rupesh Singh Rawat", farmer_hi: "रूपेश सिंह रावत" },
+    soil: { n: 72, p: 44, k: 135, ph: 6.5, oc: 0.95, type_en: "Doon Valley Alluvial & Terai Silty Loam", type_hi: "दून घाटी जलोढ़ व तराई गाद दोमट" },
     weather: { temp_en: "24.5°C", temp_hi: "२४.५°C", hum: "68%", rain_en: "95 mm", rain_hi: "९५ मिमी", cond_en: "Pleasant Valley Breeze", cond_hi: "सुहावना घाटी मौसम", spray_en: "Ideal for spraying (Morning 7-10 AM)", spray_hi: "छिड़काव के लिए अत्यंत अनुकूल", icon: "🌤️" },
     kvk: {
       center_en: "ICAR - Indian Institute of Soil and Water Conservation (IISWC), Kaulagarh Road, Dehradun - 248195 / KVK Dhakrani",
@@ -635,7 +656,7 @@ const DEMO_HUBS = {
     id: "pantnagar", name_en: "Pantnagar / US Nagar, Uttarakhand", name_hi: "पंतनगर / उधम सिंह नगर, उत्तराखंड",
     state_en: "Uttarakhand", state_hi: "उत्तराखंड", district_en: "Udham Singh Nagar", district_hi: "उधम सिंह नगर",
     lat: 29.0222, lon: 79.4908,
-    soil: { n: 86, p: 48, k: 90, ph: 6.8, oc: 0.88, type_en: "Tarai Calcareous Silty Clay Loam", type_hi: "तराई गाद युक्त उपजाऊ चिकनी दोमट", farmer_en: "Harvinder Singh Sandhu", farmer_hi: "हरविंदर सिंह संधू" },
+    soil: { n: 86, p: 48, k: 90, ph: 6.8, oc: 0.88, type_en: "Tarai Calcareous Silty Clay Loam", type_hi: "तराई गाद युक्त उपजाऊ चिकनी दोमट" },
     weather: { temp_en: "27.0°C", temp_hi: "२७.०°C", hum: "72%", rain_en: "115 mm", rain_hi: "११५ मिमी", cond_en: "Humid Tarai Plain", cond_hi: "आर्द्र तराई मैदानी मौसम", spray_en: "Spray during early morning", spray_hi: "सुबह के समय छिड़काव करें", icon: "⛅" },
     kvk: {
       center_en: "Krishi Vigyan Kendra, GBPUAT, Pantnagar, US Nagar - 263145",
@@ -649,7 +670,7 @@ const DEMO_HUBS = {
     id: "shimla", name_en: "Shimla / Solan, Himachal Pradesh", name_hi: "शिमला / सोलन, हिमाचल प्रदेश",
     state_en: "Himachal Pradesh", state_hi: "हिमाचल प्रदेश", district_en: "Shimla", district_hi: "शिमला",
     lat: 31.1048, lon: 77.1734,
-    soil: { n: 42, p: 110, k: 195, ph: 5.6, oc: 1.25, type_en: "Himalayan Acidic Brown Forest Loam", type_hi: "पर्वतीय अम्लीय भूरी वन दोमट", farmer_en: "Chetan Thakur", farmer_hi: "चेतन ठाकुर" },
+    soil: { n: 42, p: 110, k: 195, ph: 5.6, oc: 1.25, type_en: "Himalayan Acidic Brown Forest Loam", type_hi: "पर्वतीय अम्लीय भूरी वन दोमट" },
     weather: { temp_en: "18.5°C", temp_hi: "१८.५°C", hum: "65%", rain_en: "85 mm", rain_hi: "८५ मिमी", cond_en: "Cool Mountain Climate", cond_hi: "शीतल पर्वतीय मौसम", spray_en: "Safe to spray during sunny intervals", spray_hi: "धूप निकलने पर छिड़काव करें", icon: "🌤️" },
     kvk: {
       center_en: "Krishi Vigyan Kendra, ICAR-CPRI / UHF Campus, Rohru, Shimla - 171207",
@@ -663,7 +684,7 @@ const DEMO_HUBS = {
     id: "nashik", name_en: "Nashik, Maharashtra", name_hi: "नासिक, महाराष्ट्र",
     state_en: "Maharashtra", state_hi: "महाराष्ट्र", district_en: "Nashik", district_hi: "नासिक",
     lat: 19.9975, lon: 73.7898,
-    soil: { n: 85, p: 48, k: 190, ph: 6.8, oc: 0.72, type_en: "Medium Black Cotton Loam", type_hi: "मध्यम काली कपास मिट्टी (रेगुर)", farmer_en: "Ramesh Kisan Patil", farmer_hi: "रमेश किसान पाटिल" },
+    soil: { n: 85, p: 48, k: 190, ph: 6.8, oc: 0.72, type_en: "Medium Black Cotton Loam", type_hi: "मध्यम काली कपास मिट्टी (रेगुर)" },
     weather: { temp_en: "26.5°C", temp_hi: "२६.५°C", hum: "74%", rain_en: "68 mm", rain_hi: "६८ मिमी", cond_en: "Partly Cloudy • Favorable", cond_hi: "आंशिक बादल • अनुकूल मौसम", spray_en: "Good for Spraying (Morning)", spray_hi: "छिड़काव के लिए उत्तम समय", icon: "⛅" },
     kvk: {
       center_en: "Krishi Vigyan Kendra (KVK), YCMOU Campus, Gangapur Road, Nashik - 422222",
@@ -677,7 +698,7 @@ const DEMO_HUBS = {
     id: "nagpur", name_en: "Nagpur / Vidarbha, Maharashtra", name_hi: "नागपुर / विदर्भ, महाराष्ट्र",
     state_en: "Maharashtra", state_hi: "महाराष्ट्र", district_en: "Nagpur", district_hi: "नागपुर",
     lat: 21.1458, lon: 79.0882,
-    soil: { n: 62, p: 50, k: 145, ph: 7.2, oc: 0.65, type_en: "Basaltic Medium Deep Vertisol", type_hi: "काली बेसाल्ट वर्टिसोल", farmer_en: "Santosh Deshmukh", farmer_hi: "संतोष देशमुख" },
+    soil: { n: 62, p: 50, k: 145, ph: 7.2, oc: 0.65, type_en: "Basaltic Medium Deep Vertisol", type_hi: "काली बेसाल्ट वर्टिसोल" },
     weather: { temp_en: "31.5°C", temp_hi: "३१.५°C", hum: "58%", rain_en: "62 mm", rain_hi: "६२ मिमी", cond_en: "Warm & Sunny", cond_hi: "गर्म व धूप", spray_en: "Good spray conditions", spray_hi: "छिड़काव के लिए उत्तम", icon: "☀️" },
     kvk: {
       center_en: "Krishi Vigyan Kendra, ICAR-CICR, Shankarnagar, Nagpur - 440010",
@@ -691,7 +712,7 @@ const DEMO_HUBS = {
     id: "indore", name_en: "Indore, Madhya Pradesh", name_hi: "इंदौर, मध्य प्रदेश",
     state_en: "Madhya Pradesh", state_hi: "मध्य प्रदेश", district_en: "Indore", district_hi: "इंदौर",
     lat: 22.7196, lon: 75.8577,
-    soil: { n: 45, p: 62, k: 82, ph: 7.4, oc: 0.58, type_en: "Deep Black Malwa Vertisol Clay", type_hi: "गहरी काली मालवा वर्टिसोल मिट्टी", farmer_en: "Vikram Singh Chouhan", farmer_hi: "विक्रम सिंह चौहान" },
+    soil: { n: 45, p: 62, k: 82, ph: 7.4, oc: 0.58, type_en: "Deep Black Malwa Vertisol Clay", type_hi: "गहरी काली मालवा वर्टिसोल मिट्टी" },
     weather: { temp_en: "28.0°C", temp_hi: "२८.०°C", hum: "65%", rain_en: "42 mm", rain_hi: "४२ मिमी", cond_en: "Clear & Sunny • Dry Breeze", cond_hi: "साफ मौसम • शुष्क हवा", spray_en: "Optimal spray conditions", spray_hi: "छिड़काव हेतु श्रेष्ठ समय • बारिश नहीं", icon: "☀️" },
     kvk: {
       center_en: "Krishi Vigyan Kendra, Kasturbagram, Khandwa Road, Indore - 452020",
@@ -705,7 +726,7 @@ const DEMO_HUBS = {
     id: "ludhiana", name_en: "Ludhiana, Punjab", name_hi: "लुधियाना, पंजाब",
     state_en: "Punjab", state_hi: "पंजाब", district_en: "Ludhiana", district_hi: "लुधियाना",
     lat: 30.9010, lon: 75.8573,
-    soil: { n: 92, p: 42, k: 38, ph: 7.2, oc: 0.45, type_en: "Alluvial Sandy Loam", type_hi: "जलोढ़ रेतीली दोमट", farmer_en: "Gurpreet Singh Dhillon", farmer_hi: "गुरप्रीत सिंह ढिल्लों" },
+    soil: { n: 92, p: 42, k: 38, ph: 7.2, oc: 0.45, type_en: "Alluvial Sandy Loam", type_hi: "जलोढ़ रेतीली दोमट" },
     weather: { temp_en: "30.5°C", temp_hi: "३०.५°C", hum: "68%", rain_en: "55 mm", rain_hi: "५५ मिमी", cond_en: "Warm & Humid", cond_hi: "उमस भरा मौसम", spray_en: "Spray after 4 PM", spray_hi: "शाम ४ बजे बाद छिड़काव करें", icon: "🌤️" },
     kvk: {
       center_en: "Krishi Vigyan Kendra, Punjab Agricultural University (PAU), Ludhiana - 141004",
@@ -719,7 +740,7 @@ const DEMO_HUBS = {
     id: "patna", name_en: "Patna / Nalanda, Bihar", name_hi: "पटना / नालंदा, बिहार",
     state_en: "Bihar", state_hi: "बिहार", district_en: "Patna", district_hi: "पटना",
     lat: 25.5941, lon: 85.1376,
-    soil: { n: 88, p: 45, k: 70, ph: 7.0, oc: 0.62, type_en: "Middle Gangetic Deep Alluvial Loam", type_hi: "मध्य गंगा गहरी जलोढ़ दोमट", farmer_en: "Ramnath Kumar", farmer_hi: "रामनाथ कुमार" },
+    soil: { n: 88, p: 45, k: 70, ph: 7.0, oc: 0.62, type_en: "Middle Gangetic Deep Alluvial Loam", type_hi: "मध्य गंगा गहरी जलोढ़ दोमट" },
     weather: { temp_en: "30.0°C", temp_hi: "३०.०°C", hum: "75%", rain_en: "88 mm", rain_hi: "८८ मिमी", cond_en: "Humid Alluvial Climate", cond_hi: "उमस भरा मैदानी मौसम", spray_en: "Early morning spray", spray_hi: "सुबह जल्दी छिड़काव करें", icon: "🌤️" },
     kvk: {
       center_en: "Krishi Vigyan Kendra, ICAR-RCER, Barh, Patna - 803213",
@@ -733,7 +754,7 @@ const DEMO_HUBS = {
     id: "guntur", name_en: "Guntur, Andhra Pradesh", name_hi: "गुंटूर, आंध्र प्रदेश",
     state_en: "Andhra Pradesh", state_hi: "आंध्र प्रदेश", district_en: "Guntur", district_hi: "गुंटूर",
     lat: 16.3067, lon: 80.4365,
-    soil: { n: 70, p: 55, k: 140, ph: 6.5, oc: 0.65, type_en: "Coastal Red Clayey Loam", type_hi: "तटीय लाल चिकनी दोमट", farmer_en: "Venkat Ramanayya", farmer_hi: "वेंकट रमणय्या" },
+    soil: { n: 70, p: 55, k: 140, ph: 6.5, oc: 0.65, type_en: "Coastal Red Clayey Loam", type_hi: "तटीय लाल चिकनी दोमट" },
     weather: { temp_en: "31.2°C", temp_hi: "३१.२°C", hum: "78%", rain_en: "80 mm", rain_hi: "८० मिमी", cond_en: "Tropical Coastal Breeze", cond_hi: "उष्ण आर्द्र मौसम • तेज हवा", spray_en: "Check wind speed before spraying", spray_hi: "हवा की गति देखकर छिड़काव करें", icon: "🌧️" },
     kvk: {
       center_en: "Krishi Vigyan Kendra, ANGRAU Campus, Lam, Guntur - 522034",
@@ -747,7 +768,7 @@ const DEMO_HUBS = {
     id: "rajkot", name_en: "Rajkot, Gujarat", name_hi: "राजकोट, गुजरात",
     state_en: "Gujarat", state_hi: "गुजरात", district_en: "Rajkot", district_hi: "राजकोट",
     lat: 22.3039, lon: 70.8022,
-    soil: { n: 58, p: 64, k: 165, ph: 7.8, oc: 0.52, type_en: "Saurashtra Calcareous Loam", type_hi: "सौराष्ट्र मध्यम चूनायुक्त दोमट", farmer_en: "Mansukhbhai Patel", farmer_hi: "मनसुखभाई पटेल" },
+    soil: { n: 58, p: 64, k: 165, ph: 7.8, oc: 0.52, type_en: "Saurashtra Calcareous Loam", type_hi: "सौराष्ट्र मध्यम चूनायुक्त दोमट" },
     weather: { temp_en: "29.5°C", temp_hi: "२९.५°C", hum: "60%", rain_en: "35 mm", rain_hi: "३५ मिमी", cond_en: "Bright & Sunny", cond_hi: "खुला व चमकदार मौसम • धूप", spray_en: "Ideal spray conditions", spray_hi: "दिनभर छिड़काव के लिए अनुकूल", icon: "☀️" },
     kvk: {
       center_en: "Krishi Vigyan Kendra, JAU Campus, Targhadia, Rajkot - 360003",
@@ -761,7 +782,7 @@ const DEMO_HUBS = {
     id: "thanjavur", name_en: "Thanjavur, Tamil Nadu", name_hi: "तंजावूर, तमिलनाडु",
     state_en: "Tamil Nadu", state_hi: "तमिलनाडु", district_en: "Thanjavur", district_hi: "तंजावूर",
     lat: 10.7870, lon: 79.1378,
-    soil: { n: 88, p: 36, k: 95, ph: 6.7, oc: 0.81, type_en: "Cauvery Deltaic Silt Clay", type_hi: "कावेरी डेल्टा जलोढ़ गाद मिट्टी", farmer_en: "Muthusamy Sundaram", farmer_hi: "मुथुसामी सुंदरम" },
+    soil: { n: 88, p: 36, k: 95, ph: 6.7, oc: 0.81, type_en: "Cauvery Deltaic Silt Clay", type_hi: "कावेरी डेल्टा जलोढ़ गाद मिट्टी" },
     weather: { temp_en: "32.0°C", temp_hi: "३२.०°C", hum: "76%", rain_en: "90 mm", rain_hi: "९० मिमी", cond_en: "Warm Delta Weather", cond_hi: "उष्ण डेल्टा मौसम", spray_en: "Early morning spray recommended", spray_hi: "सुबह जल्दी छिड़काव करें", icon: "⛅" },
     kvk: {
       center_en: "Krishi Vigyan Kendra, TNAU, Needamangalam / Thanjavur - 613501",
@@ -775,7 +796,7 @@ const DEMO_HUBS = {
     id: "bardhaman", name_en: "Bardhaman, West Bengal", name_hi: "बर्धमान, पश्चिम बंगाल",
     state_en: "West Bengal", state_hi: "पश्चिम बंगाल", district_en: "Bardhaman", district_hi: "बर्धमान",
     lat: 23.2324, lon: 87.8615,
-    soil: { n: 95, p: 32, k: 88, ph: 6.2, oc: 0.78, type_en: "Gangetic Old Alluvial Loam", type_hi: "गंगा घाटी पुरानी जलोढ़ दोमट", farmer_en: "Subrata Mukherjee", farmer_hi: "सुब्रत मुखर्जी" },
+    soil: { n: 95, p: 32, k: 88, ph: 6.2, oc: 0.78, type_en: "Gangetic Old Alluvial Loam", type_hi: "गंगा घाटी पुरानी जलोढ़ दोमट" },
     weather: { temp_en: "29.0°C", temp_hi: "२९.०°C", hum: "82%", rain_en: "110 mm", rain_hi: "११० मिमी", cond_en: "Humid Monsoon", cond_hi: "मानसूनी आर्द्र मौसम", spray_en: "Delay spray if rain expected", spray_hi: "बारिश की संभावना में छिड़काव टालें", icon: "🌧️" },
     kvk: {
       center_en: "Krishi Vigyan Kendra, Budbud, Purba Bardhaman - 713403",
@@ -789,7 +810,7 @@ const DEMO_HUBS = {
     id: "ranchi", name_en: "Ranchi / Chota Nagpur, Jharkhand", name_hi: "रांची / छोटानागपुर, झारखंड",
     state_en: "Jharkhand", state_hi: "झारखंड", district_en: "Ranchi", district_hi: "रांची",
     lat: 23.3441, lon: 85.3096,
-    soil: { n: 48, p: 30, k: 65, ph: 5.5, oc: 0.74, type_en: "Chota Nagpur Acidic Red Sandy Loam", type_hi: "छोटानागपुर अम्लीय लाल रेतीली दोमट", farmer_en: "Birsa Munda Oraon", farmer_hi: "बिरसा मुंडा उरांव" },
+    soil: { n: 48, p: 30, k: 65, ph: 5.5, oc: 0.74, type_en: "Chota Nagpur Acidic Red Sandy Loam", type_hi: "छोटानागपुर अम्लीय लाल रेतीली दोमट" },
     weather: { temp_en: "26.0°C", temp_hi: "२६.०°C", hum: "70%", rain_en: "78 mm", rain_hi: "७८ मिमी", cond_en: "Pleasant Plateau Breeze", cond_hi: "सुहावना पठारी मौसम", spray_en: "Optimal spray weather", spray_hi: "छिड़काव के लिए श्रेष्ठ समय", icon: "⛅" },
     kvk: {
       center_en: "Krishi Vigyan Kendra, Birsa Agricultural University (BAU), Kanke, Ranchi - 834006",
@@ -803,7 +824,7 @@ const DEMO_HUBS = {
     id: "guwahati", name_en: "Guwahati / Kamrup, Assam", name_hi: "गुवाहाटी / कामरूप, असम",
     state_en: "Assam", state_hi: "असम", district_en: "Kamrup", district_hi: "कामरूप",
     lat: 26.1445, lon: 91.7362,
-    soil: { n: 65, p: 28, k: 58, ph: 5.1, oc: 1.10, type_en: "Brahmaputra Valley Acidic Floodplain Loam", type_hi: "ब्रह्मपुत्र घाटी अम्लीय जलोढ़ दोमट", farmer_en: "Pranab Barman", farmer_hi: "प्रणब बर्मन" },
+    soil: { n: 65, p: 28, k: 58, ph: 5.1, oc: 1.10, type_en: "Brahmaputra Valley Acidic Floodplain Loam", type_hi: "ब्रह्मपुत्र घाटी अम्लीय जलोढ़ दोमट" },
     weather: { temp_en: "28.0°C", temp_hi: "२८.०°C", hum: "84%", rain_en: "135 mm", rain_hi: "१३५ मिमी", cond_en: "Humid Subtropical Monsoon", cond_hi: "उपोष्ण कटिबंधीय आर्द्र मौसम", spray_en: "Check rain radar before spray", spray_hi: "बारिश का रडार देखकर छिड़काव करें", icon: "🌧️" },
     kvk: {
       center_en: "Krishi Vigyan Kendra, AAU, Kahikuchi, Kamrup, Guwahati - 781017",
@@ -817,7 +838,7 @@ const DEMO_HUBS = {
     id: "jaipur", name_en: "Jaipur, Rajasthan", name_hi: "जयपुर, राजस्थान",
     state_en: "Rajasthan", state_hi: "राजस्थान", district_en: "Jaipur", district_hi: "जयपुर",
     lat: 26.9124, lon: 75.7873,
-    soil: { n: 32, p: 28, k: 120, ph: 8.2, oc: 0.28, type_en: "Desert Light Sandy Loam", type_hi: "शुष्क रेतीली दोमट मिट्टी", farmer_en: "Ramkishan Gurjar", farmer_hi: "रामकिशन गुर्जर" },
+    soil: { n: 32, p: 28, k: 120, ph: 8.2, oc: 0.28, type_en: "Desert Light Sandy Loam", type_hi: "शुष्क रेतीली दोमट मिट्टी" },
     weather: { temp_en: "33.0°C", temp_hi: "३३.०°C", hum: "45%", rain_en: "20 mm", rain_hi: "२० मिमी", cond_en: "Arid & Sunny", cond_hi: "शुष्क व चमकदार धूप", spray_en: "Spray during morning hours", spray_hi: "सुबह छिड़काव करें", icon: "☀️" },
     kvk: {
       center_en: "Krishi Vigyan Kendra, SKNAU, Chomu, Jaipur - 303702",
@@ -831,7 +852,7 @@ const DEMO_HUBS = {
     id: "dharwad", name_en: "Dharwad, Karnataka", name_hi: "धारवाड़, कर्नाटक",
     state_en: "Karnataka", state_hi: "कर्नाटक", district_en: "Dharwad", district_hi: "धारवाड़",
     lat: 15.4589, lon: 75.0078,
-    soil: { n: 75, p: 46, k: 115, ph: 6.4, oc: 0.69, type_en: "Red Laterite Loam", type_hi: "लाल लेटेराइट दोमट मिट्टी", farmer_en: "Basavaraj Bommai Gowda", farmer_hi: "बसवरप्पा गौड़ा" },
+    soil: { n: 75, p: 46, k: 115, ph: 6.4, oc: 0.69, type_en: "Red Laterite Loam", type_hi: "लाल लेटेराइट दोमट मिट्टी" },
     weather: { temp_en: "27.5°C", temp_hi: "२७.५°C", hum: "72%", rain_en: "60 mm", rain_hi: "६० मिमी", cond_en: "Pleasant & Breezy", cond_hi: "सुहावना मौसम", spray_en: "Good spray window", spray_hi: "छिड़काव के लिए उपयुक्त", icon: "⛅" },
     kvk: {
       center_en: "Krishi Vigyan Kendra, UAS Campus, Dharwad - 580005",
@@ -845,7 +866,7 @@ const DEMO_HUBS = {
     id: "varanasi", name_en: "Varanasi, Uttar Pradesh", name_hi: "वाराणसी, उत्तर प्रदेश",
     state_en: "Uttar Pradesh", state_hi: "उत्तर प्रदेश", district_en: "Varanasi", district_hi: "वाराणसी",
     lat: 25.3176, lon: 82.9739,
-    soil: { n: 82, p: 52, k: 68, ph: 7.1, oc: 0.61, type_en: "Eastern Gangetic Silt Alluvial", type_hi: "पूर्वी गंगा जलोढ़ गाद मिट्टी", farmer_en: "Chandrabhan Tiwari", farmer_hi: "चंद्रभान तिवारी" },
+    soil: { n: 82, p: 52, k: 68, ph: 7.1, oc: 0.61, type_en: "Eastern Gangetic Silt Alluvial", type_hi: "पूर्वी गंगा जलोढ़ गाद मिट्टी" },
     weather: { temp_en: "31.0°C", temp_hi: "३१.०°C", hum: "70%", rain_en: "72 mm", rain_hi: "७२ मिमी", cond_en: "Sunny with Light Clouds", cond_hi: "धूप व हल्के बादल", spray_en: "Safe spray before 11 AM", spray_hi: "सुबह ११ बजे से पहले सुरक्षित", icon: "🌤️" },
     kvk: {
       center_en: "Krishi Vigyan Kendra, ICAR-IIVR, Jakhini, Varanasi - 221305",
@@ -859,7 +880,7 @@ const DEMO_HUBS = {
     id: "palakkad", name_en: "Palakkad, Kerala", name_hi: "पालक्काड, केरल",
     state_en: "Kerala", state_hi: "केरल", district_en: "Palakkad", district_hi: "पालक्काड",
     lat: 10.7867, lon: 76.6548,
-    soil: { n: 68, p: 24, k: 75, ph: 5.4, oc: 1.15, type_en: "Acidic Peaty Laterite", type_hi: "उच्च वर्षा अम्लीय पीट लेटेराइट", farmer_en: "Gopalakrishnan Nair", farmer_hi: "गोपालकृष्णन नायर" },
+    soil: { n: 68, p: 24, k: 75, ph: 5.4, oc: 1.15, type_en: "Acidic Peaty Laterite", type_hi: "उच्च वर्षा अम्लीय पीट लेटेराइट" },
     weather: { temp_en: "28.5°C", temp_hi: "२८.५°C", hum: "85%", rain_en: "140 mm", rain_hi: "१४० मिमी", cond_en: "Tropical Rain Showers", cond_hi: "मानसूनी बारिश", spray_en: "Do not spray during rain", spray_hi: "बारिश में छिड़काव न करें", icon: "🌧️" },
     kvk: {
       center_en: "Krishi Vigyan Kendra, KAU, Pattambi, Palakkad - 679306",
@@ -1338,7 +1359,7 @@ function setupLocationAutoDetect() {
   }
 }
 
-function detectUserLocation() {
+async function detectUserLocation() {
   const statusEl = document.getElementById("locationDetectStatus");
   const btn = document.getElementById("btnAutoDetectLocation");
   if (!navigator.geolocation) {
@@ -1348,15 +1369,15 @@ function detectUserLocation() {
 
   statusEl.style.display = "inline-flex";
   statusEl.className = "location-status-badge detecting";
-  statusEl.textContent = (currentLang === "en") ? "📡 Detecting Farm Location..." : "📡 खेत का स्थान खोजा जा रहा है...";
+  statusEl.textContent = (currentLang === "en") ? "📡 Pinpointing GPS & Reverse-Geocoding..." : "📡 जीपीएस व क्षेत्रीय कृषि मंडल खोजा जा रहा है...";
   if (btn) btn.disabled = true;
 
   navigator.geolocation.getCurrentPosition(
-    (pos) => {
+    async (pos) => {
       if (btn) btn.disabled = false;
       const userLat = pos.coords.latitude;
       const userLon = pos.coords.longitude;
-      matchNearestHubAndSelect(userLat, userLon, true);
+      await matchNearestHubAndSelect(userLat, userLon, true);
     },
     () => {
       if (btn) btn.disabled = false;
@@ -1368,48 +1389,73 @@ function detectUserLocation() {
   );
 }
 
-function matchNearestHubAndSelect(userLat, userLon, showFeedback) {
-  let closestHub = "dehradun";
+async function matchNearestHubAndSelect(userLat, userLon, showFeedback) {
+  let closestHub = "nashik";
   let minDistance = Infinity;
+  let detectedDistrict = "";
+  let detectedState = "";
 
-  // Exact territorial bounding for Dehradun / Haridwar / Roorkee Plains (Uttarakhand & Upper Doab)
-  if ((userLat >= 29.2 && userLat <= 31.0 && userLon >= 77.2 && userLon <= 78.9) ||
-      (userLat >= 29.8 && userLat <= 30.6 && userLon >= 77.7 && userLon <= 78.4)) {
-    closestHub = "dehradun";
-    minDistance = 0;
-  } else {
-    for (const [key, hub] of Object.entries(DEMO_HUBS)) {
-      const d = calculateDistance(userLat, userLon, hub.lat, hub.lon);
-      if (d < minDistance) {
-        minDistance = d;
-        closestHub = key;
-      }
+  // 1. Calculate true spherical distance to all 18 Indian agro-ecological hubs
+  for (const [key, hub] of Object.entries(DEMO_HUBS)) {
+    const d = calculateDistance(userLat, userLon, hub.lat, hub.lon);
+    if (d < minDistance) {
+      minDistance = d;
+      closestHub = key;
     }
   }
 
-  if (closestHub) {
-    const chips = document.querySelectorAll(".hub-chip");
-    chips.forEach(c => {
-      if (c.getAttribute("data-hub") === closestHub) {
-        c.classList.add("active");
-      } else {
-        c.classList.remove("active");
-      }
+  // 2. Real reverse geocoding via OpenStreetMap Nominatim / BigDataCloud
+  try {
+    const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${userLat}&lon=${userLon}&addressdetails=1`, {
+      headers: { "Accept": "application/json" }
     });
+    if (geoRes.ok) {
+      const geoData = await geoRes.json();
+      const addr = geoData.address || {};
+      detectedDistrict = addr.state_district || addr.district || addr.county || addr.city || addr.town || "";
+      detectedState = addr.state || "";
+    }
+  } catch (_) {
+    // Graceful fallback to nearest agro-ecological hub
+  }
 
-    selectHub(closestHub);
-    runDynamicCropPrediction();
+  const hub = DEMO_HUBS[closestHub] || DEMO_HUBS.nashik;
+  const isEn = (currentLang === "en");
 
-    if (showFeedback) {
-      const statusEl = document.getElementById("locationDetectStatus");
-      if (statusEl) {
-        statusEl.className = "location-status-badge success";
-        const h = DEMO_HUBS[closestHub];
-        const hubName = (currentLang === "en") ? h.name_en : h.name_hi;
-        statusEl.textContent = (currentLang === "en")
-          ? `📍 Detected: ${hubName} (${userLat.toFixed(2)}°N, ${userLon.toFixed(2)}°E)`
-          : `📍 पहचाना गया: ${hubName} (${userLat.toFixed(2)}°N, ${userLon.toFixed(2)}°E)`;
-      }
+  // Fallback to hub names if reverse geocoding is unavailable offline
+  if (!detectedDistrict) {
+    detectedDistrict = isEn ? hub.district_en : hub.district_hi;
+  }
+  if (!detectedState) {
+    detectedState = isEn ? hub.state_en : hub.state_hi;
+  }
+
+  const chips = document.querySelectorAll(".hub-chip");
+  chips.forEach(c => {
+    if (c.getAttribute("data-hub") === closestHub) {
+      c.classList.add("active");
+    } else {
+      c.classList.remove("active");
+    }
+  });
+
+  selectHub(closestHub, false);
+
+  // Auto-populate the form inputs with the real detected district and state
+  const stateInput = document.getElementById("inputState");
+  const distInput = document.getElementById("inputDistrict");
+  if (stateInput) stateInput.value = detectedState;
+  if (distInput) distInput.value = detectedDistrict;
+
+  runDynamicCropPrediction();
+
+  if (showFeedback) {
+    const statusEl = document.getElementById("locationDetectStatus");
+    if (statusEl) {
+      statusEl.className = "location-status-badge success";
+      statusEl.textContent = isEn
+        ? `📍 Detected: ${detectedDistrict}, ${detectedState} (${userLat.toFixed(2)}°N, ${userLon.toFixed(2)}°E)`
+        : `📍 पहचाना गया: ${detectedDistrict}, ${detectedState} (${userLat.toFixed(2)}°N, ${userLon.toFixed(2)}°E)`;
     }
   }
 }
@@ -1424,7 +1470,7 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-function selectHub(key) {
+function selectHub(key, overrideInputs = true) {
   currentHub = key;
   const hub = DEMO_HUBS[key] || DEMO_HUBS.nashik;
   const isEn = (currentLang === "en");
@@ -1454,18 +1500,19 @@ function selectHub(key) {
   const kInput = document.getElementById("inputK");
   const phInput = document.getElementById("inputPH");
 
-  if (stateInput) stateInput.value = isEn ? hub.state_en : hub.state_hi;
-  if (distInput) distInput.value = isEn ? hub.district_en : hub.district_hi;
+  if (overrideInputs) {
+    if (stateInput) stateInput.value = isEn ? hub.state_en : hub.state_hi;
+    if (distInput) distInput.value = isEn ? hub.district_en : hub.district_hi;
+  }
   if (nInput) nInput.value = hub.soil.n;
   if (pInput) pInput.value = hub.soil.p;
   if (kInput) kInput.value = hub.soil.k;
   if (phInput) phInput.value = hub.soil.ph;
   updatePHDisplay(hub.soil.ph);
 
-  // Update Soil Health Card Preview Box in Pure Language
+  // Update Soil Health Card Preview Box (pure official standard, no farmer name)
   updateSoilCardPreviewBox({
     texture: isEn ? hub.soil.type_en : hub.soil.type_hi,
-    farmer: isEn ? hub.soil.farmer_en : hub.soil.farmer_hi,
     n: hub.soil.n,
     p: hub.soil.p,
     k: hub.soil.k,
@@ -1639,7 +1686,7 @@ function updateSoilCardPreviewBox(card) {
   const pillOC = document.getElementById("soilPillOC");
 
   if (badge) badge.textContent = `🪨 ${card.texture}`;
-  if (farmer) farmer.textContent = isEn ? `Farmer: ${card.farmer}` : `किसान: ${card.farmer}`;
+  if (farmer) farmer.textContent = isEn ? `Soil Health Card #SHC-2025` : `मृदा स्वास्थ्य कार्ड #SHC-2025`;
 
   if (isEn) {
     if (pillN) pillN.textContent = `Nitrogen: ${card.n} (${card.n > 80 ? 'High' : (card.n < 40 ? 'Low' : 'Medium')})`;
@@ -1956,15 +2003,21 @@ function renderDiagnosisResults(data) {
 }
 
 // =========================================================================
-// 10. MULTILINGUAL VOICE SAATHI (AI AGRICULTURAL CONSULTANT)
+// 10. MULTILINGUAL VOICE SAATHI (AI AGRICULTURAL CONSULTANT - GOOGLE STYLE)
 // =========================================================================
+let voiceSpeechSynthesizer = null;
+let isCurrentlySpeaking = false;
+
 function setupMultilingualVoiceSaathi() {
   const btnAsk = document.getElementById("btnAskVoice");
   const input = document.getElementById("voiceInputText");
   const btnListen = document.getElementById("btnListenVoice");
+  const btnBigMic = document.getElementById("btnGoogleBigMic");
   const btnMic = document.getElementById("btnVoiceMicListen");
-  const micIcon = document.getElementById("micIconStatus");
+  const gStatusText = document.getElementById("gStatusText");
+  const gStatusDot = document.getElementById("gStatusDot");
 
+  // Handle Search Input & Submit
   if (btnAsk && input) {
     btnAsk.addEventListener("click", () => {
       const q = input.value.trim();
@@ -1978,10 +2031,11 @@ function setupMultilingualVoiceSaathi() {
     });
   }
 
-  const chips = document.querySelectorAll(".voice-chip:not(.followup)");
+  // Handle Quick Chips (.g-chip)
+  const chips = document.querySelectorAll(".g-chip, .voice-chip:not(.followup)");
   chips.forEach(c => {
     c.addEventListener("click", () => {
-      const q = c.getAttribute("data-q");
+      const q = c.getAttribute("data-q") || c.textContent.replace(/^[^a-zA-Z0-9\u0900-\u097F]+/, "").trim();
       if (input && q) {
         input.value = q;
         sendVoiceQuery(q);
@@ -1989,7 +2043,8 @@ function setupMultilingualVoiceSaathi() {
     });
   });
 
-  const followups = document.querySelectorAll(".voice-chip.followup");
+  // Handle Followup Pills
+  const followups = document.querySelectorAll(".g-followup-pill, .voice-chip.followup");
   followups.forEach(f => {
     f.addEventListener("click", () => {
       const q = f.textContent.replace("💬", "").trim();
@@ -2000,56 +2055,138 @@ function setupMultilingualVoiceSaathi() {
     });
   });
 
-  // Speech Recognition
-  if (btnMic && input) {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SpeechRecognition) {
-      const recognition = new SpeechRecognition();
-      recognition.continuous = false;
-      recognition.interimResults = false;
+  // Speech Recognition (Google Big Mic + Search Bar Mic)
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (SpeechRecognition) {
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.interimResults = false;
 
-      btnMic.addEventListener("click", () => {
-        recognition.lang = I18N_DICTIONARY[currentLang]?.speechCode || "hi-IN";
-        try {
-          recognition.start();
-          if (micIcon) micIcon.textContent = "🔴";
-        } catch (_) {}
+    function startListening() {
+      recognition.lang = I18N_DICTIONARY[currentLang]?.speechCode || "hi-IN";
+      try {
+        recognition.start();
+        if (btnBigMic) btnBigMic.classList.add("recording");
+        if (gStatusDot) gStatusDot.className = "g-status-dot pulse-listening";
+        if (gStatusText) {
+          gStatusText.textContent = (currentLang === "en")
+            ? "Listening to your voice... Speak now"
+            : "आपकी आवाज़ सुन रहे हैं... बोलिए";
+        }
+      } catch (_) {}
+    }
+
+    if (btnBigMic) btnBigMic.addEventListener("click", startListening);
+    if (btnMic) btnMic.addEventListener("click", startListening);
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      if (input) input.value = transcript;
+      if (btnBigMic) btnBigMic.classList.remove("recording");
+      sendVoiceQuery(transcript);
+    };
+
+    recognition.onerror = () => {
+      if (btnBigMic) btnBigMic.classList.remove("recording");
+      if (gStatusDot) gStatusDot.className = "g-status-dot";
+      if (gStatusText) {
+        gStatusText.textContent = (currentLang === "en")
+          ? "Ready • Tap mic to speak"
+          : "तैयार • पूछने के लिए माइक दबाएं";
+      }
+    };
+
+    recognition.onend = () => {
+      if (btnBigMic) btnBigMic.classList.remove("recording");
+    };
+  } else {
+    if (btnBigMic) {
+      btnBigMic.addEventListener("click", () => {
+        if (input) input.focus();
       });
-
-      recognition.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        if (input) input.value = transcript;
-        if (micIcon) micIcon.textContent = "🎤";
-        sendVoiceQuery(transcript);
-      };
-
-      recognition.onerror = () => { if (micIcon) micIcon.textContent = "🎤"; };
-      recognition.onend = () => { if (micIcon) micIcon.textContent = "🎤"; };
     }
   }
 
-  // Audio Playback
+  // 1-Tap Read Aloud Audio Playback
   if (btnListen) {
     btnListen.addEventListener("click", () => {
-      const text = document.getElementById("voiceResponseText")?.textContent?.replace(/^"|"$/g, "") || "";
-      if ('speechSynthesis' in window && text) {
-        window.speechSynthesis.cancel();
-        const utter = new SpeechSynthesisUtterance(text);
-        utter.lang = I18N_DICTIONARY[currentLang]?.speechCode || "hi-IN";
-        window.speechSynthesis.speak(utter);
-      }
+      toggleVoiceAudioPlayback();
     });
   }
 }
 
+function toggleVoiceAudioPlayback() {
+  const btnListen = document.getElementById("btnListenVoice");
+  const text = document.getElementById("voiceResponseText")?.textContent?.replace(/^"|"$/g, "") || "";
+  const isEn = (currentLang === "en");
+
+  if (!('speechSynthesis' in window) || !text) return;
+
+  if (isCurrentlySpeaking) {
+    window.speechSynthesis.cancel();
+    isCurrentlySpeaking = false;
+    if (btnListen) {
+      btnListen.innerHTML = `<span>🔊</span> <span>${isEn ? 'Listen Audio (1-Tap)' : 'एक टैप में सुनें (आवाज)'}</span>`;
+      btnListen.classList.remove("speaking");
+    }
+    return;
+  }
+
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = I18N_DICTIONARY[currentLang]?.speechCode || "hi-IN";
+  utter.rate = 0.95; // Clear natural pacing for farmers
+
+  utter.onstart = () => {
+    isCurrentlySpeaking = true;
+    if (btnListen) {
+      btnListen.innerHTML = `<span>⏹️</span> <span>${isEn ? 'Stop Audio' : 'रोकें (Stop)'}</span>`;
+      btnListen.classList.add("speaking");
+    }
+  };
+
+  utter.onend = () => {
+    isCurrentlySpeaking = false;
+    if (btnListen) {
+      btnListen.innerHTML = `<span>🔊</span> <span>${isEn ? 'Listen Again (1-Tap)' : 'पुनः सुनें (1-टैप)'}</span>`;
+      btnListen.classList.remove("speaking");
+    }
+  };
+
+  utter.onerror = () => {
+    isCurrentlySpeaking = false;
+    if (btnListen) {
+      btnListen.innerHTML = `<span>🔊</span> <span>${isEn ? 'Listen Audio (1-Tap)' : 'एक टैप में सुनें (आवाज)'}</span>`;
+      btnListen.classList.remove("speaking");
+    }
+  };
+
+  window.speechSynthesis.speak(utter);
+}
+
 async function sendVoiceQuery(query) {
   const resEl = document.getElementById("voiceResponseText");
+  const userTextEl = document.getElementById("userQueryText");
+  const userBubbleEl = document.getElementById("userQueryBubble");
+  const gStatusText = document.getElementById("gStatusText");
+  const gStatusDot = document.getElementById("gStatusDot");
   const isEn = (currentLang === "en");
+
+  // Show user query bubble
+  if (userTextEl) userTextEl.textContent = query;
+  if (userBubbleEl) userBubbleEl.style.display = "flex";
+
+  if (gStatusDot) gStatusDot.className = "g-status-dot pulse-thinking";
+  if (gStatusText) {
+    gStatusText.textContent = isEn
+      ? "Searching ICAR & Krishi Knowledge Base..."
+      : "राष्ट्रीय कृषि ज्ञान केंद्र व ICAR से परामर्श जारी...";
+  }
 
   if (resEl) {
     resEl.textContent = isEn
-      ? "⏳ Consulting National Agriculture Knowledge Base..."
-      : "⏳ राष्ट्रीय कृषि ज्ञान केंद्र से परामर्श लिया जा रहा है...";
+      ? "⏳ Searching scientific agronomy database..."
+      : "⏳ वैज्ञानिक कृषि अनुसंधान केंद्र से उत्तर प्राप्त किया जा रहा है...";
   }
 
   try {
@@ -2066,16 +2203,14 @@ async function sendVoiceQuery(query) {
 
     if (res.ok) {
       const data = await res.json();
-      const answer = isEn ? (data.response_text_en || data.tts_audio_text) : (data.response_text_hi || data.response_text_regional || data.tts_audio_text);
+      const answer = isEn
+        ? (data.response_text_en || data.tts_audio_text)
+        : (data.response_text_hi || data.response_text_regional || data.tts_audio_text);
+
       if (resEl && answer) {
         resEl.textContent = `"${answer}"`;
-        // Auto-play TTS if speech synthesis is available
-        if ('speechSynthesis' in window) {
-          window.speechSynthesis.cancel();
-          const utter = new SpeechSynthesisUtterance(answer);
-          utter.lang = I18N_DICTIONARY[currentLang]?.speechCode || "hi-IN";
-          window.speechSynthesis.speak(utter);
-        }
+        // Trigger auto 1-tap read aloud
+        toggleVoiceAudioPlayback();
       } else {
         fallbackDynamicVoiceQuery(query, isEn);
       }
@@ -2084,6 +2219,11 @@ async function sendVoiceQuery(query) {
     }
   } catch (_) {
     fallbackDynamicVoiceQuery(query, isEn);
+  } finally {
+    if (gStatusDot) gStatusDot.className = "g-status-dot";
+    if (gStatusText) {
+      gStatusText.textContent = isEn ? "Ready • Tap mic to speak" : "तैयार • पूछने के लिए माइक दबाएं";
+    }
   }
 }
 
@@ -2093,33 +2233,88 @@ function fallbackDynamicVoiceQuery(query, isEn) {
   const q = query.toLowerCase();
 
   let answer = "";
-  if (q.includes("खाद") || q.includes("यूरिया") || q.includes("fertilizer") || q.includes("dap") || q.includes("npk")) {
+
+  // 1. Sugarcane Water & Irrigation ("ganne ke khet me paani kab daale")
+  if (q.includes("गन्ना") || q.includes("ganne") || q.includes("ganna") || q.includes("sugarcane")) {
+    if (q.includes("पानी") || q.includes("paani") || q.includes("water") || q.includes("सिंचाई") || q.includes("irrigation")) {
+      answer = isEn
+        ? `Sugarcane Irrigation Schedule: First irrigation immediately after planting. During the formative tillering phase (60-120 days), irrigate every 10-12 days in summer and 20-25 days in winter. Using drip irrigation saves 40-50% water while increasing cane weight.`
+        : `गन्ने में पानी कब डालें: पहली सिंचाई बुवाई के तुरंत बाद करें। जमाव व कल्ले फूटने की अवस्था (60-120 दिन) में गन्ने को पानी की सबसे अधिक जरूरत होती है; गर्मियों में 10-12 दिन और सर्दियों में 20-25 दिन के अंतराल पर पानी दें। ड्रिप सिंचाई से 40% पानी बचता है और पैदावार बढ़ती है।`;
+    } else if (q.includes("खाद") || q.includes("यूरिया") || q.includes("dap") || q.includes("fertilizer")) {
+      answer = isEn
+        ? `Sugarcane Fertilizer Dose: 150-180 kg Nitrogen, 60 kg Phosphorus, and 60 kg Potash per hectare. Apply full DAP & Potash as basal at planting, and divide Urea into 3 equal splits (45, 90, and 120 days).`
+        : `गन्ने में खाद की मात्रा: प्रति हेक्टेयर 150-180 किग्रा नाइट्रोजन, 60 किग्रा फॉस्फोरस और 60 किग्रा पोटाश दें। बुवाई के समय पूरा डीएपी व पोटाश डालें, तथा यूरिया को 45, 90 और 120 दिन पर 3 बराबर किस्तों में डालें।`;
+    } else {
+      answer = isEn
+        ? `For Sugarcane in ${hub.district_en}, maintain weed-free furrows, apply earthing up at 90-100 days, and protect against red rot with Trichoderma soil application.`
+        : `${hub.district_hi} क्षेत्र में गन्ने की अच्छी बढ़वार के लिए 90 से 100 दिन पर मिट्टी चढ़ाने (Earthing up) का कार्य करें और लाल सड़न (Red Rot) से बचाव हेतु ट्राइकोडर्मा का प्रयोग करें।`;
+    }
+  }
+  // 2. Wheat Irrigation & CRI Phase ("gehu me pehla pani")
+  else if (q.includes("गेहूं") || q.includes("gehu") || q.includes("wheat")) {
+    if (q.includes("पहला") || q.includes("pehla") || q.includes("पानी") || q.includes("paani") || q.includes("cri") || q.includes("सिंचाई")) {
+      answer = isEn
+        ? `Wheat 1st Irrigation (CRI Stage): Apply the first crucial irrigation 20 to 25 days after sowing at Crown Root Initiation (CRI). Top-dress 30-35 kg Urea per acre immediately following this irrigation.`
+        : `गेहूं में पहला पानी (CRI स्टेज): बुवाई के 20 से 25 दिन बाद ताज जड़ (Crown Root Initiation) निकलते समय पहला पानी देना अनिवार्य है। पानी लगाने के बाद 30-35 किग्रा प्रति एकड़ यूरिया का पहला बुरकाव करें।`;
+    } else {
+      answer = isEn
+        ? `Wheat needs 4 to 5 irrigations at: CRI (21 days), Tillering (45 days), Late Jointing (65 days), Flowering (85 days), and Milking stage (105 days).`
+        : `गेहूं की फसल में कुल 4-5 सिंचाइयां मुख्य हैं: पहला पानी 21 दिन (CRI), दूसरा 45 दिन (कल्ले), तीसरा 65 दिन (गांठ), चौथा 85 दिन (फूल) और पांचवां 105 दिन (दूधिया अवस्था)।`;
+    }
+  }
+  // 3. Paddy / Rice Water & Fertilizer
+  else if (q.includes("धान") || q.includes("dhan") || q.includes("chawal") || q.includes("rice") || q.includes("paddy")) {
     answer = isEn
-      ? `For ${hub.district_en}, apply balanced NPK in 3 splits: 50% basal with full DAP & Potash, 25% urea at tillering (25 days), and 25% at flowering. Use neem-coated urea.`
-      : `${hub.district_hi} क्षेत्र के लिए यूरिया खाद ३ खुराकों में दें: बुवाई के समय ५०% डीएपी व पोटाश, २५ दिन बाद २५% यूरिया, और फूल आने पर शेष २५%। नीम लेपित यूरिया का प्रयोग करें।`;
-  } else if (q.includes("सिंचाई") || q.includes("पानी") || q.includes("water") || q.includes("irrigation")) {
+      ? `Paddy Water & Nutrient Management: Maintain 2-3 cm standing water during transplanting and tillering. Drain water before top-dressing urea (apply in 3 splits: basal, active tillering, panicle initiation).`
+      : `धान में पानी और खाद प्रबंधन: रोपाई के बाद पहले 15 दिन खेत में 2-3 सेमी पानी बनाए रखें। कल्ले फूटते समय और बाली निकलते समय नमी बनाए रखें। यूरिया 3 खुराकों में दें (रोपाई, कल्ले फूटते समय और बाली बनने पर)।`;
+  }
+  // 4. Cotton Pests & Pink Bollworm
+  else if (q.includes("कपास") || q.includes("kapas") || q.includes("cotton") || q.includes("सुंडी") || q.includes("bollworm")) {
     answer = isEn
-      ? `In ${hub.district_en}, maintain 65-75% soil moisture using drip irrigation. Water early in the morning (7 to 9 AM) to minimize evaporation losses.`
-      : `${hub.district_hi} में मध्यम काली मिट्टी के लिए ड्रिप सिंचाई सर्वोत्तम है। सुबह ७ से ९ बजे के बीच सिंचाई करें ताकि तेज धूप में पानी का नुकसान न हो।`;
-  } else if (q.includes("भाव") || q.includes("रेट") || q.includes("मंडी") || q.includes("price") || q.includes("rate")) {
+      ? `Cotton Pink Bollworm Management: Install 2 pheromone traps per acre. If rosette flowers appear, spray Profenofos 50 EC @ 2ml/L or Emamectin Benzoate 5 SG @ 0.5g/L water during clear morning weather.`
+      : `कपास में गुलाबी सुंडी नियंत्रण: प्रति एकड़ 2 फेरोमोन ट्रैप लगाएं। प्रकोप दिखने पर प्रोफेनोफॉस 50 EC (2 मिली/लीटर) या एमामेक्टिन बेंजोएट 5 SG (0.5 ग्राम/लीटर पानी) का सुबह के समय छिड़काव करें।`;
+  }
+  // 5. Tomato & Potato Blight ("jhulsa rog")
+  else if (q.includes("झुलसा") || q.includes("jhulsa") || q.includes("blight") || q.includes("टमाटर") || q.includes("आलू") || q.includes("tamatar") || q.includes("aalu")) {
     answer = isEn
-      ? `In ${hub.district_en} APMC mandi, major commodity arrivals are fetching steady market prices. Check the live Mandi Radar tab for daily modal rates.`
-      : `${hub.district_hi} कृषि उपज मंडी में आज दैनिक आवक और मॉडल भाव स्थिर बने हुए हैं। विस्तृत भाव हेतु मंडी रडार टैब देखें।`;
-  } else if (q.includes("कीट") || q.includes("दवा") || q.includes("pest") || q.includes("spray") || q.includes("रोग")) {
+      ? `Blight (Jhulsa) Treatment in Solanaceous Crops: Spray Mancozeb 75 WP @ 2.5g/L water preventively, or Azoxystrobin 23 SC @ 1ml/L as curative. Ensure morning spray (7-9 AM) mixed with sticker.`
+      : `अगेती व पछेती झुलसा रोग उपचार: रोकथाम हेतु मैंकोजेब 75 WP (2.5 ग्राम/लीटर) या रोग बढ़ने पर एजोक्सीस्ट्रोबिन 23 SC (1 मिली/लीटर पानी) का स्टिकर मिलाकर सुबह 7 से 9 बजे छिड़काव करें।`;
+  }
+  // 6. Fertilizers & NPK
+  else if (q.includes("खाद") || q.includes("यूरिया") || q.includes("fertilizer") || q.includes("dap") || q.includes("npk") || q.includes("पोटाश")) {
     answer = isEn
-      ? `For sucking pests and fungal spots in ${hub.district_en}, spray NSKE 5% Neem oil (5ml/L) or Mancozeb 75 WP (2.5g/L) during clear morning weather.`
-      : `${hub.district_hi} में रस चूसक कीटों और फफूंद के लिए ५% नीम तेल (५ मिली/लीटर) या मैंकोजेब ७५ WP (२.५ ग्राम/लीटर) का सुबह के समय छिड़काव करें।`;
-  } else if (q.includes("योजना") || q.includes("scheme") || q.includes("subsidy") || q.includes("pmkisan")) {
+      ? `Balanced NPK Advisory for ${hub.district_en}: Apply 100-120 kg N, 50-60 kg P2O5, and 40-50 kg K2O per hectare. Apply full Phosphorus & Potash as basal at sowing, and Nitrogen in 3 splits.`
+      : `${hub.district_hi} क्षेत्र के लिए संतुलित खाद प्रबंधन: प्रति हेक्टेयर 100-120 किग्रा नाइट्रोजन, 50-60 किग्रा फॉस्फोरस और 40-50 किग्रा पोटाश दें। डीएपी व पोटाश बुवाई के समय बेसल दें, यूरिया 2-3 खुराकों में दें।`;
+  }
+  // 7. General Irrigation & Water
+  else if (q.includes("सिंचाई") || q.includes("पानी") || q.includes("water") || q.includes("irrigation")) {
     answer = isEn
-      ? `Under PM-KISAN, farmers receive ₹6,000 annually. For crop insurance against drought or flood, apply under PMFBY at your local CSC.`
-      : `प्रधानमंत्री किसान सम्मान निधि के तहत ₹६,००० वार्षिक सहायता मिलती है। फसल बीमा के लिए नजदीकी सीएससी केंद्र से पीएमएफबीवाय में आवेदन करें।`;
-  } else {
+      ? `Irrigation Advisory: Water crops early morning (7 to 9 AM) or late evening to minimize evaporation losses. Drip or sprinkler irrigation delivers 40% water savings and higher yields.`
+      : `सिंचाई सलाह: सुबह 7 से 9 बजे या शाम को ही सिंचाई करें ताकि वाष्पीकरण से पानी का नुकसान न हो। ड्रिप व फव्वारा सिंचाई पद्धति अपनाने से 40% तक पानी की बचत और अधिक पैदावार होती है।`;
+  }
+  // 8. Mandi Rates & Prices
+  else if (q.includes("भाव") || q.includes("रेट") || q.includes("मंडी") || q.includes("price") || q.includes("rate")) {
     answer = isEn
-      ? `For your land in ${hub.district_en}, soil pH and nutrient levels are optimal for healthy crops. For immediate assistance, dial Kisan Call Center 1800-180-1551.`
-      : `${hub.district_hi} क्षेत्र के लिए आपकी मिट्टी व मौसम का विश्लेषण तैयार है। किसी भी कृषि समस्या के समाधान हेतु किसान हेल्पलाइन 1800-180-1551 पर संपर्क करें।`;
+      ? `Agmarknet Live Mandi Rates: Cotton ₹7,450/Qtl, Wheat ₹2,425/Qtl, Soybean ₹4,680/Qtl, Chickpea ₹6,150/Qtl, Grapes ₹6,200/Qtl. View the 'Mandi & Weather Radar' tab for full arrivals.`
+      : `एगमार्कनेट दैनिक मंडी भाव: कपास ₹7,450, गेहूं ₹2,425, सोयाबीन ₹4,680, चना ₹6,150, अंगूर ₹6,200 प्रति क्विंटल। विस्तृत दैनिक आवक हेतु 'मंडी भाव व मौसम रडार' टैब देखें।`;
+  }
+  // 9. Schemes & Subsidies
+  else if (q.includes("योजना") || q.includes("scheme") || q.includes("subsidy") || q.includes("pmkisan") || q.includes("pmfby")) {
+    answer = isEn
+      ? `Government Farmer Schemes: PM-KISAN provides ₹6,000 annual direct benefit in 3 installments. Under PMKSY, farmers receive 55-70% subsidy for micro & drip irrigation systems.`
+      : `प्रमुख सरकारी योजनाएं: पीएम-किसान (PM-KISAN) के तहत प्रतिवर्ष ₹6,000 की प्रत्यक्ष आर्थिक सहायता मिलती है। पीएमकेएसवाई (PMKSY) के तहत ड्रिप व स्प्रिंकलर सिंचाई पर 55-70% तक की भारी सब्सिडी उपलब्ध है।`;
+  }
+  // 10. General Fallback
+  else {
+    answer = isEn
+      ? `For your land in ${hub.district_en}, soil nutrients and climate are monitored. For direct scientist support, contact your local KVK or dial Kisan Call Center 1800-180-1551.`
+      : `${hub.district_hi} क्षेत्र के लिए मृदा स्वास्थ्य और वैज्ञानिक सिफारिशें तैयार हैं। किसी भी कृषि समस्या के तुरंत समाधान हेतु किसान कॉल सेंटर 1800-180-1551 (टोल फ्री) पर संपर्क करें।`;
   }
 
-  if (resEl) resEl.textContent = `"${answer}"`;
+  if (resEl) {
+    resEl.textContent = `"${answer}"`;
+    toggleVoiceAudioPlayback();
+  }
 }
 
 // =========================================================================
@@ -2130,7 +2325,7 @@ function renderWeatherAndMandiTables(hub, isEn) {
   if (weatherList) {
     weatherList.innerHTML = `
       <div class="forecast-day-row">
-        <span class="day-name">${isEn ? 'Today (Fri)' : 'आज (शुक्रवार)'}</span>
+        <span class="day-name">${isEn ? 'Today' : 'आज'}</span>
         <span class="day-icon">${hub.weather.icon}</span>
         <span class="day-cond">${isEn ? hub.weather.cond_en : hub.weather.cond_hi} • ${isEn ? hub.weather.temp_en : hub.weather.temp_hi}</span>
         <span class="day-rain">${isEn ? '10 mm Rain' : '१० मिमी वर्षा'}</span>
@@ -2245,7 +2440,6 @@ function generateAndExportOfficialReport() {
   const hub = DEMO_HUBS[currentHub] || DEMO_HUBS.nashik;
   const isEn = (currentLang === "en");
 
-  const farmerName = document.getElementById("soilFarmerName")?.textContent || (isEn ? "Ramesh Kisan Patil" : "रमेश किसान पाटिल");
   const state = document.getElementById("inputState")?.value || (isEn ? hub.state_en : hub.state_hi);
   const district = document.getElementById("inputDistrict")?.value || (isEn ? hub.district_en : hub.district_hi);
   const topCrop = document.getElementById("topCropName")?.textContent || (isEn ? "🍇 Grapes" : "🍇 अंगूर");
@@ -2285,9 +2479,9 @@ function generateAndExportOfficialReport() {
       </div>
 
       <div class="report-section">
-        <div class="section-title">${isEn ? '1. Farm & Soil Parameters' : '1. किसान व खेत का विवरण'}</div>
+        <div class="section-title">${isEn ? '1. Farm & Soil Parameters' : '1. खेत एवं मृदा विवरण'}</div>
         <div class="grid-2">
-          <div><strong>${farmerName}</strong></div>
+          <div><strong>${isEn ? 'Soil Health Card ID:' : 'मृदा स्वास्थ्य कार्ड आईडी:'}</strong> #SHC-2025</div>
           <div><strong>${isEn ? 'Location:' : 'स्थान:'}</strong> ${district}, ${state}</div>
           <div><strong>${isEn ? 'Nitrogen (N):' : 'नाइट्रोजन (N):'}</strong> ${nVal} kg/ha</div>
           <div><strong>${isEn ? 'Phosphorus (P):' : 'फॉस्फोरस (P):'}</strong> ${pVal} kg/ha</div>

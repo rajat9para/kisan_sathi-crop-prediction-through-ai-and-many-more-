@@ -430,20 +430,20 @@
             </div>
           </div>
 
-          <!-- SOIL TYPE & HEALTH CARD METRICS PREVIEW -->
-          <div class="soil-card-preview-box" id="soilCardPreviewBox">
-            <div class="soil-preview-header">
-              <span class="soil-badge" id="soilTextureBadge">🪨 मध्यम काली कपास मिट्टी (रेगुर)</span>
-              <span class="soil-farmer" id="soilFarmerName">किसान: रमेश किसान पाटिल</span>
+            <!-- SOIL TYPE & HEALTH CARD METRICS PREVIEW -->
+            <div class="soil-card-preview-box" id="soilCardPreviewBox">
+              <div class="soil-preview-header">
+                <span class="soil-badge" id="soilTextureBadge">🪨 मध्यम काली कपास मिट्टी (रेगुर)</span>
+                <span class="soil-farmer" id="soilFarmerName">मृदा स्वास्थ्य कार्ड #SHC-2025</span>
+              </div>
+              <div class="soil-pills-row">
+                <span class="soil-pill pill-n" id="soilPillN">नाइट्रोजन: ८५ (अधिक)</span>
+                <span class="soil-pill pill-p" id="soilPillP">फॉस्फोरस: ४८ (मध्यम)</span>
+                <span class="soil-pill pill-k" id="soilPillK">पोटाश: १९० (अधिक)</span>
+                <span class="soil-pill pill-ph" id="soilPillPH">सामू pH: ६.८ (संतुलित)</span>
+                <span class="soil-pill pill-oc" id="soilPillOC">जैविक कार्बन: ०.७२% (उत्तम)</span>
+              </div>
             </div>
-            <div class="soil-pills-row">
-              <span class="soil-pill pill-n" id="soilPillN">नाइट्रोजन: ८५ (अधिक)</span>
-              <span class="soil-pill pill-p" id="soilPillP">फॉस्फोरस: ४८ (मध्यम)</span>
-              <span class="soil-pill pill-k" id="soilPillK">पोटाश: १९० (अधिक)</span>
-              <span class="soil-pill pill-ph" id="soilPillPH">सामू pH: ६.८ (संतुलित)</span>
-              <span class="soil-pill pill-oc" id="soilPillOC">जैविक कार्बन: ०.७२% (उत्तम)</span>
-            </div>
-          </div>
 
           <form id="recommendForm" class="grid-form">
             <div class="form-row two-col">
@@ -777,57 +777,97 @@
     </section>
 
     <!-- ============================================================== -->
-    <!-- TAB 3: VOICE SAATHI (AI MULTILINGUAL ADVISOR) -->
+    <!-- TAB 3: VOICE SAATHI (GOOGLE-STYLE AI MULTILINGUAL ADVISOR) -->
     <!-- ============================================================== -->
     <section id="tab-voice" class="tab-pane">
-      <div class="voice-panel-wrap">
-        <div class="voice-hero">
-          <span class="voice-mic-hero">🎙️</span>
-          <h2 data-i18n="voice_hero_title">वॉइस साथी — आपका अपना डिजिटल कृषि सलाहकार</h2>
-          <p data-i18n="voice_hero_sub">सरल हिंदी और क्षेत्रीय भाषाओं में बोलकर सटीक कृषि मार्गदर्शन देता है।</p>
+      <div class="google-voice-container">
+        
+        <!-- Google-Style Voice Hero -->
+        <div class="google-voice-hero">
+          <div class="google-mic-wrapper" id="googleMicWrapper">
+            <button id="btnGoogleBigMic" class="google-mic-btn" title="Tap to Speak / बोलकर पूछें" type="button">
+              <span class="g-mic-icon" id="bigMicIcon">🎙️</span>
+              <div class="g-mic-pulse-ring"></div>
+              <div class="g-mic-pulse-ring delay-1"></div>
+            </button>
+          </div>
+          <div class="google-voice-status" id="googleVoiceStatus">
+            <span class="g-status-dot pulse-idle" id="gStatusDot"></span>
+            <span id="gStatusText">माइक दबाएं और सीधे अपनी भाषा में पूछें (जैसे: गन्ने में पानी कब डालें)</span>
+          </div>
         </div>
 
-        <div class="voice-box-container">
-          <div class="voice-chips-row">
-            <span class="chips-label" data-i18n="voice_chips_label">अक्सर पूछे जाने वाले सवाल:</span>
-            <button class="voice-chip" data-q="मेरे खेत के लिए सिंचाई का सही समय और पानी की मात्रा क्या है?">💧 <span data-i18n="chip_water">सिंचाई की मात्रा</span></button>
-            <button class="voice-chip" data-q="फसल में यूरिया और डीएपी खाद की कितनी मात्रा देनी चाहिए?">🧪 <span data-i18n="chip_fertilizer">खाद की मात्रा (NPK)</span></button>
-            <button class="voice-chip" data-q="आज नासिक और इंदौर मंडी में क्या भाव चल रहा है?">📊 <span data-i18n="chip_mandi">मंडी भाव क्या है?</span></button>
-            <button class="voice-chip" data-q="पत्तियों पर लगे पीले धब्बों और फफूंद से फसल को कैसे बचाएं?">🐛 <span data-i18n="chip_pest">कीट व रोग रोकथाम</span></button>
-            <button class="voice-chip" data-q="प्रधानमंत्री किसान सम्मान निधि और फसल बीमा का लाभ कैसे लें?">🏛️ <span data-i18n="chip_schemes">सरकारी योजनाएं</span></button>
-          </div>
-
-          <div class="voice-input-group">
-            <input type="text" id="voiceInputText" class="form-input voice-text-input" placeholder="यहाँ कोई भी कृषि प्रश्न लिखें या माइक दबाएं..." value="मेरे खेत के लिए सिंचाई का सही समय क्या है?" />
-            <button id="btnVoiceMicListen" class="btn-secondary" style="padding:0.75rem 1rem;" title="Speak with Mic / बोलकर पूछें">
+        <!-- Google-Style Search & Voice Input Bar -->
+        <div class="google-search-bar-wrap">
+          <div class="google-search-bar">
+            <span class="g-search-icon">🔍</span>
+            <input type="text" id="voiceInputText" class="google-voice-input" placeholder="यहाँ कोई भी कृषि प्रश्न पूछें या बोलें (उदा: गन्ने के खेत में पानी कब डालें?)..." value="गन्ने के खेत में पानी कब डालें?" />
+            <button id="btnVoiceMicListen" class="g-bar-mic-btn" title="Speak with Mic / माइक से बोलें" type="button">
               <span id="micIconStatus">🎤</span>
             </button>
-            <button id="btnAskVoice" class="btn-primary">
-              <span>🎙️</span>
-              <span data-i18n="btn_ask_ai">पूछें</span>
+            <button id="btnAskVoice" class="g-bar-submit-btn" title="Ask AI / उत्तर पाएं" type="button">
+              <span>➔</span>
             </button>
           </div>
+        </div>
 
-          <div class="voice-response-card" id="voiceResponseCard">
-            <div class="response-header">
-              <span id="voiceSpeakerHeader">🌾 किसान साथी सलाहकार उत्तर:</span>
-              <button id="btnListenVoice" class="btn-listen-voice">
-                <span>🔊</span>
-                <span data-i18n="btn_listen_audio">आवाज सुनें</span>
-              </button>
-            </div>
-            <div class="response-body" id="voiceResponseText">
-              "नासिक क्षेत्र में मध्यम काली मिट्टी के लिए ड्रिप सिंचाई सबसे उत्तम है। मिट्टी में ६५-७५% नमी बनाए रखें और दोपहर की धूप के बजाय सुबह ७ से ९ बजे के बीच सिंचाई करें।"
-            </div>
-          </div>
-
-          <div class="voice-followups-wrap" id="voiceFollowups">
-            <span class="followup-lbl" data-i18n="lbl_followups">आगे पूछें:</span>
-            <button class="voice-chip followup" data-followup="urea">💬 <span id="followup1Text">यूरिया की पहली खुराक कब दें?</span></button>
-            <button class="voice-chip followup" data-followup="spray">💬 <span id="followup2Text">कीटनाशक छिड़काव का सही समय?</span></button>
-            <button class="voice-chip followup" data-followup="organic">💬 <span id="followup3Text">जैविक नीमास्त्र कैसे बनाएं?</span></button>
+        <!-- Smart Quick-Prompt Chips (Hinglish & Regional Friendly) -->
+        <div class="google-voice-chips-container">
+          <span class="g-chips-title">🌾 त्वरित कृषि प्रश्न (एक टैप में पूछें):</span>
+          <div class="google-chips-scroll">
+            <button class="g-chip" data-q="गन्ने के खेत में पानी कब डालें और कितनी सिंचाई चाहिए?">🎋 <span>गन्ने में पानी कब डालें?</span></button>
+            <button class="g-chip" data-q="गेहूं में पहली सिंचाई और यूरिया कब देना चाहिए?">🌾 <span>गेहूं में पहली सिंचाई (CRI)?</span></button>
+            <button class="g-chip" data-q="धान की फसल में यूरिया खाद और पानी प्रबंधन कैसे करें?">🌾 <span>धान में खाद व पानी</span></button>
+            <button class="g-chip" data-q="कपास में गुलाबी सुंडी और रस चूसक कीटों की रोकथाम कैसे करें?">🌿 <span>कपास में कीट रोकथाम</span></button>
+            <button class="g-chip" data-q="टमाटर और आलू में झुलसा रोग (Blight) का उपचार क्या है?">🍅 <span>आलू-टमाटर झुलसा रोग</span></button>
+            <button class="g-chip" data-q="फसल में डीएपी और यूरिया खाद की सही संतुलित मात्रा क्या है?">🧪 <span>डीएपी व यूरिया की मात्रा</span></button>
+            <button class="g-chip" data-q="ड्रिप सिंचाई से पानी और बिजली की बचत कैसे करें?">💧 <span>ड्रिप सिंचाई प्रबंधन</span></button>
+            <button class="g-chip" data-q="आज स्थानीय मंडी में प्रमुख फसलों का क्या भाव चल रहा है?">📊 <span>आज का मंडी भाव</span></button>
+            <button class="g-chip" data-q="प्रधानमंत्री किसान सम्मान निधि और फसल बीमा का लाभ कैसे लें?">🏛️ <span>सरकारी कृषि योजनाएं</span></button>
           </div>
         </div>
+
+        <!-- Conversational Query & AI Response Display -->
+        <div class="google-dialogue-wrap">
+          
+          <!-- User Query Bubble -->
+          <div class="user-query-bubble" id="userQueryBubble">
+            <div class="user-query-label">🗣️ आपने पूछा / Your Question:</div>
+            <div class="user-query-text" id="userQueryText">"गन्ने के खेत में पानी कब डालें?"</div>
+          </div>
+
+          <!-- AI Response Card with 1-Tap Read Aloud -->
+          <div class="google-ai-response-card" id="voiceResponseCard">
+            <div class="g-response-header">
+              <div class="g-avatar-group">
+                <span class="g-avatar-badge">🌾</span>
+                <div>
+                  <strong class="g-ai-title">किसान साथी AI सलाहकार (Kisaan_Sathi)</strong>
+                  <span class="g-ai-sub" id="gAiSub">वैज्ञानिक कृषि एवं शस्य परामर्श • त्वरित 1-टैप उत्तर</span>
+                </div>
+              </div>
+              <button id="btnListenVoice" class="g-btn-read-aloud" type="button">
+                <span class="g-speaker-icon">🔊</span>
+                <span id="readAloudBtnText">एक टैप में सुनें (Read Aloud)</span>
+              </button>
+            </div>
+
+            <!-- Response Body -->
+            <div class="g-response-body" id="voiceResponseText">
+              "गन्ने में बुवाई के बाद पहली सिंचाई 10-15 दिन के अंतराल पर अंकुरण के लिए करें। इसके बाद कल्ले निकलते समय (Tillering) 8-10 दिन के अंतर पर पानी दें। तेज धूप में सुबह या शाम ही सिंचाई करें और जलभराव से बचें।"
+            </div>
+
+            <!-- Follow-up Questions -->
+            <div class="google-followups-row" id="voiceFollowups">
+              <span class="g-followup-label">💡 संबंधित प्रश्न:</span>
+              <button class="g-followup-pill" data-followup="गन्ने में यूरिया की खुराक कब और कितनी दें?">🎋 गन्ने में यूरिया की खुराक?</button>
+              <button class="g-followup-pill" data-followup="गन्ने में खरपतवार नियंत्रण कैसे करें?">🌿 खरपतवार नियंत्रण?</button>
+              <button class="g-followup-pill" data-followup="गन्ने में लाल सड़न (Red Rot) रोग का उपचार?">🩺 लाल सड़न (Red Rot) उपचार?</button>
+            </div>
+          </div>
+
+        </div>
+
       </div>
     </section>
 
