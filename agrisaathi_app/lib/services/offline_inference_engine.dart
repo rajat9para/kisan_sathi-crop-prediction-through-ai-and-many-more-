@@ -3,6 +3,31 @@ import '../models/crop_recommendation.dart';
 
 class OfflineInferenceEngine {
   static const Map<String, Map<String, dynamic>> cropProfiles = {
+    "wheat": {
+      "hi": "गेहूं", "sci": "Triticum aestivum",
+      "N": [75, 130], "P": [35, 65], "K": [30, 60], "temp": [12, 27], "humidity": [40, 78], "ph": [5.8, 8.0], "rain": [35, 95],
+      "yield_min": 18.0, "yield_max": 25.0, "unit": "Quintals", "price": 2425.0, "cost": 17000.0, "water": "Medium", "days": 120, "sowing_en": "October - November", "sowing_hi": "अक्टूबर - नवंबर"
+    },
+    "soybean": {
+      "hi": "सोयाबीन", "sci": "Glycine max",
+      "N": [20, 55], "P": [40, 75], "K": [30, 65], "temp": [18, 33], "humidity": [50, 85], "ph": [6.0, 7.8], "rain": [55, 125],
+      "yield_min": 10.0, "yield_max": 15.0, "unit": "Quintals", "price": 4680.0, "cost": 16000.0, "water": "Medium", "days": 95, "sowing_en": "June - July", "sowing_hi": "जून - जुलाई", "legume": true
+    },
+    "mustard": {
+      "hi": "सरसों / राई", "sci": "Brassica juncea",
+      "N": [35, 80], "P": [25, 55], "K": [20, 45], "temp": [10, 26], "humidity": [35, 75], "ph": [5.8, 8.2], "rain": [20, 65],
+      "yield_min": 8.0, "yield_max": 14.0, "unit": "Quintals", "price": 5650.0, "cost": 14000.0, "water": "Low", "days": 115, "sowing_en": "October - November", "sowing_hi": "अक्टूबर - नवंबर"
+    },
+    "sugarcane": {
+      "hi": "गन्ना", "sci": "Saccharum officinarum",
+      "N": [110, 180], "P": [45, 80], "K": [45, 100], "temp": [18, 36], "humidity": [55, 85], "ph": [5.8, 8.2], "rain": [90, 190],
+      "yield_min": 30.0, "yield_max": 45.0, "unit": "Tonnes", "price": 3800.0, "cost": 65000.0, "water": "High", "days": 330, "sowing_en": "October - March", "sowing_hi": "अक्टूबर - मार्च"
+    },
+    "groundnut": {
+      "hi": "मूंगफली", "sci": "Arachis hypogaea",
+      "N": [20, 45], "P": [30, 65], "K": [35, 75], "temp": [20, 33], "humidity": [50, 80], "ph": [5.8, 7.6], "rain": [45, 95],
+      "yield_min": 10.0, "yield_max": 16.0, "unit": "Quintals", "price": 6400.0, "cost": 20000.0, "water": "Medium", "days": 110, "sowing_en": "June - July", "sowing_hi": "जून - जुलाई", "legume": true
+    },
     "rice": {
       "hi": "धान / चावल", "sci": "Oryza sativa",
       "N": [60, 100], "P": [35, 60], "K": [35, 45], "temp": [20, 27], "humidity": [80, 85], "ph": [5.0, 7.5], "rain": [180, 300],
@@ -15,7 +40,7 @@ class OfflineInferenceEngine {
     },
     "chickpea": {
       "hi": "चना (देसी)", "sci": "Cicer arietinum",
-      "N": [20, 60], "P": [55, 80], "K": [75, 85], "temp": [15, 22], "humidity": [14, 20], "ph": [6.0, 8.5], "rain": [65, 95],
+      "N": [20, 60], "P": [55, 80], "K": [75, 85], "temp": [15, 22], "humidity": [30, 75], "ph": [6.0, 8.5], "rain": [65, 95],
       "yield_min": 8.0, "yield_max": 12.0, "unit": "Quintals", "price": 6150.0, "cost": 16000.0, "water": "Low", "days": 110, "sowing_en": "October - November", "sowing_hi": "अक्टूबर - नवंबर", "legume": true
     },
     "cotton": {

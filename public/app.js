@@ -15,13 +15,83 @@
 // =========================================================================
 const CROP_DATABASE = [
   {
+    id: "wheat",
+    name_en: "🌾 Wheat (Gehun / Kanak)", name_hi: "🌾 गेहूं",
+    family_en: "Poaceae (Cereal)", family_hi: "अन्न फसल • पोएसी",
+    botanical_family: "Poaceae",
+    n_opt: [75, 130], p_opt: [35, 65], k_opt: [30, 60],
+    ph_opt: [5.8, 8.0], ph_range: [5.5, 8.5],
+    temp_opt: [12, 27], humidity_opt: [40, 78], rain_opt: [35, 95],
+    water_req: "Medium", duration_days: 120,
+    yield_en: "18 - 25 Quintals / Acre", yield_hi: "१८ - २५ क्विंटल / एकड़",
+    rev_en: "₹45,000 - ₹62,000", rev_hi: "₹४५,००० - ₹६२,०००",
+    mandi_price: 2425, trend: "up",
+    sowing_en: "October - November (Rabi)", sowing_hi: "अक्टूबर - नवंबर (रबी)"
+  },
+  {
+    id: "soybean",
+    name_en: "🌱 Soybean (Bhat)", name_hi: "🌱 सोयाबीन",
+    family_en: "Fabaceae (Legume/Oilseed)", family_hi: "दलहन व तिलहन • फैबेसी",
+    botanical_family: "Fabaceae",
+    n_opt: [20, 55], p_opt: [40, 75], k_opt: [30, 65],
+    ph_opt: [6.0, 7.8], ph_range: [5.5, 8.2],
+    temp_opt: [18, 33], humidity_opt: [50, 85], rain_opt: [55, 125],
+    water_req: "Medium", duration_days: 95,
+    yield_en: "10 - 15 Quintals / Acre", yield_hi: "१० - १५ क्विंटल / एकड़",
+    rev_en: "₹48,000 - ₹70,000", rev_hi: "₹४८,००० - ₹७०,०००",
+    mandi_price: 4680, trend: "up",
+    sowing_en: "June - July (Kharif)", sowing_hi: "जून - जुलाई (खरीफ)"
+  },
+  {
+    id: "mustard",
+    name_en: "🌻 Mustard (Sarson / Rai)", name_hi: "🌻 सरसों / राई",
+    family_en: "Brassicaceae (Oilseed)", family_hi: "तिलहन फसल • ब्रैसिकेसी",
+    botanical_family: "Brassicaceae",
+    n_opt: [35, 80], p_opt: [25, 55], k_opt: [20, 45],
+    ph_opt: [5.8, 8.2], ph_range: [5.5, 8.8],
+    temp_opt: [10, 26], humidity_opt: [35, 75], rain_opt: [20, 65],
+    water_req: "Low", duration_days: 115,
+    yield_en: "8 - 14 Quintals / Acre", yield_hi: "८ - १४ क्विंटल / एकड़",
+    rev_en: "₹45,000 - ₹78,000", rev_hi: "₹४५,००० - ₹७८,०००",
+    mandi_price: 5650, trend: "up",
+    sowing_en: "October - November (Rabi)", sowing_hi: "अक्टूबर - नवंबर (रबी)"
+  },
+  {
+    id: "sugarcane",
+    name_en: "🎋 Sugarcane (Ganna)", name_hi: "🎋 गन्ना",
+    family_en: "Poaceae (Sugar)", family_hi: "नकदी फसल • पोएसी",
+    botanical_family: "Poaceae",
+    n_opt: [110, 180], p_opt: [45, 80], k_opt: [45, 100],
+    ph_opt: [5.8, 8.2], ph_range: [5.5, 8.5],
+    temp_opt: [18, 36], humidity_opt: [55, 85], rain_opt: [90, 190],
+    water_req: "High", duration_days: 330,
+    yield_en: "30 - 45 Tonnes / Acre", yield_hi: "३० - ४५ टन / एकड़",
+    rev_en: "₹1,20,000 - ₹1,80,000", rev_hi: "₹१,२०,००० - ₹१,८०,०००",
+    mandi_price: 380, trend: "up",
+    sowing_en: "October - March (Spring/Autumn)", sowing_hi: "अक्टूबर - मार्च"
+  },
+  {
+    id: "groundnut",
+    name_en: "🥜 Groundnut / Peanut (Moongphali)", name_hi: "🥜 मूंगफली",
+    family_en: "Fabaceae (Legume/Oilseed)", family_hi: "तिलहनी फसल • फैबेसी",
+    botanical_family: "Fabaceae",
+    n_opt: [20, 45], p_opt: [30, 65], k_opt: [35, 75],
+    ph_opt: [5.8, 7.6], ph_range: [5.2, 8.0],
+    temp_opt: [20, 33], humidity_opt: [50, 80], rain_opt: [45, 95],
+    water_req: "Medium", duration_days: 110,
+    yield_en: "10 - 16 Quintals / Acre", yield_hi: "१० - १६ क्विंटल / एकड़",
+    rev_en: "₹64,000 - ₹1,02,000", rev_hi: "₹६४,००० - ₹१,०२,०००",
+    mandi_price: 6400, trend: "up",
+    sowing_en: "June - July (Kharif)", sowing_hi: "जून - जुलाई (खरीफ)"
+  },
+  {
     id: "grapes",
     name_en: "🍇 Grapes (Vitis vinifera)", name_hi: "🍇 अंगूर",
     family_en: "Vitaceae (Fruit)", family_hi: "फल फसल • अंगूर कुल",
     botanical_family: "Vitaceae",
-    n_opt: [15, 45], p_opt: [120, 150], k_opt: [180, 215],
-    ph_opt: [5.8, 7.0], ph_range: [5.2, 7.5],
-    temp_opt: [15, 35], humidity_opt: [70, 85], rain_opt: [60, 85],
+    n_opt: [15, 45], p_opt: [90, 150], k_opt: [140, 215],
+    ph_opt: [5.8, 7.2], ph_range: [5.2, 7.5],
+    temp_opt: [15, 35], humidity_opt: [55, 85], rain_opt: [45, 85],
     water_req: "Medium", duration_days: 135,
     yield_en: "8 - 12 Tonnes / Acre", yield_hi: "८ - १२ टन / एकड़",
     rev_en: "₹3,50,000 - ₹5,00,000", rev_hi: "₹३,५०,००० - ₹५,००,०००",
@@ -33,9 +103,9 @@ const CROP_DATABASE = [
     name_en: "🍎 Pomegranate (Anar)", name_hi: "🍎 अनार",
     family_en: "Lythraceae (Fruit)", family_hi: "फल फसल • अनार कुल",
     botanical_family: "Lythraceae",
-    n_opt: [15, 45], p_opt: [15, 35], k_opt: [35, 50],
-    ph_opt: [5.5, 7.2], ph_range: [5.0, 7.8],
-    temp_opt: [18, 30], humidity_opt: [80, 95], rain_opt: [90, 120],
+    n_opt: [15, 45], p_opt: [15, 40], k_opt: [30, 55],
+    ph_opt: [5.5, 7.5], ph_range: [5.0, 7.8],
+    temp_opt: [18, 32], humidity_opt: [60, 95], rain_opt: [60, 120],
     water_req: "Low", duration_days: 180,
     yield_en: "4 - 6 Tonnes / Acre", yield_hi: "४ - ६ टन / एकड़",
     rev_en: "₹2,80,000 - ₹4,20,000", rev_hi: "₹२,८०,००० - ₹४,२०,०००",
@@ -47,9 +117,9 @@ const CROP_DATABASE = [
     name_en: "🌿 Cotton (Kapas)", name_hi: "🌿 कपास",
     family_en: "Malvaceae (Fiber)", family_hi: "रेशा फसल • मालवेसी",
     botanical_family: "Malvaceae",
-    n_opt: [100, 145], p_opt: [35, 65], k_opt: [15, 30],
+    n_opt: [90, 145], p_opt: [35, 65], k_opt: [20, 45],
     ph_opt: [6.0, 8.2], ph_range: [5.8, 8.8],
-    temp_opt: [21, 30], humidity_opt: [70, 88], rain_opt: [60, 110],
+    temp_opt: [21, 33], humidity_opt: [55, 85], rain_opt: [55, 110],
     water_req: "Medium", duration_days: 160,
     yield_en: "10 - 14 Quintals / Acre", yield_hi: "१० - १४ क्विंटल / एकड़",
     rev_en: "₹75,000 - ₹1,05,000", rev_hi: "₹७५,००० - ₹१,०५,०००",
@@ -61,9 +131,9 @@ const CROP_DATABASE = [
     name_en: "🌾 Chickpea (Desi Chana)", name_hi: "🌾 चना (देसी)",
     family_en: "Fabaceae (Legume/Pulse)", family_hi: "दलहनी फसल • फैबेसी",
     botanical_family: "Fabaceae",
-    n_opt: [15, 45], p_opt: [55, 85], k_opt: [70, 90],
+    n_opt: [15, 50], p_opt: [45, 80], k_opt: [35, 85],
     ph_opt: [6.0, 8.5], ph_range: [5.5, 9.0],
-    temp_opt: [14, 24], humidity_opt: [14, 25], rain_opt: [60, 100],
+    temp_opt: [14, 26], humidity_opt: [30, 75], rain_opt: [45, 95],
     water_req: "Low", duration_days: 110,
     yield_en: "8 - 12 Quintals / Acre", yield_hi: "८ - १२ क्विंटल / एकड़",
     rev_en: "₹50,000 - ₹74,000", rev_hi: "₹५०,००० - ₹७४,०००",
@@ -330,22 +400,21 @@ const CROP_DATABASE = [
 function evaluateAgronomicModel(params) {
   const { n, p, k, ph, temp, humidity, rain, irrigation, prevCrop } = params;
 
-  // Steep exponential agronomic response curve for ultra-reactive sensitivity
+  // Smooth Gaussian bell-curve tolerance for realistic agronomic responses
   function agronomicFit(val, optLow, optHigh, hardMin, hardMax) {
     if (val >= optLow && val <= optHigh) return 1.0;
-    const center = (optLow + optHigh) / 2.0;
-    const span = Math.max(8.0, (optHigh - optLow) / 2.0);
+    const span = Math.max(12.0, (optHigh - optLow) / 2.0);
     const dist = val < optLow ? (optLow - val) : (val - optHigh);
     
-    // Penalize hard threshold breaches heavily (e.g. extreme pH or nitrogen toxicities/deficiencies)
+    // Penalize extreme hard threshold breaches
     if (hardMin !== undefined && val < hardMin) {
-      return Math.max(0.01, 0.25 - (hardMin - val) * 0.15);
+      return Math.max(0.05, 0.35 - (hardMin - val) * 0.12);
     }
     if (hardMax !== undefined && val > hardMax) {
-      return Math.max(0.01, 0.25 - (val - hardMax) * 0.15);
+      return Math.max(0.05, 0.35 - (val - hardMax) * 0.12);
     }
     
-    return Math.max(0.02, Math.exp(-Math.pow(dist / (span * 0.95), 1.85)));
+    return Math.max(0.15, Math.exp(-0.5 * Math.pow(dist / (span * 1.35), 2)));
   }
 
   const scoredCrops = CROP_DATABASE.map(crop => {
@@ -385,33 +454,33 @@ function evaluateAgronomicModel(params) {
     const isPrevCereal = prev.includes("wheat") || prev.includes("गेहूं") || prev.includes("rice") || prev.includes("धान") || prev.includes("maize") || prev.includes("मक्का");
     const isPrevCotton = prev.includes("cotton") || prev.includes("कपास");
 
-    const isCurrLegume = currFam.includes("fabaceae") || ["chickpea", "lentil", "blackgram", "mungbean", "pigeonpeas", "kidneybeans", "mothbeans"].includes(currId);
+    const isCurrLegume = currFam.includes("fabaceae") || ["chickpea", "soybean", "groundnut", "lentil", "blackgram", "mungbean", "pigeonpeas", "kidneybeans", "mothbeans"].includes(currId);
     const isCurrCerealOrHeavy = currFam.includes("poaceae") || currFam.includes("malvaceae") || ["rice", "wheat", "maize", "cotton", "sugarcane", "banana"].includes(currId);
 
     if (isPrevCereal || isPrevCotton) {
       if (isCurrLegume) {
         rotationFit = 99.0; // Excellent N-fixing break
       } else if (currFam.includes("poaceae") || currFam.includes("malvaceae")) {
-        rotationFit = 48.0; // Heavy-feeder after heavy-feeder penalty
+        rotationFit = 55.0; // Heavy-feeder after heavy-feeder penalty
       }
     } else if (isPrevLegume) {
       if (isCurrCerealOrHeavy) {
         rotationFit = 98.0; // Beneficial nitrogen utilization
       } else if (isCurrLegume) {
-        rotationFit = 55.0; // Consecutive legume disease risk
+        rotationFit = 60.0; // Consecutive legume disease risk
       }
     }
 
-    // Total Multi-Criteria Agronomic Fit (Soil: 45%, Weather: 25%, Market: 12%, Rotation: 18%)
-    const totalScore = (soilFit * 0.45 + weatherFit * 0.25 + marketFit * 0.12 + rotationFit * 0.18);
+    // Total Multi-Criteria Agronomic Fit (Soil: 42%, Weather: 28%, Market: 14%, Rotation: 16%)
+    const totalScore = (soilFit * 0.42 + weatherFit * 0.28 + marketFit * 0.14 + rotationFit * 0.16);
 
     return {
       ...crop,
-      soilFit: Math.round(Math.min(99, Math.max(15, soilFit))),
-      weatherFit: Math.round(Math.min(99, Math.max(20, weatherFit))),
+      soilFit: Math.round(Math.min(99, Math.max(25, soilFit))),
+      weatherFit: Math.round(Math.min(99, Math.max(25, weatherFit))),
       marketFit: Math.round(marketFit),
       rotationFit: Math.round(rotationFit),
-      totalScore: Math.round(Math.min(99, Math.max(25, totalScore))),
+      totalScore: Math.round(Math.min(99, Math.max(35, totalScore))),
       rawNScore: nScore,
       rawPScore: pScore,
       rawKScore: kScore,
@@ -424,7 +493,7 @@ function evaluateAgronomicModel(params) {
   scoredCrops.sort((a, b) => b.totalScore - a.totalScore);
 
   const top = scoredCrops[0];
-  const runners = scoredCrops.slice(1, 3);
+  const runners = scoredCrops.slice(1, 4);
 
   // Dynamic SHAP Feature Contribution Bars
   const shapBars = [
@@ -1430,22 +1499,25 @@ async function matchNearestHubAndSelect(userLat, userLon, showFeedback) {
     detectedState = isEn ? hub.state_en : hub.state_hi;
   }
 
+  // Activate the nearest agro-ecological hub chip and scroll it smoothly into view
   const chips = document.querySelectorAll(".hub-chip");
   chips.forEach(c => {
     if (c.getAttribute("data-hub") === closestHub) {
       c.classList.add("active");
+      c.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "center" });
     } else {
       c.classList.remove("active");
     }
   });
 
-  selectHub(closestHub, false);
+  // Fully select hub and populate all parameters
+  selectHub(closestHub, true);
 
   // Auto-populate the form inputs with the real detected district and state
   const stateInput = document.getElementById("inputState");
   const distInput = document.getElementById("inputDistrict");
-  if (stateInput) stateInput.value = detectedState;
-  if (distInput) distInput.value = detectedDistrict;
+  if (stateInput && detectedState) stateInput.value = detectedState;
+  if (distInput && detectedDistrict) distInput.value = detectedDistrict;
 
   runDynamicCropPrediction();
 
@@ -1454,8 +1526,8 @@ async function matchNearestHubAndSelect(userLat, userLon, showFeedback) {
     if (statusEl) {
       statusEl.className = "location-status-badge success";
       statusEl.textContent = isEn
-        ? `📍 Detected: ${detectedDistrict}, ${detectedState} (${userLat.toFixed(2)}°N, ${userLon.toFixed(2)}°E)`
-        : `📍 पहचाना गया: ${detectedDistrict}, ${detectedState} (${userLat.toFixed(2)}°N, ${userLon.toFixed(2)}°E)`;
+        ? `📍 Auto-Selected: ${detectedDistrict}, ${detectedState} (${userLat.toFixed(2)}°N, ${userLon.toFixed(2)}°E)`
+        : `📍 चयनित क्षेत्र: ${detectedDistrict}, ${detectedState} (${userLat.toFixed(2)}°N, ${userLon.toFixed(2)}°E)`;
     }
   }
 }
@@ -1637,16 +1709,19 @@ function renderDynamicCropResult(result) {
     `).join("");
   }
 
-  // Runners Up
+  // Runners Up (Display top 3 alternative crops with complete metrics)
   const runnersContainer = document.getElementById("runnersList");
   if (runnersContainer && result.runners) {
-    runnersContainer.innerHTML = result.runners.map(r => `
+    runnersContainer.innerHTML = result.runners.map((r, idx) => `
       <div class="runner-card">
         <div class="runner-header">
-          <span class="runner-name">${isEn ? r.name_en : r.name_hi}</span>
-          <span class="runner-score">${r.totalScore}%</span>
+          <span class="runner-name"><span class="runner-rank-badge">#${idx + 2}</span> ${isEn ? r.name_en : r.name_hi}</span>
+          <span class="runner-score">${r.totalScore}% ${isEn ? 'Match' : 'अनुकूल'}</span>
         </div>
-        <div class="runner-meta">${isEn ? `Est: ${r.rev_en} • Mandi: ₹${r.mandi_price}/Qtl` : `अपेक्षित आय: ${r.rev_hi} • मंडी: ₹${r.mandi_price}/क्विंटल`}</div>
+        <div class="runner-meta">${isEn ? `Est. Yield: ${r.yield_en} • Est. Income: ${r.rev_en}` : `अपेक्षित उपज: ${r.yield_hi} • अपेक्षित आय: ${r.rev_hi}`}</div>
+        <div class="runner-footer" style="font-size:0.8rem; color:#15803D; font-weight:600; margin-top:4px;">
+          ${isEn ? `Mandi: ₹${r.mandi_price.toLocaleString()}/Qtl • Soil: ${r.soilFit}% • Weather: ${r.weatherFit}%` : `मंडी: ₹${r.mandi_price.toLocaleString('hi-IN')}/क्विंटल • मृदा: ${r.soilFit}% • मौसम: ${r.weatherFit}%`}
+        </div>
       </div>
     `).join("");
   }

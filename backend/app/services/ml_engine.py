@@ -49,6 +49,9 @@ CROP_FAMILIES = {
     "soybean": "Fabaceae (Legume/Pulse)",
     "cotton": "Malvaceae (Fiber)",
     "jute": "Malvaceae (Fiber)",
+    "mustard": "Brassicaceae (Oilseed)",
+    "sugarcane": "Poaceae (Sugar)",
+    "groundnut": "Fabaceae (Legume/Oilseed)",
     "grapes": "Vitaceae (Fruit)",
     "pomegranate": "Lythraceae (Fruit)",
     "banana": "Musaceae (Fruit)",
@@ -64,6 +67,41 @@ CROP_FAMILIES = {
 
 # Crop Base Agronomic & Economic Metadata
 CROP_METADATA = {
+    "wheat": {
+        "hi": "गेहूं", "sci": "Triticum aestivum",
+        "base_yield_min": 18.0, "base_yield_max": 25.0, "yield_unit": "Quintals",
+        "base_mandi_price": 2425.0, "trend": "up", "base_cost_acre": 17000.0,
+        "water_level": "Medium", "sowing_en": "October - November (Rabi)", "sowing_hi": "अक्टूबर - नवंबर (रबी)",
+        "duration_days": 120, "is_nitrogen_fixer": False, "chemical_intensity": "Low"
+    },
+    "soybean": {
+        "hi": "सोयाबीन", "sci": "Glycine max",
+        "base_yield_min": 10.0, "base_yield_max": 15.0, "yield_unit": "Quintals",
+        "base_mandi_price": 4680.0, "trend": "up", "base_cost_acre": 16000.0,
+        "water_level": "Medium", "sowing_en": "June - July (Kharif)", "sowing_hi": "जून - जुलाई (खरीफ)",
+        "duration_days": 95, "is_nitrogen_fixer": True, "chemical_intensity": "Low"
+    },
+    "mustard": {
+        "hi": "सरसों / राई", "sci": "Brassica juncea",
+        "base_yield_min": 8.0, "base_yield_max": 14.0, "yield_unit": "Quintals",
+        "base_mandi_price": 5650.0, "trend": "up", "base_cost_acre": 14000.0,
+        "water_level": "Low", "sowing_en": "October - November (Rabi)", "sowing_hi": "अक्टूबर - नवंबर (रबी)",
+        "duration_days": 115, "is_nitrogen_fixer": False, "chemical_intensity": "Low"
+    },
+    "sugarcane": {
+        "hi": "गन्ना", "sci": "Saccharum officinarum",
+        "base_yield_min": 30.0, "base_yield_max": 45.0, "yield_unit": "Tonnes",
+        "base_mandi_price": 3800.0, "trend": "up", "base_cost_acre": 65000.0,
+        "water_level": "High", "sowing_en": "October - March (Adsali/Spring)", "sowing_hi": "अक्टूबर - मार्च",
+        "duration_days": 330, "is_nitrogen_fixer": False, "chemical_intensity": "Medium"
+    },
+    "groundnut": {
+        "hi": "मूंगफली", "sci": "Arachis hypogaea",
+        "base_yield_min": 10.0, "base_yield_max": 16.0, "yield_unit": "Quintals",
+        "base_mandi_price": 6400.0, "trend": "up", "base_cost_acre": 20000.0,
+        "water_level": "Medium", "sowing_en": "June - July (Kharif)", "sowing_hi": "जून - जुलाई (खरीफ)",
+        "duration_days": 110, "is_nitrogen_fixer": True, "chemical_intensity": "Low"
+    },
     "grapes": {
         "hi": "अंगूर", "sci": "Vitis vinifera",
         "base_yield_min": 8.0, "base_yield_max": 12.0, "yield_unit": "Tonnes",
@@ -222,6 +260,54 @@ CROP_METADATA = {
 
 # Crop-Specific Agronomic Schedules Database (22+ Crops)
 CROP_SCHEDULES: Dict[str, Dict[str, List[Dict[str, str]]]] = {
+    "wheat": {
+        "fertilizer": [
+            {"stage": "Basal Sowing (बुवाई के समय)", "dosage": "50 kg DAP + 25 kg MOP + 20 kg Urea/acre", "purpose": "Rapid root development and early tillering"},
+            {"stage": "CRI Stage (20-25 DAS)", "dosage": "35 kg Neem Coated Urea top-dressing after 1st irrigation", "purpose": "Boost crown root initiation and tiller count"},
+            {"stage": "Jointing to Booting (50-60 DAS)", "dosage": "25 kg Urea + Foliar spray of 13:00:45 (Potassium Nitrate @ 5g/L)", "purpose": "Maximize earhead length and spikelet fertility"}
+        ],
+        "irrigation": [
+            {"stage": "CRI Stage (Crown Root Initiation)", "timing": "Day 20 - 25", "note": "Most critical irrigation; delay reduces yield by up to 25%"},
+            {"stage": "Tillering & Jointing", "timing": "Day 40 - 65", "note": "Maintain root moisture for canopy growth"},
+            {"stage": "Flowering & Milk Stage", "timing": "Day 80 - 105", "note": "Ensure soil moisture for bold grain filling"}
+        ]
+    },
+    "soybean": {
+        "fertilizer": [
+            {"stage": "Basal Sowing (बुवाई के समय)", "dosage": "40 kg DAP (or 100 kg SSP) + 20 kg MOP/acre + Rhizobium seed inoculation", "purpose": "Root nodulation and phosphorus reserve"},
+            {"stage": "Vegetative Stage (25-30 DAS)", "dosage": "Foliar spray of 19:19:19 (@ 5g/L) + Zinc Sulphate", "purpose": "Enhance branching and photosynthetic efficiency"},
+            {"stage": "Pod Development (50-60 DAS)", "dosage": "Foliar spray of 0:52:34 (MKP @ 5g/L) + 0.1% Boron", "purpose": "Maximize pod filling, oil content, and seed weight"}
+        ],
+        "irrigation": [
+            {"stage": "Pre-Sowing / Emergence", "timing": "Day 0 - 5", "note": "Ensure good seedbed moisture without waterlogging"},
+            {"stage": "Flowering Stage", "timing": "Day 35 - 45", "note": "Critical stage; moisture stress causes flower drop"},
+            {"stage": "Pod Filling Stage", "timing": "Day 60 - 75", "note": "Essential for seed size and yield"}
+        ]
+    },
+    "mustard": {
+        "fertilizer": [
+            {"stage": "Basal Sowing (बुवाई के समय)", "dosage": "35 kg DAP + 15 kg MOP + 10 kg Sulphur Bentonite/acre", "purpose": "Sulphur is crucial for oil synthesis and root growth"},
+            {"stage": "Rosette / Branching (25-30 DAS)", "dosage": "30 kg Urea top-dressed after first irrigation", "purpose": "Promote vigorous secondary branching"},
+            {"stage": "Siliqua Formation (50-60 DAS)", "dosage": "Foliar spray of 13:00:45 (@ 5g/L) + 0.2% Boron", "purpose": "Prevent pod shattering and increase oil percentage"}
+        ],
+        "irrigation": [
+            {"stage": "Pre-Sowing (Palewa)", "timing": "Day -3 to 0", "note": "Adequate moisture for uniform emergence"},
+            {"stage": "First Irrigation (Rosette)", "timing": "Day 28 - 35", "note": "Crucial for branch formation"},
+            {"stage": "Siliqua Filling", "timing": "Day 60 - 70", "note": "Light irrigation; avoid on windy days to prevent lodging"}
+        ]
+    },
+    "sugarcane": {
+        "fertilizer": [
+            {"stage": "Basal Planting (बुवाई के समय)", "dosage": "60 kg DAP + 40 kg MOP + 10 tonnes FYM/acre", "purpose": "Root development and sett germination"},
+            {"stage": "Tillering Phase (45-60 DAP)", "dosage": "45 kg Urea + 10 kg Zinc Sulphate top-dressed", "purpose": "Maximize millable cane tiller count"},
+            {"stage": "Grand Growth Stage (90-120 DAP)", "dosage": "45 kg Urea top-dressing followed by earthing up", "purpose": "Cane elongation and girth thickness"}
+        ],
+        "irrigation": [
+            {"stage": "Germination Phase", "timing": "Day 0 - 30", "note": "Light and frequent irrigations (7-8 day interval)"},
+            {"stage": "Tillering & Formative Phase", "timing": "Day 45 - 120", "note": "Critical water demand (8-10 day interval in summer)"},
+            {"stage": "Maturity Phase", "timing": "Day 270 - 330", "note": "Withhold water 15-20 days before harvest to build sucrose"}
+        ]
+    },
     "rice": {
         "fertilizer": [
             {"stage": "Basal Application (बुवाई/रोपाई के समय)", "dosage": "50 kg DAP + 25 kg MOP + 10 kg Zinc Sulphate/acre", "purpose": "Rapid root development and vigorous seedling anchorage"},
@@ -387,7 +473,22 @@ class MLEngine:
         irrigation: str = "Borewell"
     ) -> Dict[str, float]:
         """Calculates quantitative suitability across Soil, Weather, Market, and Rotation pillars."""
-        profile = self.crop_profiles.get(crop, {
+        # Realistic ICAR/State Agriculture University Agronomic Standards
+        standard_profiles = {
+            "wheat": {"N": (70, 130), "P": (35, 65), "K": (30, 60), "temp": (12, 28), "humidity": (40, 80), "ph": (5.8, 8.2), "rain": (30, 95)},
+            "soybean": {"N": (20, 55), "P": (40, 75), "K": (30, 65), "temp": (18, 33), "humidity": (50, 85), "ph": (6.0, 7.8), "rain": (55, 125)},
+            "mustard": {"N": (35, 80), "P": (25, 55), "K": (20, 45), "temp": (10, 26), "humidity": (35, 75), "ph": (5.8, 8.2), "rain": (20, 65)},
+            "sugarcane": {"N": (110, 180), "P": (45, 80), "K": (45, 100), "temp": (18, 36), "humidity": (55, 85), "ph": (5.8, 8.2), "rain": (90, 190)},
+            "groundnut": {"N": (20, 45), "P": (30, 65), "K": (35, 75), "temp": (20, 33), "humidity": (50, 80), "ph": (5.8, 7.6), "rain": (45, 95)},
+            "chickpea": {"N": (20, 55), "P": (45, 80), "K": (40, 85), "temp": (14, 26), "humidity": (30, 75), "ph": (6.0, 8.5), "rain": (45, 95)},
+            "rice": {"N": (60, 120), "P": (35, 65), "K": (35, 55), "temp": (20, 34), "humidity": (65, 90), "ph": (5.0, 7.6), "rain": (120, 300)},
+            "maize": {"N": (60, 110), "P": (35, 65), "K": (20, 45), "temp": (18, 30), "humidity": (50, 80), "ph": (5.5, 7.6), "rain": (55, 115)},
+            "cotton": {"N": (90, 145), "P": (35, 65), "K": (20, 45), "temp": (21, 33), "humidity": (55, 85), "rain": (55, 110), "ph": (6.0, 8.2)},
+            "grapes": {"N": (15, 45), "P": (90, 150), "K": (140, 215), "temp": (12, 38), "humidity": (55, 85), "rain": (45, 85), "ph": (5.5, 7.2)},
+            "pomegranate": {"N": (15, 45), "P": (15, 40), "K": (30, 55), "temp": (18, 32), "humidity": (60, 95), "rain": (60, 120), "ph": (5.5, 7.5)},
+        }
+
+        profile = standard_profiles.get(crop) or self.crop_profiles.get(crop, {
             "N": (40, 80), "P": (30, 60), "K": (30, 60),
             "temp": (20, 30), "humidity": (50, 80), "ph": (6.0, 7.5), "rain": (50, 150)
         })

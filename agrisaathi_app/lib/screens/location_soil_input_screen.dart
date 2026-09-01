@@ -82,8 +82,7 @@ class _LocationSoilInputScreenState extends State<LocationSoilInputScreen> {
 
   void _autoDetectGPSLocation() {
     final advisory = context.read<AdvisoryProvider>();
-    // Default to the first location or Nashik with feedback
-    final selectedLoc = DemoConstants.demoLocations.first;
+    final selectedLoc = advisory.selectedLocation;
     advisory.setLocation(selectedLoc);
 
     ScaffoldMessenger.of(context).showSnackBar(

@@ -269,7 +269,11 @@ class LLMAdvisor:
         last_error = None
         for model_name in self.WORKING_MODELS:
             try:
-                print(f"[LLM] Trying model={model_name} for query: {query_text[:80]}")
+                try:
+                    print(f"[LLM] Trying model={model_name} for lang={language}")
+                except Exception:
+                    pass
+
                 chat_completion = self.client.chat.completions.create(
                     messages=[
                         {"role": "system", "content": system_prompt},
@@ -286,7 +290,10 @@ class LLMAdvisor:
                     raw_text = re.sub(r'<think>.*?</think>', '', raw_text, flags=re.DOTALL).strip()
                     resp_hi = raw_text if language == "hi" else ""
                     resp_en = raw_text if language == "en" else ""
-                    print(f"[LLM] ✅ Success with {model_name}: {raw_text[:100]}...")
+                    try:
+                        print(f"[LLM] Success with {model_name}")
+                    except Exception:
+                        pass
                     return {
                         "query": query_text,
                         "detected_intent": f"groq_{intent_type}",
@@ -302,10 +309,16 @@ class LLMAdvisor:
                     }
             except Exception as e:
                 last_error = str(e)
-                print(f"[LLM] ❌ Model {model_name} failed: {last_error[:120]}")
+                try:
+                    print(f"[LLM] Model {model_name} failed: {last_error[:100].encode('ascii', 'replace').decode('ascii')}")
+                except Exception:
+                    pass
                 continue
 
-        print(f"[LLM] All models failed. Last error: {last_error}. Using fallback.")
+        try:
+            print(f"[LLM] All models failed. Using fallback.")
+        except Exception:
+            pass
         return self._fallback_response(query_text, language, intent_type=intent_type)
 
     def _get_smart_followups(self, intent_type: str, language: str) -> List[str]:
