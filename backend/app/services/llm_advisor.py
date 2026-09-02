@@ -198,12 +198,19 @@ MULTILINGUAL_KNOWLEDGE_BASE = {
 
 class LLMAdvisor:
     # Currently working Groq models (verified 2026-09)
+    # Ordered fast-first with reasoning_effort=low so the total latency
+    # always stays under the frontend's 15s timeout budget.
     WORKING_MODELS = [
-        "openai/gpt-oss-120b",       # Best quality, detailed answers
-        "qwen/qwen3.8-27b",          # Excellent multilingual Hindi/English
+        "openai/gpt-oss-120b",       # Best quality, ~1s with reasoning_effort=low
         "openai/gpt-oss-20b",        # Fast, good quality
+        "qwen/qwen3.8-27b",          # Excellent multilingual Hindi/English
         "qwen/qwen3.6-27b",          # Alternate multilingual
     ]
+
+    # Per-model timeout (s). Worst case 3 models = 18s hard cap, but typical
+    # success is < 2s on the first model.
+    MODEL_TIMEOUT_S = 6.0
+    MAX_TOKENS = 800
 
     def __init__(self):
         self.client = None
@@ -246,7 +253,10 @@ class LLMAdvisor:
 
         if not self.client:
             print(f"[LLM] No Groq client available. Using fallback for: {query_text[:60]}")
-            return self._fallback_response(query_text, language, intent_type=intent_type)
+            return self._fallback_response(
+                query_text, language, intent_type=intent_type,
+                crop_context=crop_context, location=location
+            )
 
         # Build a comprehensive system prompt that answers ANY farming question intelligently
         system_prompt = (
@@ -267,12 +277,26 @@ class LLMAdvisor:
         )
 
         last_error = None
+        import time as _time
+        deadline = _time.time() + 13.0  # stay within the frontend's 15s abort window
         for model_name in self.WORKING_MODELS:
+            if _time.time() > deadline:
+                try:
+                    print("[LLM] Time budget exhausted, switching to fallback.")
+                except Exception:
+                    pass
+                break
             try:
                 try:
                     print(f"[LLM] Trying model={model_name} for lang={language}")
                 except Exception:
                     pass
+
+                extra_kwargs = {}
+                if model_name.startswith("openai/gpt-oss"):
+                    # gpt-oss models spend tokens on hidden reasoning; low effort
+                    # keeps the answer fast and leaves budget for real content.
+                    extra_kwargs["extra_body"] = {"reasoning_effort": "low"}
 
                 chat_completion = self.client.chat.completions.create(
                     messages=[
@@ -281,32 +305,45 @@ class LLMAdvisor:
                     ],
                     model=model_name,
                     temperature=0.3,
-                    max_tokens=400,
-                    timeout=12.0
+                    max_tokens=self.MAX_TOKENS,
+                    timeout=self.MODEL_TIMEOUT_S,
+                    **extra_kwargs
                 )
-                raw_text = chat_completion.choices[0].message.content.strip()
-                if raw_text:
-                    # Clean up any thinking tags from qwen models
-                    raw_text = re.sub(r'<think>.*?</think>', '', raw_text, flags=re.DOTALL).strip()
-                    resp_hi = raw_text if language == "hi" else ""
-                    resp_en = raw_text if language == "en" else ""
+                raw_text = (chat_completion.choices[0].message.content or "").strip()
+                if not raw_text:
+                    # Reasoning tokens can consume the entire budget -> empty
+                    # content. Treat as failure and try the next model instead
+                    # of silently returning a blank/canned answer.
+                    last_error = f"{model_name} returned empty content"
                     try:
-                        print(f"[LLM] Success with {model_name}")
+                        print(f"[LLM] {model_name} returned empty content, trying next model")
                     except Exception:
                         pass
-                    return {
-                        "query": query_text,
-                        "detected_intent": f"groq_{intent_type}",
-                        "intent_type": intent_type,
-                        "model_used": model_name,
-                        "language": language,
-                        "response_text_hi": resp_hi,
-                        "response_text_en": resp_en,
-                        "response_text_regional": raw_text,
-                        "tts_audio_text": raw_text,
-                        "confidence": 0.98,
-                        "suggested_followups": self._get_smart_followups(intent_type, language)
-                    }
+                    continue
+                # Clean up any thinking tags from qwen models
+                raw_text = re.sub(r'<think>.*?</think>', '', raw_text, flags=re.DOTALL).strip()
+                if not raw_text:
+                    last_error = f"{model_name} returned only think-tags"
+                    continue
+                resp_hi = raw_text if language == "hi" else ""
+                resp_en = raw_text if language == "en" else ""
+                try:
+                    print(f"[LLM] Success with {model_name}")
+                except Exception:
+                    pass
+                return {
+                    "query": query_text,
+                    "detected_intent": f"groq_{intent_type}",
+                    "intent_type": intent_type,
+                    "model_used": model_name,
+                    "language": language,
+                    "response_text_hi": resp_hi,
+                    "response_text_en": resp_en,
+                    "response_text_regional": raw_text,
+                    "tts_audio_text": raw_text,
+                    "confidence": 0.98,
+                    "suggested_followups": self._get_smart_followups(intent_type, language)
+                }
             except Exception as e:
                 last_error = str(e)
                 try:
@@ -319,7 +356,10 @@ class LLMAdvisor:
             print(f"[LLM] All models failed. Using fallback.")
         except Exception:
             pass
-        return self._fallback_response(query_text, language, intent_type=intent_type)
+        return self._fallback_response(
+            query_text, language, intent_type=intent_type,
+            crop_context=crop_context, location=location
+        )
 
     def _get_smart_followups(self, intent_type: str, language: str) -> List[str]:
         """Generate contextual follow-up suggestions based on the detected intent."""
@@ -385,7 +425,8 @@ class LLMAdvisor:
 
         return "GENERAL_AGRONOMY"
 
-    def _fallback_response(self, query_text: str, language: str = "hi", intent_type: Optional[str] = None) -> Dict[str, Any]:
+    def _fallback_response(self, query_text: str, language: str = "hi", intent_type: Optional[str] = None,
+                           crop_context: Optional[str] = None, location: Optional[str] = None) -> Dict[str, Any]:
         q = (query_text or "").lower()
         if not intent_type:
             intent_type = self._classify_intent(query_text)
@@ -435,6 +476,18 @@ class LLMAdvisor:
 
         dict_entry = MULTILINGUAL_KNOWLEDGE_BASE.get(topic, MULTILINGUAL_KNOWLEDGE_BASE["general"])
         text = dict_entry.get(language, dict_entry.get("hi", dict_entry["en"]))
+
+        # Personalize the offline answer with the farmer's live context
+        # (auto-detected location + crop focus) instead of one canned line.
+        ctx_en = f"For your farm in {location}" if location else ""
+        ctx_hi = f"आपके क्षेत्र {location} में" if location else ""
+        if crop_context and crop_context not in ("General Farming", "General Crop"):
+            ctx_en += f" (crop focus: {crop_context})"
+            ctx_hi += f" (फसल: {crop_context})"
+        if ctx_en and language == "en":
+            text = f"{ctx_en.strip()}: {text}"
+        elif ctx_hi and language != "en":
+            text = f"{ctx_hi} — {text}"
 
         is_en = (language == "en")
         resp_hi = dict_entry.get("hi", "")

@@ -12,7 +12,8 @@
 
 // =========================================================================
 // 1. ALL 22 INDIAN BENCHMARK CROPS AGRONOMIC ML KNOWLEDGE BASE
-// ======================================================const CROP_DATABASE = [
+// =========================================================================
+const CROP_DATABASE = [
   {
     id: "wheat",
     name_en: "🌾 Wheat (Gehun / Kanak)", name_hi: "🌾 गेहूं",
@@ -1544,10 +1545,13 @@ function selectHub(key, overrideInputs = true) {
   const hub = DEMO_HUBS[key] || DEMO_HUBS.nashik;
   const isEn = (currentLang === "en");
 
-  // Synchronize Soil Health Card Preset Dropdown to match selected hub
+  // Synchronize Soil Health Card Preset Dropdown to match selected hub (auto-location aware)
   const cardSelect = document.getElementById("soilCardPresetSelect");
   if (cardSelect) {
-    cardSelect.value = "sample_" + key;
+    const wantVal = "sample_" + key;
+    if (cardSelect.querySelector(`option[value="${wantVal}"]`)) {
+      cardSelect.value = wantVal;
+    }
   }
 
   // Weather Card
@@ -1757,7 +1761,6 @@ function setupSoilCardPreset() {
 function updateSoilCardPreviewBox(card) {
   const isEn = (currentLang === "en");
   const badge = document.getElementById("soilTextureBadge");
-  const farmer = document.getElementById("soilFarmerName");
   const pillN = document.getElementById("soilPillN");
   const pillP = document.getElementById("soilPillP");
   const pillK = document.getElementById("soilPillK");
@@ -1765,7 +1768,6 @@ function updateSoilCardPreviewBox(card) {
   const pillOC = document.getElementById("soilPillOC");
 
   if (badge) badge.textContent = `🪨 ${card.texture}`;
-  if (farmer) farmer.textContent = isEn ? `Soil Health Card #SHC-2025` : `मृदा स्वास्थ्य कार्ड #SHC-2025`;
 
   if (isEn) {
     if (pillN) pillN.textContent = `Nitrogen: ${card.n} (${card.n > 80 ? 'High' : (card.n < 40 ? 'Low' : 'Medium')})`;
@@ -1955,7 +1957,7 @@ function setupLivePlantDoctor() {
       currentLeafBase64 = re.target.result;
       if (previewImg) previewImg.src = currentLeafBase64;
       if (previewBox) previewBox.style.display = "flex";
-      runRealLeafScanInference();
+      // Do NOT auto-trigger scan — wait for user to click "Run Diagnosis" button
     };
     reader.readAsDataURL(file);
   }
@@ -2001,6 +2003,15 @@ async function runRealLeafScanInference() {
   const resultBox = document.getElementById("diagnosisResultBox");
   const isEn = (currentLang === "en");
 
+  if (statusBadge) {
+    statusBadge.innerHTML = `<span class="status-dot pulse-green"></span> <span>${isEn ? 'AI Pathology Analysis in Progress...' : 'पत्ती के ऊतकों का विश्लेषण जारी...'}</span>`;
+  }
+
+  // Restart the laser scanning animation while a new scan is running
+  const laserLine = document.getElementById("scanLaserLine");
+  const scanVisualizer = document.getElementById("leafScanVisualizer");
+  if (laserLine) laserLine.style.display = "block";
+  if (scanVisualizer) scanVisualizer.classList.remove("scan-complete");
   if (btn) {
     btn.innerHTML = isEn ? "<span>⏳ AI Neural Scanning Active...</span>" : "<span>⏳ एआई न्यूरल स्कैनिंग प्रक्रिया चालू...</span>";
     btn.disabled = true;
@@ -2040,9 +2051,12 @@ async function runRealLeafScanInference() {
       btn.innerHTML = isEn ? "<span>🔬 Generate Diagnostic Report & Treatment Plan</span>" : "<span>🔬 रोग निदान व उपचार योजना देखें</span>";
       btn.disabled = false;
     }
+    // STOP the scanning animation — diagnosis is complete (no continuous scanning)
+    if (laserLine) laserLine.style.display = "none";
+    if (scanVisualizer) scanVisualizer.classList.add("scan-complete");
     if (statusBadge) {
       const conf = diagnosisData ? `${diagnosisData.confidence_pct}%` : "96.4%";
-      statusBadge.innerHTML = `<span class="status-dot pulse-green"></span> <span>${isEn ? `✓ Disease Detected (${conf})` : `✓ रोग लक्षण पहचाने गए (${conf} सटीकता)`}</span>`;
+      statusBadge.innerHTML = `<span class="status-dot"></span> <span>${isEn ? `✓ Diagnosis Complete (${conf})` : `✓ निदान पूर्ण हुआ (${conf} सटीकता)`}</span>`;
     }
 
     if (tipsBox) tipsBox.style.display = "none";
@@ -2071,13 +2085,36 @@ function renderDiagnosisResults(data) {
     if (organicEl) organicEl.textContent = isEn ? data.organic_remedy_en : data.organic_remedy_hi;
     if (chemEl) chemEl.textContent = isEn ? data.chemical_remedy_en : data.chemical_remedy_hi;
   } else {
-    // High-quality fallback
-    if (cropBadge) cropBadge.textContent = isEn ? "Tomato (Solanum lycopersicum)" : "टमाटर";
-    if (nameEl) nameEl.textContent = isEn ? "Early Blight (Alternaria solani)" : "अगेती झुलसा रोग (Alternaria solani)";
+    // Intelligent fallback using the user-selected crop (NOT hardcoded Tomato)
+    const cropSelectEl = document.getElementById("leafCropSelector");
+    const selectedCrop = cropSelectEl ? cropSelectEl.value : "auto";
+    
+    // Map crop IDs to their fallback disease information
+    const FALLBACK_DISEASE_DB = {
+      wheat:     { en: "Wheat (Triticum aestivum)", hi: "गेहूं (Wheat)", disease_en: "Yellow Rust (Puccinia striiformis)", disease_hi: "पीला रतुआ रोग (Yellow Rust)", organic_en: "Spray Neem Oil (5ml/L) and apply Trichoderma harzianum (5g/L) as preventive.", organic_hi: "नीम तेल (5 मिली/लीटर) और ट्राइकोडर्मा (5 ग्राम/लीटर) का छिड़काव करें।", chem_en: "Apply Propiconazole 25 EC @ 1ml/L water immediately on rust symptom appearance.", chem_hi: "प्रोपीकोनाजोल 25 EC (1 मिली/लीटर पानी) का तुरंत छिड़काव करें।" },
+      rice:      { en: "Rice / Paddy (Oryza sativa)", hi: "धान (Rice)", disease_en: "Blast Disease (Pyricularia oryzae)", disease_hi: "झोंका रोग (Blast Disease)", organic_en: "Use Pseudomonas fluorescens (10g/L) seed treatment and Trichoderma viride (5g/L) spray.", organic_hi: "सूडोमोनास (10 ग्राम/लीटर) से बीज उपचार करें और ट्राइकोडर्मा का छिड़काव करें।", chem_en: "Spray Tricyclazole 75 WP @ 0.6g/L water at panicle emergence.", chem_hi: "ट्राइसाइक्लाजोल 75 WP (0.6 ग्राम/लीटर) का छिड़काव करें।" },
+      tomato:    { en: "Tomato (Solanum lycopersicum)", hi: "टमाटर (Tomato)", disease_en: "Early Blight (Alternaria solani)", disease_hi: "अगेती झुलसा रोग (Alternaria solani)", organic_en: "Spray Neem Seed Kernel Extract (NSKE 5% @ 5ml/L) or Trichoderma viride (5g/L water).", organic_hi: "नीम के बीज का अर्क (NSKE 5% @ 5 मिली/लीटर) या ट्राइकोडर्मा विरिडी (5 ग्राम/लीटर) का छिड़काव करें।", chem_en: "Apply Mancozeb 75 WP (2.5g/L) or Azoxystrobin 23 SC (1ml/L) immediately.", chem_hi: "मैंकोजेब 75 WP (2.5 ग्राम/लीटर) या एजोक्सीस्ट्रोबिन (1 मिली/लीटर) का तुरंत छिड़काव करें।" },
+      potato:    { en: "Potato (Solanum tuberosum)", hi: "आलू (Potato)", disease_en: "Late Blight (Phytophthora infestans)", disease_hi: "पछेती झुलसा रोग (Late Blight)", organic_en: "Apply Bordeaux Mixture (1%) or Copper Hydroxide preventively.", organic_hi: "बोर्डो मिश्रण (1%) या कॉपर हाइड्रोक्साइड का रोकथाम छिड़काव करें।", chem_en: "Spray Cymoxanil 8% + Mancozeb 64% WP @ 3g/L water at 7-10 day intervals.", chem_hi: "साइमोक्सेनिल + मैंकोजेब (3 ग्राम/लीटर) का 7-10 दिन के अंतराल पर छिड़काव करें।" },
+      cotton:    { en: "Cotton (Gossypium)", hi: "कपास (Cotton)", disease_en: "Bacterial Blight (Xanthomonas citri)", disease_hi: "जीवाणु झुलसा (Bacterial Blight)", organic_en: "Apply Pseudomonas fluorescens (10g/L) and remove infected plant parts immediately.", organic_hi: "सूडोमोनास (10 ग्राम/लीटर) का छिड़काव करें और रोगग्रस्त पौधों को हटाएं।", chem_en: "Spray Streptocycline 100 ppm + Copper Oxychloride (3g/L).", chem_hi: "स्ट्रेप्टोसाइक्लिन 100 ppm + कॉपर ऑक्सीक्लोराइड (3 ग्राम/लीटर) का छिड़काव करें।" },
+      maize:     { en: "Maize / Corn (Zea mays)", hi: "मक्का (Maize)", disease_en: "Turcicum Leaf Blight (Exserohilum turcicum)", disease_hi: "टर्सिकम झुलसा (Turcicum Blight)", organic_en: "Apply Trichoderma viride (5g/L) foliar spray at early symptoms.", organic_hi: "ट्राइकोडर्मा विरिडी (5 ग्राम/लीटर) का प्रारंभिक लक्षणों पर छिड़काव करें।", chem_en: "Spray Mancozeb 75 WP (2.5g/L) or Zineb 75 WP (2g/L).", chem_hi: "मैंकोजेब 75 WP (2.5 ग्राम/लीटर) या जिनेब 75 WP (2 ग्राम/लीटर) का छिड़काव करें।" },
+      chilli:    { en: "Chilli (Capsicum annuum)", hi: "मिर्च (Chilli)", disease_en: "Leaf Curl (Gemini Virus)", disease_hi: "पत्ती मरोड़ (Leaf Curl Virus)", organic_en: "Control whitefly vector with Yellow Sticky Traps and Neem Oil (5ml/L).", organic_hi: "सफेद मक्खी नियंत्रण हेतु पीले चिपचिपे ट्रैप लगाएं और नीम तेल (5 मिली/लीटर) का छिड़काव करें।", chem_en: "Spray Imidacloprid 17.8 SL (0.3ml/L) against whitefly vectors.", chem_hi: "इमिडाक्लोप्रिड 17.8 SL (0.3 मिली/लीटर) का सफेद मक्खी पर छिड़काव करें।" },
+      mustard:   { en: "Mustard (Brassica juncea)", hi: "सरसों (Mustard)", disease_en: "White Rust (Albugo candida)", disease_hi: "सफेद रतुआ (White Rust)", organic_en: "Apply Trichoderma seed treatment and remove infected leaves.", organic_hi: "ट्राइकोडर्मा से बीज उपचार करें और रोगग्रस्त पत्तियां हटाएं।", chem_en: "Spray Metalaxyl + Mancozeb (Ridomil Gold) @ 2.5g/L water.", chem_hi: "मेटालैक्सिल + मैंकोजेब (रिडोमिल गोल्ड) (2.5 ग्राम/लीटर) का छिड़काव करें।" },
+      sugarcane: { en: "Sugarcane (Saccharum)", hi: "गन्ना (Sugarcane)", disease_en: "Red Rot (Colletotrichum falcatum)", disease_hi: "लाल सड़न रोग (Red Rot)", organic_en: "Use resistant varieties and apply Trichoderma in soil before planting.", organic_hi: "प्रतिरोधी किस्में लगाएं और बुवाई पूर्व ट्राइकोडर्मा मिट्टी में मिलाएं।", chem_en: "Treat setts with Carbendazim 50 WP (1g/L) before planting.", chem_hi: "बुवाई पूर्व गन्ने के टुकड़ों को कार्बेंडाजिम (1 ग्राम/लीटर) से उपचारित करें।" },
+      soybean:   { en: "Soybean (Glycine max)", hi: "सोयाबीन (Soybean)", disease_en: "Yellow Mosaic Virus (YMV)", disease_hi: "पीला मोजेक विषाणु (YMV)", organic_en: "Control whitefly with Neem Oil (5ml/L) and install Yellow Sticky Traps.", organic_hi: "नीम तेल (5 मिली/लीटर) का छिड़काव करें और पीले चिपचिपे ट्रैप लगाएं।", chem_en: "Spray Thiamethoxam 25 WG (0.2g/L) against whitefly vectors.", chem_hi: "थायमेथोक्साम 25 WG (0.2 ग्राम/लीटर) का सफेद मक्खी पर छिड़काव करें।" },
+      apple:     { en: "Apple (Malus domestica)", hi: "सेब (Apple)", disease_en: "Apple Scab (Venturia inaequalis)", disease_hi: "स्कैब रोग (Apple Scab)", organic_en: "Apply Bordeaux Mixture (1%) at green tip stage and repeat after 10 days.", organic_hi: "हरे कोपल अवस्था में बोर्डो मिश्रण (1%) का छिड़काव करें, 10 दिन बाद दोहराएं।", chem_en: "Spray Myclobutanil 10 WP (1g/L) during pre-bloom and petal fall.", chem_hi: "माइक्लोब्यूटानिल 10 WP (1 ग्राम/लीटर) का फूल खिलने से पहले छिड़काव करें।" },
+      grapes:    { en: "Grapes (Vitis vinifera)", hi: "अंगूर (Grapes)", disease_en: "Downy Mildew (Plasmopara viticola)", disease_hi: "डाउनी मिल्ड्यू (Downy Mildew)", organic_en: "Spray Bordeaux Mixture (0.5%) before monsoon onset.", organic_hi: "मानसून से पहले बोर्डो मिश्रण (0.5%) का छिड़काव करें।", chem_en: "Apply Metalaxyl + Mancozeb (Ridomil Gold) @ 2.5g/L.", chem_hi: "मेटालैक्सिल + मैंकोजेब (2.5 ग्राम/लीटर) का छिड़काव करें।" },
+      chickpea:  { en: "Chickpea (Cicer arietinum)", hi: "चना (Chickpea)", disease_en: "Ascochyta Blight (Ascochyta rabiei)", disease_hi: "एस्कोकाइटा झुलसा (Ascochyta Blight)", organic_en: "Use Trichoderma seed treatment and remove infected debris.", organic_hi: "ट्राइकोडर्मा से बीज उपचार करें और रोगग्रस्त पौधे हटाएं।", chem_en: "Spray Mancozeb 75 WP (2.5g/L) at first symptom.", chem_hi: "लक्षण दिखते ही मैंकोजेब 75 WP (2.5 ग्राम/लीटर) का छिड़काव करें।" }
+    };
+    
+    // Pick the right fallback disease info based on selected crop
+    const fb = FALLBACK_DISEASE_DB[selectedCrop] || FALLBACK_DISEASE_DB.tomato;
+    
+    if (cropBadge) cropBadge.textContent = isEn ? fb.en : fb.hi;
+    if (nameEl) nameEl.textContent = isEn ? fb.disease_en : fb.disease_hi;
     if (confEl) confEl.textContent = isEn ? "96.8% Reliability" : "९६.८% विश्वसनीयता";
     if (timingEl) timingEl.textContent = isEn ? `Clear weather in ${hub.district_en}. Spray early morning (6-8 AM) with sticker.` : `${hub.district_hi} में मौसम अनुकूल है। सुबह 6 से 8 बजे स्टिकर मिलाकर ही छिड़काव करें।`;
-    if (organicEl) organicEl.textContent = isEn ? "Spray Neem Seed Kernel Extract (NSKE 5% @ 5ml/L) or Trichoderma viride (@ 5g/L water). Fermented 10% cow urine spray prevents fungal spore expansion." : "नीम के बीज का अर्क (NSKE 5% @ 5 मिली/लीटर) या ट्राइकोडर्मा विरिडी (5 ग्राम/लीटर) का छिड़काव करें। 10% गोमूत्र का अर्क फंगस रोकने में अत्यंत लाभकारी है।";
-    if (chemEl) chemEl.textContent = isEn ? "Apply Mancozeb 75 WP (@ 2.5g/L water) or Azoxystrobin 23 SC (@ 1ml/L water) for fast curative action." : "मैंकोजेब 75 WP (Mancozeb @ 2.5 ग्राम/लीटर पानी) या एजोक्सीस्ट्रोबिन (1 मिली/लीटर) का तुरंत छिड़काव करें।";
+    if (organicEl) organicEl.textContent = isEn ? fb.organic_en : fb.organic_hi;
+    if (chemEl) chemEl.textContent = isEn ? fb.chem_en : fb.chem_hi;
   }
 }
 
@@ -2382,7 +2419,7 @@ async function sendVoiceQuery(query) {
       body: JSON.stringify({
         query_text: query,
         language: currentLang,
-        crop_context: hub?.district_en || "General Farming",
+        crop_context: hub?.crops?.[0]?.name_en || "General Farming",
         location_context: `${hub?.district_en || "India"}, ${hub?.state_en || "India"}`
       })
     });

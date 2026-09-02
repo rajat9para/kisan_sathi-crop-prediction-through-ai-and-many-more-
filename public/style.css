@@ -2334,6 +2334,11 @@ body {
   font-weight: 700;
 }
 
+/* STOP scanning animation once diagnosis is complete */
+.live-scan-preview-box.scan-complete .scan-laser-line {
+  display: none !important;
+}
+
 /* LIVE SCANNING VISUALIZER WRAP */
 .live-scan-preview-box {
   position: relative;

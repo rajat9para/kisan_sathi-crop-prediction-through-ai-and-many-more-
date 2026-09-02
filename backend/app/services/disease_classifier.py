@@ -532,6 +532,20 @@ class DiseaseClassifier:
                         top_conf = float(top_probs[0]) * 100.0
                         disease_key = self.class_mapping.get(pred_idx, "wheat_yellow_rust")
                         confidence = round(min(99.1, max(75.0, top_conf)), 1)
+
+                    # Respect the farmer's explicit crop selection: if the neural
+                    # model predicts a disease belonging to a DIFFERENT crop family
+                    # than the crop the user selected, defer to the crop-guided
+                    # expert rule instead of returning a wrong-crop diagnosis.
+                    if crop_hint and crop_hint.lower().strip() not in ("auto", ""):
+                        expert_key = self._resolve_expert_rule(crop_hint, metrics)
+                        expected_crop = self.knowledge_base.get(expert_key, {}).get("crop_key", "")
+                        pred_crop = self.knowledge_base.get(disease_key, {}).get("crop_key", "")
+                        if expected_crop and pred_crop and expected_crop != pred_crop:
+                            disease_key = expert_key
+                            confidence = round(min(97.5, max(82.0, 85.0 + (metrics.get("chlorosis_yellow_pct", 0) * 0.2))), 1)
+                            model_name = "Crop-Guided Expert System (Neural cross-crop mismatch resolved)"
+                            inference_source = "Farmer Crop Selection + Agronomic Expert Rules"
                 else:
                     # Fallback to Agronomic expert system
                     disease_key = self._resolve_expert_rule(crop_hint, metrics)

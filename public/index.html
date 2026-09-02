@@ -434,7 +434,6 @@
             <div class="soil-card-preview-box" id="soilCardPreviewBox">
               <div class="soil-preview-header">
                 <span class="soil-badge" id="soilTextureBadge">🪨 मध्यम काली कपास मिट्टी (रेगुर)</span>
-                <span class="soil-farmer" id="soilFarmerName">मृदा स्वास्थ्य कार्ड #SHC-2025</span>
               </div>
               <div class="soil-pills-row">
                 <span class="soil-pill pill-n" id="soilPillN">नाइट्रोजन: ८५ (अधिक)</span>
@@ -733,10 +732,10 @@
           <div class="diagnosis-card" id="diagnosisResultBox" style="display: none;">
             <div class="diag-header-box">
               <div>
-                <span class="diag-badge-crop" id="diagCrop">टमाटर (Tomato)</span>
-                <h3 class="diag-disease-name" id="diagDiseaseName">अगेती झुलसा रोग (Alternaria solani)</h3>
+                <span class="diag-badge-crop" id="diagCrop"></span>
+                <h3 class="diag-disease-name" id="diagDiseaseName"></h3>
               </div>
-              <span class="badge-confidence" id="diagConfidence">९६.४% विश्वसनीयता</span>
+              <span class="badge-confidence" id="diagConfidence"></span>
             </div>
 
             <!-- WEATHER SPRAY ALERT -->
@@ -802,7 +801,7 @@
               id="voiceInputText" 
               class="google-voice-input" 
               placeholder="यहाँ फसल, सिंचाई, खाद, बीमारी या मंडी भाव के बारे में पूछें (उदा: खेत में पानी किस समय डालना चाहिए?)..." 
-              value="खेत में पानी किस समय डालना चाहिए?"
+              value=""
               autocomplete="off"
             />
             <button id="btnClearVoiceInput" class="g-bar-clear-btn" title="Clear text / साफ करें" type="button" style="display: none;">
@@ -846,9 +845,9 @@
         <div class="google-dialogue-wrap">
           
           <!-- User Query Bubble -->
-          <div class="user-query-bubble" id="userQueryBubble">
+          <div class="user-query-bubble" id="userQueryBubble" style="display:none;">
             <div class="user-query-label">🗣️ आपने पूछा / Your Question:</div>
-            <div class="user-query-text" id="userQueryText">"खेत में पानी किस समय डालना चाहिए?"</div>
+            <div class="user-query-text" id="userQueryText"></div>
           </div>
 
           <!-- AI Response Card with 1-Tap Read Aloud & Multi-Intent Tag -->
@@ -872,7 +871,7 @@
 
             <!-- Response Body -->
             <div class="g-response-body" id="voiceResponseText">
-              "खेत में सिंचाई हमेशा सुबह (6 से 9 बजे) या शाम को (5 बजे के बाद) करनी चाहिए। दोपहर की तेज धूप में पानी लगाने से 30-40% पानी वाष्पीकरण में नष्ट हो जाता है और पौधों की जड़ों पर प्रतिकूल प्रभाव पड़ता है। ड्रिप व स्प्रिंकलर सिंचाई से 40% पानी बचता है और पैदावार बढ़ती है।"
+              माइक दबाकर बोलें या अपना प्रश्न टाइप करें और 'खोजें' बटन दबाएं। AI आपकी भाषा में तुरंत उत्तर देगा।
             </div>
 
             <!-- Dynamic ML Highlight Banner (Displayed for ML Recommendation Queries) -->
