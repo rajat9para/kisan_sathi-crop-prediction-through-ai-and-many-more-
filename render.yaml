@@ -4,7 +4,7 @@ services:
     runtime: docker
     dockerfilePath: ./backend/Dockerfile
     dockerContext: ./backend
-    plan: starter          # free tier "free" has 512MB RAM; torch + SHAP need ~1GB+
+    plan: free            # free tier: 512MB RAM, sleeps after 15 min idle
     healthCheckPath: /health
     envVars:
       - key: GROQ_API_KEY
