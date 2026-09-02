@@ -82,7 +82,7 @@ class OfflineDemoScreen extends StatelessWidget {
                       ),
                       Switch(
                         value: syncMgr.isSimulatedAirplaneMode,
-                        activeColor: AppColors.offlineBadge,
+                        activeThumbColor: AppColors.offlineBadge,
                         onChanged: (val) async {
                           await syncMgr.toggleAirplaneModeSimulation(val);
                           if (!val) {
@@ -162,6 +162,7 @@ class OfflineDemoScreen extends StatelessWidget {
                         await syncMgr.triggerLiveSync(onSyncCallback: () async {
                           await advisory.fetchRecommendations();
                         });
+                        if (!context.mounted) return;
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             backgroundColor: AppColors.primary,

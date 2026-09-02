@@ -46,16 +46,16 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         if (hasSavedLang) {
           Navigator.of(context).pushReplacement(
             PageRouteBuilder(
-              pageBuilder: (_, __, ___) => const HomeDashboardScreen(),
-              transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+              pageBuilder: (ctx, anim, secAnim) => const HomeDashboardScreen(),
+              transitionsBuilder: (ctx, anim, secAnim, child) => FadeTransition(opacity: anim, child: child),
               transitionDuration: const Duration(milliseconds: 500),
             ),
           );
         } else {
           Navigator.of(context).pushReplacement(
             PageRouteBuilder(
-              pageBuilder: (_, __, ___) => const LanguageSelectionScreen(),
-              transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
+              pageBuilder: (ctx, anim, secAnim) => const LanguageSelectionScreen(),
+              transitionsBuilder: (ctx, anim, secAnim, child) => FadeTransition(opacity: anim, child: child),
               transitionDuration: const Duration(milliseconds: 500),
             ),
           );

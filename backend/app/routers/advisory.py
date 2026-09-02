@@ -6,6 +6,7 @@ from app.models.schemas import RecommendationRequest, RecommendationResponse
 from app.services.external_apis import fetch_soilgrids_data, fetch_weather_data, fetch_market_prices
 from app.services.ml_engine import ml_engine
 from app.services.demo_cache import find_nearest_hub
+from app.services.supabase_client import supabase_service
 
 router = APIRouter(prefix="/api", tags=["Crop Advisory"])
 
@@ -133,6 +134,10 @@ async def get_crop_recommendations(req: RecommendationRequest):
             "top_recommendations": recommendations,
             "advisory_warnings": warnings
         }
+        try:
+            supabase_service.save_recommendation(response_payload)
+        except Exception:
+            pass
         return response_payload
 
     except Exception as e:

@@ -88,7 +88,7 @@ def train_and_export():
     
     # Save label mapping
     crop_mapping = {int(i): str(crop) for i, crop in enumerate(label_encoder.classes_)}
-    with open(os.path.join(artifacts_dir, "crop_label_encoder.json"), "w") as f:
+    with open(os.path.join(artifacts_dir, "crop_label_encoder.json"), "w", encoding="utf-8") as f:
         json.dump(crop_mapping, f, indent=2)
 
     # Calculate feature stats (mean, std, min, max) for UI normalization
@@ -100,11 +100,11 @@ def train_and_export():
             "min": round(float(df[col].min()), 2),
             "max": round(float(df[col].max()), 2)
         }
-    with open(os.path.join(artifacts_dir, "feature_stats.json"), "w") as f:
+    with open(os.path.join(artifacts_dir, "feature_stats.json"), "w", encoding="utf-8") as f:
         json.dump(feature_stats, f, indent=2)
 
     # Save Agronomic profiles for rule-based explanation
-    with open(os.path.join(artifacts_dir, "crop_profiles.json"), "w") as f:
+    with open(os.path.join(artifacts_dir, "crop_profiles.json"), "w", encoding="utf-8") as f:
         json.dump(CROP_PROFILES, f, indent=2)
 
     # 1. Rigorous 5-Fold Stratified Cross-Validation
@@ -163,7 +163,7 @@ def train_and_export():
         "confusion_matrix": cm,
         "classes": list(label_encoder.classes_)
     }
-    with open(os.path.join(artifacts_dir, "evaluation_metrics.json"), "w") as f:
+    with open(os.path.join(artifacts_dir, "evaluation_metrics.json"), "w", encoding="utf-8") as f:
         json.dump(eval_report, f, indent=2)
     print(f"[+] Saved evaluation metrics to: {os.path.join(artifacts_dir, 'evaluation_metrics.json')}")
 

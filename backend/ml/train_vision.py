@@ -299,7 +299,7 @@ def main():
     pth_path = os.path.join(artifacts_dir, "leaf_mobilenet_v2.pth")
     torch.save(best_state, pth_path)
 
-    with open(os.path.join(artifacts_dir, "disease_classes.json"), "w") as f:
+    with open(os.path.join(artifacts_dir, "disease_classes.json"), "w", encoding="utf-8") as f:
         json.dump({int(i): name for i, name in enumerate(OUTPUT_CLASSES)}, f, indent=2)
 
     metrics_doc = {
@@ -327,10 +327,10 @@ def main():
         "confusion_matrix": cm,
         "class_order": OUTPUT_CLASSES,
     }
-    with open(os.path.join(artifacts_dir, "vision_evaluation_metrics.json"), "w") as f:
+    with open(os.path.join(artifacts_dir, "vision_evaluation_metrics.json"), "w", encoding="utf-8") as f:
         json.dump(metrics_doc, f, indent=2)
 
-    with open(os.path.join(artifacts_dir, "vision_training_history.json"), "w") as f:
+    with open(os.path.join(artifacts_dir, "vision_training_history.json"), "w", encoding="utf-8") as f:
         json.dump(history, f, indent=2)
 
     print(f"[+] Exported trained weights -> {pth_path}")

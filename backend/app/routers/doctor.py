@@ -9,6 +9,7 @@ from typing import Optional
 import base64
 from pydantic import BaseModel
 from app.services.disease_classifier import disease_classifier
+from app.services.supabase_client import supabase_service
 
 router = APIRouter(prefix="/api/doctor", tags=["Plant Doctor & Leaf Pathology"])
 
@@ -37,6 +38,10 @@ async def diagnose_leaf_disease(req: DiagnoseJsonRequest):
         crop_hint=req.crop_hint or req.preset_sample,
         language=req.language or "hi"
     )
+    try:
+        supabase_service.save_disease_scan(result)
+    except Exception:
+        pass
     return result
 
 @router.post("/diagnose-file")
@@ -54,4 +59,8 @@ async def diagnose_leaf_file(
         crop_hint=crop_hint,
         language=language or "hi"
     )
+    try:
+        supabase_service.save_disease_scan(result)
+    except Exception:
+        pass
     return result

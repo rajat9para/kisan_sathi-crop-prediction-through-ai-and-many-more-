@@ -427,7 +427,7 @@ class DiseaseClassifier:
 
         if os.path.exists(weights_path) and os.path.exists(classes_path):
             try:
-                with open(classes_path, "r") as f:
+                with open(classes_path, "r", encoding="utf-8") as f:
                     raw_classes = json.load(f)
                     self.class_mapping = {int(k): v for k, v in raw_classes.items()}
 

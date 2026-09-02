@@ -39,18 +39,25 @@ CREATE INDEX IF NOT EXISTS idx_iot_device
 
 -- 3. Farmer recommendation history
 CREATE TABLE IF NOT EXISTS crop_recommendations (
-    id             BIGSERIAL PRIMARY KEY,
-    device_id      TEXT,
-    district       TEXT,
-    state          TEXT,
-    top_crop       TEXT,
-    match_score    DOUBLE PRECISION,
-    created_at     TIMESTAMPTZ DEFAULT NOW()
+    id                UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    device_id         TEXT,
+    location_district TEXT,
+    location_state    TEXT,
+    district          TEXT,
+    state             TEXT,
+    top_crop          TEXT,
+    match_score       DOUBLE PRECISION,
+    soil_ph           DOUBLE PRECISION,
+    soil_nitrogen     DOUBLE PRECISION,
+    soil_phosphorus   DOUBLE PRECISION,
+    soil_potassium    DOUBLE PRECISION,
+    raw_response      JSONB,
+    created_at        TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- 4. Disease scan history
 CREATE TABLE IF NOT EXISTS disease_scans (
-    id           BIGSERIAL PRIMARY KEY,
+    id           UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     device_id    TEXT,
     crop         TEXT,
     disease_name TEXT,
@@ -58,10 +65,13 @@ CREATE TABLE IF NOT EXISTS disease_scans (
     created_at   TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 5. Keep-alive ping table
+-- 5. Keep-alive ping table (prevents Supabase idle pause)
 CREATE TABLE IF NOT EXISTS app_keepalive (
-    id         BIGSERIAL PRIMARY KEY,
-    pinged_at  TIMESTAMPTZ DEFAULT NOW()
+    id          TEXT PRIMARY KEY DEFAULT 'kisaan_sathi_heartbeat',
+    last_active TIMESTAMPTZ DEFAULT NOW(),
+    app_status  TEXT DEFAULT 'healthy',
+    ping_count  INT DEFAULT 1,
+    pinged_at   TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- Enable row-level access for the anon key to read mandi prices (public data),

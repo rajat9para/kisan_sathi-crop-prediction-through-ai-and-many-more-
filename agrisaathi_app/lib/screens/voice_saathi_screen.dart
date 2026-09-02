@@ -306,7 +306,7 @@ class _VoiceSaathiScreenState extends State<VoiceSaathiScreen> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 16),
               itemCount: _quickPrompts.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 8),
+              separatorBuilder: (ctx, i) => const SizedBox(width: 8),
               itemBuilder: (context, idx) {
                 final prompt = _quickPrompts[idx];
                 return ActionChip(

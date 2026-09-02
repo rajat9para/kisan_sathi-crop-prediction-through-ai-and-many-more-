@@ -106,7 +106,7 @@ class WeatherForecastWidget extends StatelessWidget {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: weather.forecast7d.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 10),
+              separatorBuilder: (ctx, i) => const SizedBox(width: 10),
               itemBuilder: (context, idx) {
                 final day = weather.forecast7d[idx];
                 final isRain = day.precipitationProb > 30;

@@ -442,22 +442,22 @@ class MLEngine:
             full_profiles_json = os.path.join(artifacts_dir, "crop_profiles_full.json")
 
             if os.path.exists(encoder_json):
-                with open(encoder_json, "r") as f:
+                with open(encoder_json, "r", encoding="utf-8") as f:
                     raw_map = json.load(f)
                     self.label_mapping = {int(k): v for k, v in raw_map.items()}
 
             if os.path.exists(stats_json):
-                with open(stats_json, "r") as f:
+                with open(stats_json, "r", encoding="utf-8") as f:
                     self.feature_stats = json.load(f)
 
             if os.path.exists(profiles_json):
-                with open(profiles_json, "r") as f:
+                with open(profiles_json, "r", encoding="utf-8") as f:
                     self.crop_profiles = json.load(f)
 
             # Full 27-crop profiles (incl. staples: wheat, soybean, mustard, sugarcane, groundnut)
             # sourced from the verified frontend CROP_DATABASE — single source of agronomic truth.
             if os.path.exists(full_profiles_json):
-                with open(full_profiles_json, "r") as f:
+                with open(full_profiles_json, "r", encoding="utf-8") as f:
                     self.full_profiles = json.load(f)
                 print(f"[+] Loaded {len(self.full_profiles)} full crop profiles (all staples included).")
 

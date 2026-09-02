@@ -206,15 +206,13 @@ class LLMAdvisor:
     # Ordered fast-first; invalid/retired model names simply fail fast and the
     # loop continues to the next candidate.
     WORKING_MODELS = [
-        "openai/gpt-oss-120b",       # Best quality, ~1s with reasoning_effort=low
-        "llama-3.3-70b-versatile",   # Excellent Hindi/multilingual quality
-        "openai/gpt-oss-20b",        # Fast, good quality
-        "qwen/qwen3-32b",            # Multilingual alternate
+        "qwen/qwen3.8-27b",          # Verified active on Groq, ultra-fast multilingual direct answers
+        "openai/gpt-oss-120b",       # High quality reasoning
+        "openai/gpt-oss-20b",        # Fast secondary
     ]
 
-    # Per-model timeout (s). Worst case 4 models = 18s hard cap, but typical
-    # success is < 2s on the first model.
-    MODEL_TIMEOUT_S = 6.0
+    # Per-model timeout (s). Fast responsive cap
+    MODEL_TIMEOUT_S = 5.0
     MAX_TOKENS = 800
 
     # Native script Unicode ranges per language code — used to VERIFY that the
@@ -259,7 +257,20 @@ class LLMAdvisor:
         try:
             if config.GROQ_API_KEY:
                 self.client = Groq(api_key=config.GROQ_API_KEY)
-                print(f"[+] Groq LLM client initialized. Models: {self.WORKING_MODELS}")
+                try:
+                    remote_models = {m.id for m in self.client.models.list().data}
+                    prioritized = []
+                    # Best multilingual model first
+                    for m in ["qwen/qwen3.8-27b", "openai/gpt-oss-120b", "openai/gpt-oss-20b", "llama-3.3-70b-versatile", "llama-3.1-8b-instant"]:
+                        if m in remote_models and m not in prioritized:
+                            prioritized.append(m)
+                    if config.GROQ_MODEL and config.GROQ_MODEL.strip() in remote_models and config.GROQ_MODEL.strip() not in prioritized:
+                        prioritized.append(config.GROQ_MODEL.strip())
+                    if prioritized:
+                        self.WORKING_MODELS = prioritized
+                except Exception as list_e:
+                    print(f"[!] Warning checking Groq models: {list_e}")
+                print(f"[+] Groq LLM client initialized. Active models: {self.WORKING_MODELS}")
         except Exception as e:
             print(f"[!] Warning: Could not initialize Groq client: {e}")
             self.client = None

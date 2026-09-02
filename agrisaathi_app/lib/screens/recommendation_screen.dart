@@ -101,7 +101,7 @@ class RecommendationScreen extends StatelessWidget {
                       ),
                       const SizedBox(height: 12),
 
-                      ...rec.topRecommendations.map((crop) => _buildCropCard(context, crop)).toList(),
+                      ...rec.topRecommendations.map((crop) => _buildCropCard(context, crop)),
                     ],
                   ),
                 ),

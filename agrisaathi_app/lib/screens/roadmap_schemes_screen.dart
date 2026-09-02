@@ -58,7 +58,7 @@ class RoadmapSchemesScreen extends StatelessWidget {
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
             ),
             const SizedBox(height: 12),
-            ..._schemes.map((s) => _buildSchemeCard(s)).toList(),
+            ..._schemes.map((s) => _buildSchemeCard(s)),
             const SizedBox(height: 24),
 
             // Roadmap & Future Integrations (Pitch Card for Judges)

@@ -14,10 +14,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Application code + pre-trained ML artifacts
+# Application code + pre-trained ML artifacts + portal UI
 COPY app ./app
 COPY ml ./ml
 COPY run.py .
+COPY public ./public
 
 # Render/Railway/Fly inject PORT; default 8000 for local docker runs
 ENV PORT=8000
