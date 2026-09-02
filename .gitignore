@@ -40,3 +40,12 @@ agrisaathi_app/.flutter-plugins-dependencies
 *~
 .DS_Store
 Thumbs.db
+
+# ML training datasets (2+ GB — download via DEPLOYMENT.md instructions)
+ml_training/
+ml_training/download.ps1
+ml_training/*.zip
+ml_training/*.log
+ml_training/*.txt
+ml_training/extracted/
+ml_training/PlantVillage-Dataset/

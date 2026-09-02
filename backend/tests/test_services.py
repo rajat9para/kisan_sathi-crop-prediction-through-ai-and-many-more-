@@ -89,7 +89,7 @@ def test_crop_specific_management_schedules():
 
 
 def test_pytorch_leaf_pathology_classifier_valid_image():
-    """Verify PyTorch MobileNetV2 leaf disease classification on a generated leaf image."""
+    """Verify CV diagnosis (auto-detect) returns a genuine raw softmax confidence."""
     img = Image.new("RGB", (224, 224), color=(34, 139, 34))
     arr = np.array(img)
     arr[50:100, 50:100] = [220, 200, 30] # Yellow
@@ -100,11 +100,26 @@ def test_pytorch_leaf_pathology_classifier_valid_image():
     test_img.save(buf, format="JPEG")
     image_bytes = buf.getvalue()
 
-    diag = disease_classifier.diagnose_image(image_bytes=image_bytes, crop_hint="wheat", language="hi")
+    diag = disease_classifier.diagnose_image(image_bytes=image_bytes, language="hi")
     assert diag.get("error") is not True
     assert "disease_name" in diag
     assert "confidence_pct" in diag
-    assert diag["confidence_pct"] >= 75.0
+    # CV-capable path must report a real softmax confidence in [0, 100]
+    assert diag["confidence_pct"] is not None
+    assert 0.0 <= diag["confidence_pct"] <= 100.0
+    assert diag["diagnosis_method"] == "deep_learning_cv"
+    assert "organic_remedy" in diag
+    assert "chemical_remedy" in diag
+
+
+def test_symptom_triage_for_crops_without_cv_data():
+    """Crops without verified CV datasets must be served honestly by the
+    symptom-guided knowledge base — never with a fabricated neural confidence."""
+    diag = disease_classifier.diagnose_image(image_bytes=None, crop_hint="wheat", language="en")
+    assert diag.get("error") is not True
+    assert diag["diagnosis_method"] == "symptom_guidelines"
+    assert diag["confidence_pct"] is None
+    assert "disease_name" in diag
     assert "organic_remedy" in diag
     assert "chemical_remedy" in diag
 
@@ -248,6 +263,7 @@ if __name__ == "__main__":
         ("3. Quantitative 4-Pillar Sustainability Scoring", test_sustainability_score_calculation),
         ("4. Crop-Specific Agronomic Schedules", test_crop_specific_management_schedules),
         ("5. PyTorch MobileNetV2 Leaf Pathology Inference", test_pytorch_leaf_pathology_classifier_valid_image),
+        ("5b. Honest Symptom Triage for Non-CV Crops", test_symptom_triage_for_crops_without_cv_data),
         ("6. Input Validation (Blank Image Rejection)", test_leaf_classifier_rejects_blank_image),
         ("7. Agmarknet APMC Mandi Price Generator", test_apmc_market_prices),
         ("8. Soil Health Card OCR Parameter Parser", test_ocr_parameter_parser),

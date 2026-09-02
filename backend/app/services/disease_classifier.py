@@ -448,12 +448,12 @@ class DiseaseClassifier:
                 self.model = model
 
                 self.transform = transforms.Compose([
-                    transforms.Resize((224, 224)),
+                    transforms.Resize((160, 160)),
                     transforms.ToTensor(),
                     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
                 ])
                 self.is_pytorch_active = True
-                print(f"[+] Loaded PyTorch MobileNetV2 Leaf Pathology Classifier ({num_classes} classes).")
+                print(f"[+] Loaded PlantVillage-trained MobileNetV2 leaf pathology model ({num_classes} classes).")
             except Exception as e:
                 print(f"[!] Failed to load PyTorch vision model: {e}. Fallback to agronomic expert system.")
         else:
@@ -493,6 +493,11 @@ class DiseaseClassifier:
         }
         return True, "Valid leaf image", metrics
 
+    # Crops for which the CV model has verified PlantVillage training data.
+    # All other crops are served by the symptom-based knowledge base with an
+    # honest "symptom_guidelines" diagnosis_method label.
+    CV_TRAINED_CROPS = {"apple", "grape", "grapes", "potato", "tomato", "auto", ""}
+
     def diagnose_image(
         self,
         image_bytes: Optional[bytes] = None,
@@ -502,10 +507,17 @@ class DiseaseClassifier:
         is_en = (language == "en")
         metrics = {"avg_red": 120.0, "avg_green": 140.0, "avg_blue": 80.0, "lesion_spot_pct": 25.0, "chlorosis_yellow_pct": 20.0, "contrast_std": 35.0}
 
-        disease_key = "wheat_yellow_rust"
-        confidence = 94.2
-        model_name = "PyTorch MobileNetV2 Deep Leaf Pathology Classifier"
-        inference_source = "Deep Learning Neural Inference (PyTorch)"
+        disease_key = "healthy_leaf"
+        confidence = None
+        model_name = ""
+        inference_source = ""
+        diagnosis_method = ""
+
+        hint_lower = (crop_hint or "").lower().strip()
+        if not hint_lower or hint_lower in ("auto", "ai"):
+            cv_capable = True  # auto-detect: model only knows its 7 trained classes anyway
+        else:
+            cv_capable = any(k in hint_lower for k in ("apple", "grape", "potato", "tomato"))
 
         if image_bytes and Image and np:
             try:
@@ -520,8 +532,9 @@ class DiseaseClassifier:
                     }
                 metrics = calculated_metrics
 
-                # 1. Run Neural Inference if PyTorch model is ready
-                if self.is_pytorch_active and self.model and self.transform and torch:
+                # 1. Neural inference — ONLY when the selected crop has verified
+                #    PlantVillage training data (honest CV capability gating).
+                if self.is_pytorch_active and self.model and self.transform and torch and cv_capable:
                     tensor = self.transform(img).unsqueeze(0)
                     with torch.no_grad():
                         logits = self.model(tensor)
@@ -529,42 +542,57 @@ class DiseaseClassifier:
                         top_probs, top_indices = torch.topk(probs, k=3)
 
                         pred_idx = int(top_indices[0])
+                        # Raw softmax confidence — never artificially floored
                         top_conf = float(top_probs[0]) * 100.0
-                        disease_key = self.class_mapping.get(pred_idx, "wheat_yellow_rust")
-                        confidence = round(min(99.1, max(75.0, top_conf)), 1)
+                        disease_key = self.class_mapping.get(pred_idx, "healthy_leaf")
+                        confidence = round(top_conf, 1)
 
                     # Respect the farmer's explicit crop selection: if the neural
                     # model predicts a disease belonging to a DIFFERENT crop family
                     # than the crop the user selected, defer to the crop-guided
                     # expert rule instead of returning a wrong-crop diagnosis.
-                    if crop_hint and crop_hint.lower().strip() not in ("auto", ""):
+                    if hint_lower and hint_lower not in ("auto", ""):
                         expert_key = self._resolve_expert_rule(crop_hint, metrics)
                         expected_crop = self.knowledge_base.get(expert_key, {}).get("crop_key", "")
                         pred_crop = self.knowledge_base.get(disease_key, {}).get("crop_key", "")
                         if expected_crop and pred_crop and expected_crop != pred_crop:
                             disease_key = expert_key
-                            confidence = round(min(97.5, max(82.0, 85.0 + (metrics.get("chlorosis_yellow_pct", 0) * 0.2))), 1)
-                            model_name = "Crop-Guided Expert System (Neural cross-crop mismatch resolved)"
-                            inference_source = "Farmer Crop Selection + Agronomic Expert Rules"
+                            confidence = None
+                            model_name = "ICAR Symptom-Guided Expert Triage (crop mismatch guard)"
+                            inference_source = "Farmer crop selection + ICAR/TNAU symptom guidelines (image spectral metrics)"
+                            diagnosis_method = "symptom_guidelines"
+                    if not model_name:
+                        model_name = "MobileNetV2 fine-tuned on PlantVillage (frozen ImageNet backbone + trained head)"
+                        inference_source = "Deep learning inference on verified PlantVillage imagery"
+                        diagnosis_method = "deep_learning_cv"
                 else:
-                    # Fallback to Agronomic expert system
+                    # Symptom-guided triage: for crops without verified CV training
+                    # data, or when the vision model is unavailable.
                     disease_key = self._resolve_expert_rule(crop_hint, metrics)
-                    confidence = round(min(97.5, max(82.0, 85.0 + (metrics.get("chlorosis_yellow_pct", 0) * 0.2))), 1)
-                    model_name = "Agronomic Leaf Feature Expert System"
-                    inference_source = "Agronomic Spectral Heuristic"
+                    model_name = "ICAR/TNAU/PAU Symptom-Guided Expert System"
+                    inference_source = (
+                        "Symptom-based triage using image color/lesion metrics and ICAR extension "
+                        "guidelines (no verified public CV dataset exists for this crop — neural "
+                        "diagnosis is intentionally NOT claimed here)."
+                    ) if not cv_capable else "Agronomic Leaf Feature Expert System"
+                    diagnosis_method = "symptom_guidelines"
 
             except Exception as e:
                 print(f"[!] Error processing leaf image: {e}")
                 disease_key = self._resolve_expert_rule(crop_hint, metrics)
-                model_name = "Agronomic Leaf Feature Expert System"
+                model_name = "ICAR/TNAU/PAU Symptom-Guided Expert System"
                 inference_source = "Agronomic Fallback"
+                diagnosis_method = "symptom_guidelines"
 
         elif crop_hint:
             disease_key = self._resolve_expert_rule(crop_hint, metrics)
-            model_name = "Agronomic Knowledge Base"
-            inference_source = "Agronomic Crop Hint Knowledge Base"
+            model_name = "ICAR/TNAU/PAU Symptom-Guided Expert System"
+            inference_source = "Farmer crop selection + ICAR/TNAU symptom guidelines"
+            diagnosis_method = "symptom_guidelines"
 
-        diag = self.knowledge_base.get(disease_key, self.knowledge_base["wheat_yellow_rust"])
+        diag = self.knowledge_base.get(disease_key)
+        if diag is None:
+            diag = self.knowledge_base.get("healthy_leaf") or next(iter(self.knowledge_base.values()))
 
         return {
             "disease_key": disease_key,
@@ -576,6 +604,7 @@ class DiseaseClassifier:
             "disease_name_en": diag["disease_en"],
             "severity": diag.get("severity", "Moderate"),
             "confidence_pct": confidence,
+            "diagnosis_method": diagnosis_method,
             "ai_model": model_name,
             "inference_source": inference_source,
             "symptoms": diag["symptoms_en"] if is_en else diag["symptoms_hi"],

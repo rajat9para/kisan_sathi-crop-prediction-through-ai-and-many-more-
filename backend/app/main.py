@@ -1,4 +1,5 @@
 import asyncio
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import config
@@ -11,12 +12,23 @@ app = FastAPI(
     description=config.API_DESCRIPTION
 )
 
-# Enable CORS for Flutter Web, Android Emulators, and Vercel clients
+# CORS: explicit origins (wildcard "*" combined with credentials is invalid per
+# the Fetch spec and rejected by browsers). Configure extra origins via the
+# ALLOWED_ORIGINS env var (comma-separated), e.g. your Vercel frontend URL.
+_allowed_origins = [
+    o.strip() for o in os.getenv("ALLOWED_ORIGINS", "").split(",") if o.strip()
+]
+_DEFAULT_ORIGINS = [
+    "http://localhost:8000",
+    "http://localhost:3000",
+    "http://127.0.0.1:8000",
+    "https://kisaansathicroppredictionaiandmanym.vercel.app",
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_DEFAULT_ORIGINS + _allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
 

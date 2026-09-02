@@ -423,6 +423,7 @@ class MLEngine:
         self.label_mapping: Dict[int, str] = {}
         self.feature_stats: Dict[str, Dict[str, float]] = {}
         self.crop_profiles: Dict[str, Dict[str, Tuple[float, float]]] = {}
+        self.full_profiles: Dict[str, Dict[str, Any]] = {}
         self.is_loaded = False
         
         self.load_artifacts()
@@ -438,6 +439,7 @@ class MLEngine:
             encoder_json = os.path.join(artifacts_dir, "crop_label_encoder.json")
             stats_json = os.path.join(artifacts_dir, "feature_stats.json")
             profiles_json = os.path.join(artifacts_dir, "crop_profiles.json")
+            full_profiles_json = os.path.join(artifacts_dir, "crop_profiles_full.json")
 
             if os.path.exists(encoder_json):
                 with open(encoder_json, "r") as f:
@@ -452,6 +454,13 @@ class MLEngine:
                 with open(profiles_json, "r") as f:
                     self.crop_profiles = json.load(f)
 
+            # Full 27-crop profiles (incl. staples: wheat, soybean, mustard, sugarcane, groundnut)
+            # sourced from the verified frontend CROP_DATABASE — single source of agronomic truth.
+            if os.path.exists(full_profiles_json):
+                with open(full_profiles_json, "r") as f:
+                    self.full_profiles = json.load(f)
+                print(f"[+] Loaded {len(self.full_profiles)} full crop profiles (all staples included).")
+
             if joblib and os.path.exists(model_pkl):
                 self.model = joblib.load(model_pkl)
                 print("[+] Loaded trained XGBoost Multi-Class Classifier.")
@@ -465,12 +474,22 @@ class MLEngine:
             print(f"[!] Warning: ML Artifacts load failed: {e}. Engine will run in Agronomic Expert fallback mode.")
             self.is_loaded = False
 
+    # Maps Agmarknet/mandi commodity names -> internal crop keys
+    COMMODITY_TO_CROP = {
+        "wheat": "wheat", "maize": "maize", "paddy (rice)": "rice", "rice": "rice",
+        "gram (chickpea)": "chickpea", "chickpea": "chickpea", "cotton": "cotton",
+        "soybean": "soybean", "grapes": "grapes", "pomegranate": "pomegranate",
+        "onion": None, "tomato": None, "banana": "banana", "chilli": None,
+        "sugarcane": "sugarcane", "mustard": "mustard", "groundnut": "groundnut"
+    }
+
     def calculate_pillar_fits(
         self,
         crop: str,
         features: Dict[str, float],
         previous_crop: Optional[str] = None,
-        irrigation: str = "Borewell"
+        irrigation: str = "Borewell",
+        market_trend: Optional[Dict[str, Any]] = None
     ) -> Dict[str, float]:
         """Calculates quantitative suitability across Soil, Weather, Market, and Rotation pillars."""
         # Realistic ICAR/State Agriculture University Agronomic Standards
@@ -488,10 +507,14 @@ class MLEngine:
             "pomegranate": {"N": (15, 45), "P": (15, 40), "K": (30, 55), "temp": (18, 32), "humidity": (60, 95), "rain": (60, 120), "ph": (5.5, 7.5)},
         }
 
-        profile = standard_profiles.get(crop) or self.crop_profiles.get(crop, {
-            "N": (40, 80), "P": (30, 60), "K": (30, 60),
-            "temp": (20, 30), "humidity": (50, 80), "ph": (6.0, 7.5), "rain": (50, 150)
-        })
+        # Priority: full 27-crop verified profiles -> ICAR standards -> legacy profiles -> neutral default
+        profile = (
+            self.full_profiles.get(crop)
+            or standard_profiles.get(crop)
+            or self.crop_profiles.get(crop)
+            or {"N": (40, 80), "P": (30, 60), "K": (30, 60),
+                "temp": (20, 30), "humidity": (50, 80), "ph": (6.0, 7.5), "rain": (50, 150)}
+        )
 
         # 1. Soil Fit (N, P, K, pH)
         soil_penalties = 0.0
@@ -532,9 +555,23 @@ class MLEngine:
             if water_lvl in ["High", "Medium"]:
                 weather_fit = min(99.0, weather_fit * 1.10)
 
-        # 3. Market Profitability
-        trend = meta.get("trend", "stable")
-        market_fit = 92.0 if trend == "up" else (78.0 if trend == "stable" else 62.0)
+        # 3. Market Profitability — driven by LIVE mandi trend when available,
+        # otherwise by the crop profile's seasonal trend indicator.
+        trend = None
+        trend_pct = 0.0
+        if market_trend:
+            trend = market_trend.get("trend_direction", "stable")
+            trend_pct = float(market_trend.get("trend_pct_7d", 0.0) or 0.0)
+        else:
+            trend = (self.full_profiles.get(crop) or {}).get("trend", meta.get("trend", "stable"))
+            trend_pct = 2.0 if trend == "up" else (-2.0 if trend == "down" else 0.0)
+
+        if trend == "up":
+            market_fit = min(95.0, 80.0 + min(15.0, abs(trend_pct) * 3.0))
+        elif trend == "down":
+            market_fit = max(55.0, 78.0 - min(23.0, abs(trend_pct) * 3.0))
+        else:
+            market_fit = 78.0
 
         # 4. Rotation Impact
         prev = (previous_crop or "").lower().strip()
@@ -768,19 +805,43 @@ class MLEngine:
             "status": status
         }
 
+    def _build_market_trend_map(self, market_prices: Optional[List[Dict[str, Any]]]) -> Dict[str, Dict[str, Any]]:
+        """Converts live mandi price rows into a crop-keyed trend map for the ranking engine."""
+        trends: Dict[str, Dict[str, Any]] = {}
+        if not market_prices:
+            return trends
+        for row in market_prices:
+            comm = str(row.get("commodity", "")).lower().strip()
+            crop_key = self.COMMODITY_TO_CROP.get(comm)
+            if crop_key:
+                trends[crop_key] = {
+                    "trend_direction": row.get("trend_direction", "stable"),
+                    "trend_pct_7d": row.get("trend_pct_7d", 0.0)
+                }
+        return trends
+
     def recommend_crops(
         self,
         features: Dict[str, float],
         previous_crop: Optional[str] = None,
         irrigation: str = "Borewell",
         farm_size_acres: float = 2.5,
-        top_k: int = 3
+        top_k: int = 3,
+        market_prices: Optional[List[Dict[str, Any]]] = None
     ) -> List[Dict[str, Any]]:
-        """Main inference, SHAP attribution, yield/profit forecasting, and sustainability pipeline."""
+        """Main inference, SHAP attribution, yield/profit forecasting, and sustainability pipeline.
+
+        Ranking model (v2): agronomy-first with ML as a plausibility damper.
+          pillar_composite = soil*0.40 + weather*0.30 + rotation*0.18 + market*0.12
+          ml_factor = 0.65 + 0.35*sqrt(base_conf/100)  for the 22 XGBoost-trained crops
+                      0.85 (neutral)                   for staples outside the model's label space
+          final_match = clamp(pillar_composite * ml_factor)
+        """
         cols = ["N", "P", "K", "temperature", "humidity", "ph", "rainfall"]
+        trend_map = self._build_market_trend_map(market_prices)
         
         shap_raw = None
-        candidates = []
+        ml_probs: Dict[str, float] = {}
 
         if self.model and self.explainer and pd is not None:
             try:
@@ -790,45 +851,44 @@ class MLEngine:
                 
                 for idx, prob in enumerate(probs):
                     crop_name = self.label_mapping.get(idx, f"crop_{idx}")
-                    base_conf = float(prob) * 100.0
-                    fits = self.calculate_pillar_fits(crop_name, features, previous_crop, irrigation)
-                    
-                    final_match = (
-                        base_conf * 0.40 +
-                        fits["soil_fit_pct"] * 0.25 +
-                        fits["weather_fit_pct"] * 0.20 +
-                        fits["market_profitability_pct"] * 0.08 +
-                        fits["rotation_impact_pct"] * 0.07
-                    )
-                    final_match = round(min(99.4, max(35.0, final_match)), 1)
-                    candidates.append({
-                        "idx": idx,
-                        "crop_name": crop_name,
-                        "base_conf": round(base_conf, 1),
-                        "final_match": final_match,
-                        "fits": fits
-                    })
+                    ml_probs[crop_name] = float(prob) * 100.0
             except Exception as e:
                 print(f"[!] Error in ML prediction: {e}. Using agronomic fallback.")
-                candidates = []
+                shap_raw = None
+                ml_probs = {}
 
-        if not candidates:
-            # Deterministic Agronomic Fallback
-            for idx, crop_name in enumerate(CROP_METADATA.keys()):
-                fits = self.calculate_pillar_fits(crop_name, features, previous_crop, irrigation)
-                composite = (
-                    fits["soil_fit_pct"] * 0.40 +
-                    fits["weather_fit_pct"] * 0.30 +
-                    fits["market_profitability_pct"] * 0.15 +
-                    fits["rotation_impact_pct"] * 0.15
-                )
-                candidates.append({
-                    "idx": idx,
-                    "crop_name": crop_name,
-                    "base_conf": round(composite, 1),
-                    "final_match": round(min(98.5, max(45.0, composite)), 1),
-                    "fits": fits
-                })
+        # Candidate set = union of XGBoost label space + full 27-crop verified profiles
+        candidate_crops = list(dict.fromkeys(
+            list(ml_probs.keys()) + list(self.full_profiles.keys()) + list(CROP_METADATA.keys())
+        ))
+
+        candidates = []
+        for crop_name in candidate_crops:
+            fits = self.calculate_pillar_fits(
+                crop_name, features, previous_crop, irrigation,
+                market_trend=trend_map.get(crop_name)
+            )
+            pillar_composite = (
+                fits["soil_fit_pct"] * 0.40 +
+                fits["weather_fit_pct"] * 0.30 +
+                fits["rotation_impact_pct"] * 0.18 +
+                fits["market_profitability_pct"] * 0.12
+            )
+            base_conf = ml_probs.get(crop_name)
+            if base_conf is not None:
+                # XGBoost acts as a plausibility damper, never a diluter
+                ml_factor = 0.65 + 0.35 * (base_conf / 100.0) ** 0.5
+            else:
+                # Staple crops outside the model's Kaggle label space: neutral trust
+                ml_factor = 0.85
+            final_match = round(min(98.5, max(30.0, pillar_composite * ml_factor)), 1)
+            candidates.append({
+                "idx": list(self.label_mapping.values()).index(crop_name) if crop_name in self.label_mapping.values() else -1,
+                "crop_name": crop_name,
+                "base_conf": round(base_conf, 1) if base_conf is not None else round(pillar_composite, 1),
+                "final_match": final_match,
+                "fits": fits
+            })
 
         candidates.sort(key=lambda x: x["final_match"], reverse=True)
         top_candidates = candidates[:top_k]

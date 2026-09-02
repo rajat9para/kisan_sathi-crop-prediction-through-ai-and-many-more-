@@ -21,10 +21,38 @@
 - **Target Classes (22 Indian Crops)**: Rice, Maize, Chickpea, Kidneybeans, Pigeonpeas, Mothbeans, Mungbean, Blackgram, Lentil, Pomegranate, Banana, Mango, Grapes, Watermelon, Muskmelon, Apple, Orange, Papaya, Coconut, Cotton, Jute, Coffee.
 
 ### 1.2 Plant Doctor Leaf Pathology Engine
-- **Model Type**: Deep Convolutional Neural Network (`MobileNetV2` with customized 2-layer Dropout-Dense classification head).
+- **Model Type**: Deep Convolutional Neural Network (`MobileNetV2` — ImageNet-pretrained frozen backbone + fine-tuned 2-layer Dropout-Dense classification head).
 - **Framework**: PyTorch (`torch`, `torchvision`).
-- **Input Preprocessing**: RGB PIL Image -> Resize (224, 224) -> Tensor -> Normalize (ImageNet mean `[0.485, 0.456, 0.406]`, std `[0.229, 0.224, 0.225]`).
-- **Diagnostic Classes (23 Pathology Classes)**: Wheat Yellow Rust, Wheat Brown Rust, Wheat Leaf Blight, Wheat Powdery Mildew, Rice Blast, Rice Bacterial Blight, Rice Sheath Blight, Tomato Early Blight, Tomato Late Blight, Tomato Leaf Curl, Potato Early Blight, Potato Late Blight, Cotton Bacterial Blight, Cotton Grey Mildew, Chilli Leaf Curl, Chilli Anthracnose, Mustard White Rust, Sugarcane Red Rot, Soybean Yellow Mosaic, Apple Scab, Grape Black Rot, Chickpea Ascochyta, and Healthy Leaf.
+- **Training Data**: Genuine **PlantVillage** public dataset (spMohanty/PlantVillage-Dataset, CC-BY-SA) — 4,200 verified leaf images across 7 classes (3,570 train / 630 val).
+- **Input Preprocessing**: RGB PIL Image -> Resize (160, 160) -> Tensor -> Normalize (ImageNet mean `[0.485, 0.456, 0.406]`, std `[0.229, 0.224, 0.225]`). Train-time augmentation: RandomResizedCrop, horizontal flip, ±15° rotation, color jitter.
+- **CV-Diagnosable Classes (7 — verified public training data exists)**: Apple Scab, Grape Black Rot, Healthy Leaf, Potato Early Blight, Potato Late Blight, Tomato Early Blight, Tomato Late Blight.
+- **Honest capability boundary**: Crops with NO verified public leaf-pathology dataset (wheat, rice, cotton, chilli, mustard, sugarcane, soybean-YMV, chickpea) are deliberately **not claimed as CV-diagnosable**. They are served by the ICAR/TNAU/PAU symptom-based knowledge base and API responses carry `diagnosis_method: "symptom_guidelines"` with `confidence_pct: null`. The UI displays "ICAR symptom-based guidance" instead of a fabricated neural score.
+
+### 1.2.1 Vision Model Evaluation (held-out validation set, n=630)
+| Metric | Value |
+|---|---|
+| **Validation Accuracy** | **95.87%** |
+| **Macro F1** | **95.88%** |
+| **Weighted F1** | **95.88%** |
+| Apple Scab F1 | 0.983 |
+| Grape Black Rot F1 | 0.994 |
+| Healthy Leaf F1 | 0.972 |
+| Potato Early Blight F1 | 0.966 |
+| Potato Late Blight F1 | 0.941 |
+| Tomato Early Blight F1 | 0.930 |
+| Tomato Late Blight F1 | 0.924 |
+
+Per-epoch training history and the full confusion matrix are exported to
+`backend/ml/artifacts/vision_training_history.json` and
+`vision_evaluation_metrics.json`. Confidence scores returned by the API are the
+**raw softmax outputs** — never artificially floored or clamped.
+
+### 1.3 Weather-Driven Disease-Risk Early Warning
+Rule-based epidemiological risk indices (ICAR/SAU infection thresholds) computed
+from the **live Open-Meteo forecast**: temperature trapezoid favourability ×
+humidity ramp × rainfall/leaf-wetness proxy for Wheat Yellow Rust, Rice Blast,
+Late Blight (potato/tomato) and Grape Downy Mildew. Exposed via
+`GET /api/weather` → `disease_risk_early_warning`.
 
 ---
 

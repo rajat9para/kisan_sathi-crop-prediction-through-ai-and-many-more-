@@ -1,0 +1,1136 @@
+{
+  "wheat": {
+    "N": [
+      75,
+      130
+    ],
+    "P": [
+      35,
+      65
+    ],
+    "K": [
+      30,
+      60
+    ],
+    "ph": [
+      5.8,
+      8
+    ],
+    "ph_hard": [
+      5.5,
+      8.5
+    ],
+    "temp": [
+      12,
+      27
+    ],
+    "humidity": [
+      40,
+      78
+    ],
+    "rain": [
+      35,
+      95
+    ],
+    "water_req": "Medium",
+    "trend": "up",
+    "mandi_price": 2425,
+    "yield_min": 18,
+    "yield_max": 25,
+    "yield_unit": "Quintals",
+    "name_en": "🌾 Wheat (Gehun / Kanak)",
+    "name_hi": "🌾 गेहूं"
+  },
+  "soybean": {
+    "N": [
+      20,
+      55
+    ],
+    "P": [
+      40,
+      75
+    ],
+    "K": [
+      30,
+      65
+    ],
+    "ph": [
+      6,
+      7.8
+    ],
+    "ph_hard": [
+      5.5,
+      8.2
+    ],
+    "temp": [
+      18,
+      33
+    ],
+    "humidity": [
+      50,
+      85
+    ],
+    "rain": [
+      55,
+      125
+    ],
+    "water_req": "Medium",
+    "trend": "up",
+    "mandi_price": 4680,
+    "yield_min": 10,
+    "yield_max": 15,
+    "yield_unit": "Quintals",
+    "name_en": "🌱 Soybean (Bhat)",
+    "name_hi": "🌱 सोयाबीन"
+  },
+  "mustard": {
+    "N": [
+      35,
+      80
+    ],
+    "P": [
+      25,
+      55
+    ],
+    "K": [
+      20,
+      45
+    ],
+    "ph": [
+      5.8,
+      8.2
+    ],
+    "ph_hard": [
+      5.5,
+      8.8
+    ],
+    "temp": [
+      10,
+      26
+    ],
+    "humidity": [
+      35,
+      75
+    ],
+    "rain": [
+      20,
+      65
+    ],
+    "water_req": "Low",
+    "trend": "up",
+    "mandi_price": 5650,
+    "yield_min": 8,
+    "yield_max": 14,
+    "yield_unit": "Quintals",
+    "name_en": "🌻 Mustard (Sarson / Rai)",
+    "name_hi": "🌻 सरसों / राई"
+  },
+  "sugarcane": {
+    "N": [
+      110,
+      180
+    ],
+    "P": [
+      45,
+      80
+    ],
+    "K": [
+      45,
+      100
+    ],
+    "ph": [
+      5.8,
+      8.2
+    ],
+    "ph_hard": [
+      5.5,
+      8.5
+    ],
+    "temp": [
+      18,
+      36
+    ],
+    "humidity": [
+      55,
+      85
+    ],
+    "rain": [
+      90,
+      190
+    ],
+    "water_req": "High",
+    "trend": "up",
+    "mandi_price": 380,
+    "yield_min": 30,
+    "yield_max": 45,
+    "yield_unit": "Tonnes",
+    "name_en": "🎋 Sugarcane (Ganna)",
+    "name_hi": "🎋 गन्ना"
+  },
+  "groundnut": {
+    "N": [
+      20,
+      45
+    ],
+    "P": [
+      30,
+      65
+    ],
+    "K": [
+      35,
+      75
+    ],
+    "ph": [
+      5.8,
+      7.6
+    ],
+    "ph_hard": [
+      5.2,
+      8
+    ],
+    "temp": [
+      20,
+      33
+    ],
+    "humidity": [
+      50,
+      80
+    ],
+    "rain": [
+      45,
+      95
+    ],
+    "water_req": "Medium",
+    "trend": "up",
+    "mandi_price": 6400,
+    "yield_min": 10,
+    "yield_max": 16,
+    "yield_unit": "Quintals",
+    "name_en": "🥜 Groundnut / Peanut (Moongphali)",
+    "name_hi": "🥜 मूंगफली"
+  },
+  "grapes": {
+    "N": [
+      15,
+      45
+    ],
+    "P": [
+      90,
+      150
+    ],
+    "K": [
+      140,
+      215
+    ],
+    "ph": [
+      5.8,
+      7.2
+    ],
+    "ph_hard": [
+      5.2,
+      7.5
+    ],
+    "temp": [
+      15,
+      35
+    ],
+    "humidity": [
+      55,
+      85
+    ],
+    "rain": [
+      45,
+      85
+    ],
+    "water_req": "Medium",
+    "trend": "up",
+    "mandi_price": 6200,
+    "yield_min": 8,
+    "yield_max": 12,
+    "yield_unit": "Tonnes",
+    "name_en": "🍇 Grapes (Vitis vinifera)",
+    "name_hi": "🍇 अंगूर"
+  },
+  "pomegranate": {
+    "N": [
+      15,
+      45
+    ],
+    "P": [
+      15,
+      40
+    ],
+    "K": [
+      30,
+      55
+    ],
+    "ph": [
+      5.5,
+      7.5
+    ],
+    "ph_hard": [
+      5,
+      7.8
+    ],
+    "temp": [
+      18,
+      32
+    ],
+    "humidity": [
+      60,
+      95
+    ],
+    "rain": [
+      60,
+      120
+    ],
+    "water_req": "Low",
+    "trend": "up",
+    "mandi_price": 8400,
+    "yield_min": 4,
+    "yield_max": 6,
+    "yield_unit": "Tonnes",
+    "name_en": "🍎 Pomegranate (Anar)",
+    "name_hi": "🍎 अनार"
+  },
+  "cotton": {
+    "N": [
+      90,
+      145
+    ],
+    "P": [
+      35,
+      65
+    ],
+    "K": [
+      20,
+      45
+    ],
+    "ph": [
+      6,
+      8.2
+    ],
+    "ph_hard": [
+      5.8,
+      8.8
+    ],
+    "temp": [
+      21,
+      33
+    ],
+    "humidity": [
+      55,
+      85
+    ],
+    "rain": [
+      55,
+      110
+    ],
+    "water_req": "Medium",
+    "trend": "stable",
+    "mandi_price": 7450,
+    "yield_min": 10,
+    "yield_max": 14,
+    "yield_unit": "Quintals",
+    "name_en": "🌿 Cotton (Kapas)",
+    "name_hi": "🌿 कपास"
+  },
+  "chickpea": {
+    "N": [
+      15,
+      50
+    ],
+    "P": [
+      45,
+      80
+    ],
+    "K": [
+      35,
+      85
+    ],
+    "ph": [
+      6,
+      8.5
+    ],
+    "ph_hard": [
+      5.5,
+      9
+    ],
+    "temp": [
+      14,
+      26
+    ],
+    "humidity": [
+      30,
+      75
+    ],
+    "rain": [
+      45,
+      95
+    ],
+    "water_req": "Low",
+    "trend": "up",
+    "mandi_price": 6150,
+    "yield_min": 8,
+    "yield_max": 12,
+    "yield_unit": "Quintals",
+    "name_en": "🌾 Chickpea (Desi Chana)",
+    "name_hi": "🌾 चना (देसी)"
+  },
+  "rice": {
+    "N": [
+      60,
+      105
+    ],
+    "P": [
+      35,
+      60
+    ],
+    "K": [
+      35,
+      50
+    ],
+    "ph": [
+      4.8,
+      7.2
+    ],
+    "ph_hard": [
+      4.2,
+      7.8
+    ],
+    "temp": [
+      20,
+      29
+    ],
+    "humidity": [
+      78,
+      88
+    ],
+    "rain": [
+      170,
+      300
+    ],
+    "water_req": "High",
+    "trend": "up",
+    "mandi_price": 3950,
+    "yield_min": 22,
+    "yield_max": 28,
+    "yield_unit": "Quintals",
+    "name_en": "🌾 Paddy / Rice (Dhan)",
+    "name_hi": "🌾 धान / चावल"
+  },
+  "maize": {
+    "N": [
+      60,
+      105
+    ],
+    "P": [
+      35,
+      65
+    ],
+    "K": [
+      15,
+      30
+    ],
+    "ph": [
+      5.5,
+      7.5
+    ],
+    "ph_hard": [
+      5,
+      8.2
+    ],
+    "temp": [
+      18,
+      29
+    ],
+    "humidity": [
+      55,
+      78
+    ],
+    "rain": [
+      60,
+      115
+    ],
+    "water_req": "Medium",
+    "trend": "up",
+    "mandi_price": 2280,
+    "yield_min": 25,
+    "yield_max": 32,
+    "yield_unit": "Quintals",
+    "name_en": "🌽 Maize (Makka / Corn)",
+    "name_hi": "🌽 मक्का"
+  },
+  "mothbeans": {
+    "N": [
+      10,
+      35
+    ],
+    "P": [
+      35,
+      60
+    ],
+    "K": [
+      15,
+      30
+    ],
+    "ph": [
+      3.5,
+      9.5
+    ],
+    "ph_hard": [
+      3.5,
+      9.5
+    ],
+    "temp": [
+      24,
+      34
+    ],
+    "humidity": [
+      38,
+      68
+    ],
+    "rain": [
+      25,
+      75
+    ],
+    "water_req": "Low",
+    "trend": "stable",
+    "mandi_price": 7200,
+    "yield_min": 4,
+    "yield_max": 7,
+    "yield_unit": "Quintals",
+    "name_en": "🌾 Moth Bean (Moth / Matki)",
+    "name_hi": "🌾 मोठ दाल"
+  },
+  "apple": {
+    "N": [
+      15,
+      45
+    ],
+    "P": [
+      115,
+      145
+    ],
+    "K": [
+      190,
+      215
+    ],
+    "ph": [
+      5.2,
+      6.6
+    ],
+    "ph_hard": [
+      4.8,
+      7
+    ],
+    "temp": [
+      12,
+      24
+    ],
+    "humidity": [
+      85,
+      98
+    ],
+    "rain": [
+      95,
+      130
+    ],
+    "water_req": "Medium",
+    "trend": "up",
+    "mandi_price": 7500,
+    "yield_min": 8,
+    "yield_max": 14,
+    "yield_unit": "Tonnes",
+    "name_en": "🍎 Apple (Seb)",
+    "name_hi": "🍎 सेब"
+  },
+  "coffee": {
+    "N": [
+      75,
+      120
+    ],
+    "P": [
+      15,
+      40
+    ],
+    "K": [
+      25,
+      40
+    ],
+    "ph": [
+      4.5,
+      6.2
+    ],
+    "ph_hard": [
+      4,
+      6.8
+    ],
+    "temp": [
+      20,
+      29
+    ],
+    "humidity": [
+      55,
+      75
+    ],
+    "rain": [
+      115,
+      210
+    ],
+    "water_req": "Medium",
+    "trend": "up",
+    "mandi_price": 24000,
+    "yield_min": 6,
+    "yield_max": 9,
+    "yield_unit": "Quintals",
+    "name_en": "☕ Coffee (Arabica/Robusta)",
+    "name_hi": "☕ कॉफी"
+  },
+  "banana": {
+    "N": [
+      80,
+      125
+    ],
+    "P": [
+      68,
+      98
+    ],
+    "K": [
+      45,
+      60
+    ],
+    "ph": [
+      5.5,
+      6.8
+    ],
+    "ph_hard": [
+      5,
+      7.5
+    ],
+    "temp": [
+      24,
+      32
+    ],
+    "humidity": [
+      75,
+      88
+    ],
+    "rain": [
+      90,
+      125
+    ],
+    "water_req": "High",
+    "trend": "up",
+    "mandi_price": 1850,
+    "yield_min": 25,
+    "yield_max": 35,
+    "yield_unit": "Tonnes",
+    "name_en": "🍌 Banana (Kela)",
+    "name_hi": "🍌 केला"
+  },
+  "coconut": {
+    "N": [
+      15,
+      45
+    ],
+    "P": [
+      5,
+      30
+    ],
+    "K": [
+      25,
+      40
+    ],
+    "ph": [
+      5.2,
+      6.8
+    ],
+    "ph_hard": [
+      4.8,
+      7.5
+    ],
+    "temp": [
+      24,
+      30
+    ],
+    "humidity": [
+      88,
+      100
+    ],
+    "rain": [
+      130,
+      240
+    ],
+    "water_req": "Medium",
+    "trend": "stable",
+    "mandi_price": 2500,
+    "yield_min": 80,
+    "yield_max": 120,
+    "yield_unit": "Hundred Nuts",
+    "name_en": "🥥 Coconut (Nariyal)",
+    "name_hi": "🥥 नारियल"
+  },
+  "jute": {
+    "N": [
+      60,
+      105
+    ],
+    "P": [
+      35,
+      60
+    ],
+    "K": [
+      35,
+      50
+    ],
+    "ph": [
+      6,
+      7.6
+    ],
+    "ph_hard": [
+      5.5,
+      8
+    ],
+    "temp": [
+      23,
+      28
+    ],
+    "humidity": [
+      70,
+      92
+    ],
+    "rain": [
+      150,
+      210
+    ],
+    "water_req": "High",
+    "trend": "stable",
+    "mandi_price": 5200,
+    "yield_min": 12,
+    "yield_max": 16,
+    "yield_unit": "Quintals",
+    "name_en": "🌾 Jute (Patson)",
+    "name_hi": "🌾 पटसन / जूट"
+  },
+  "kidneybeans": {
+    "N": [
+      10,
+      40
+    ],
+    "P": [
+      55,
+      85
+    ],
+    "K": [
+      15,
+      30
+    ],
+    "ph": [
+      5.2,
+      6.2
+    ],
+    "ph_hard": [
+      4.8,
+      6.8
+    ],
+    "temp": [
+      15,
+      25
+    ],
+    "humidity": [
+      35,
+      75
+    ],
+    "rain": [
+      60,
+      150
+    ],
+    "water_req": "Medium",
+    "trend": "up",
+    "mandi_price": 8600,
+    "yield_min": 5,
+    "yield_max": 8,
+    "yield_unit": "Quintals",
+    "name_en": "🍲 Kidney Beans (Rajma)",
+    "name_hi": "🍲 राजमा"
+  },
+  "pigeonpeas": {
+    "N": [
+      10,
+      40
+    ],
+    "P": [
+      55,
+      85
+    ],
+    "K": [
+      15,
+      30
+    ],
+    "ph": [
+      5,
+      7.5
+    ],
+    "ph_hard": [
+      4.5,
+      8
+    ],
+    "temp": [
+      25,
+      38
+    ],
+    "humidity": [
+      30,
+      70
+    ],
+    "rain": [
+      90,
+      200
+    ],
+    "water_req": "Low",
+    "trend": "up",
+    "mandi_price": 7800,
+    "yield_min": 6,
+    "yield_max": 9,
+    "yield_unit": "Quintals",
+    "name_en": "🌾 Pigeon Peas (Arhar / Toor)",
+    "name_hi": "🌾 अरहर / तुअर दाल"
+  },
+  "mungbean": {
+    "N": [
+      10,
+      40
+    ],
+    "P": [
+      35,
+      60
+    ],
+    "K": [
+      15,
+      30
+    ],
+    "ph": [
+      6.2,
+      7.4
+    ],
+    "ph_hard": [
+      5.5,
+      8
+    ],
+    "temp": [
+      26,
+      32
+    ],
+    "humidity": [
+      80,
+      92
+    ],
+    "rain": [
+      35,
+      65
+    ],
+    "water_req": "Low",
+    "trend": "up",
+    "mandi_price": 8200,
+    "yield_min": 4,
+    "yield_max": 6,
+    "yield_unit": "Quintals",
+    "name_en": "🌱 Mung Bean (Moong Dal)",
+    "name_hi": "🌱 मूंग दाल"
+  },
+  "blackgram": {
+    "N": [
+      30,
+      65
+    ],
+    "P": [
+      55,
+      85
+    ],
+    "K": [
+      15,
+      30
+    ],
+    "ph": [
+      6.5,
+      7.8
+    ],
+    "ph_hard": [
+      5.8,
+      8.2
+    ],
+    "temp": [
+      25,
+      36
+    ],
+    "humidity": [
+      60,
+      75
+    ],
+    "rain": [
+      60,
+      80
+    ],
+    "water_req": "Low",
+    "trend": "up",
+    "mandi_price": 7600,
+    "yield_min": 4,
+    "yield_max": 7,
+    "yield_unit": "Quintals",
+    "name_en": "🌾 Black Gram (Urad Dal)",
+    "name_hi": "🌾 उड़द दाल"
+  },
+  "lentil": {
+    "N": [
+      10,
+      40
+    ],
+    "P": [
+      55,
+      85
+    ],
+    "K": [
+      15,
+      30
+    ],
+    "ph": [
+      6,
+      7.8
+    ],
+    "ph_hard": [
+      5.5,
+      8.2
+    ],
+    "temp": [
+      16,
+      28
+    ],
+    "humidity": [
+      55,
+      72
+    ],
+    "rain": [
+      35,
+      60
+    ],
+    "water_req": "Low",
+    "trend": "stable",
+    "mandi_price": 6600,
+    "yield_min": 5,
+    "yield_max": 8,
+    "yield_unit": "Quintals",
+    "name_en": "🍲 Lentil (Masoor Dal)",
+    "name_hi": "🍲 मसूर दाल"
+  },
+  "watermelon": {
+    "N": [
+      80,
+      125
+    ],
+    "P": [
+      5,
+      30
+    ],
+    "K": [
+      45,
+      60
+    ],
+    "ph": [
+      6,
+      7.2
+    ],
+    "ph_hard": [
+      5.5,
+      7.8
+    ],
+    "temp": [
+      24,
+      29
+    ],
+    "humidity": [
+      80,
+      92
+    ],
+    "rain": [
+      40,
+      65
+    ],
+    "water_req": "Medium",
+    "trend": "up",
+    "mandi_price": 1200,
+    "yield_min": 15,
+    "yield_max": 22,
+    "yield_unit": "Tonnes",
+    "name_en": "🍉 Watermelon (Tarbooj)",
+    "name_hi": "🍉 तरबूज"
+  },
+  "muskmelon": {
+    "N": [
+      80,
+      125
+    ],
+    "P": [
+      5,
+      30
+    ],
+    "K": [
+      45,
+      60
+    ],
+    "ph": [
+      6,
+      7
+    ],
+    "ph_hard": [
+      5.5,
+      7.5
+    ],
+    "temp": [
+      26,
+      32
+    ],
+    "humidity": [
+      88,
+      96
+    ],
+    "rain": [
+      20,
+      35
+    ],
+    "water_req": "Medium",
+    "trend": "up",
+    "mandi_price": 1600,
+    "yield_min": 8,
+    "yield_max": 12,
+    "yield_unit": "Tonnes",
+    "name_en": "🍈 Muskmelon (Kharbooza)",
+    "name_hi": "🍈 खरबूजा"
+  },
+  "papaya": {
+    "N": [
+      30,
+      75
+    ],
+    "P": [
+      45,
+      75
+    ],
+    "K": [
+      45,
+      60
+    ],
+    "ph": [
+      6.2,
+      7.2
+    ],
+    "ph_hard": [
+      5.8,
+      7.8
+    ],
+    "temp": [
+      23,
+      40
+    ],
+    "humidity": [
+      88,
+      98
+    ],
+    "rain": [
+      40,
+      240
+    ],
+    "water_req": "Medium",
+    "trend": "stable",
+    "mandi_price": 1400,
+    "yield_min": 25,
+    "yield_max": 40,
+    "yield_unit": "Tonnes",
+    "name_en": "🍈 Papaya (Papita)",
+    "name_hi": "🍈 पपीता"
+  },
+  "orange": {
+    "N": [
+      10,
+      45
+    ],
+    "P": [
+      5,
+      30
+    ],
+    "K": [
+      5,
+      20
+    ],
+    "ph": [
+      6,
+      8
+    ],
+    "ph_hard": [
+      5.5,
+      8.5
+    ],
+    "temp": [
+      10,
+      35
+    ],
+    "humidity": [
+      88,
+      98
+    ],
+    "rain": [
+      95,
+      125
+    ],
+    "water_req": "Medium",
+    "trend": "up",
+    "mandi_price": 3800,
+    "yield_min": 6,
+    "yield_max": 10,
+    "yield_unit": "Tonnes",
+    "name_en": "🍊 Orange / Nagpur Santra",
+    "name_hi": "🍊 संतरा"
+  },
+  "mango": {
+    "N": [
+      10,
+      45
+    ],
+    "P": [
+      15,
+      40
+    ],
+    "K": [
+      25,
+      40
+    ],
+    "ph": [
+      4.8,
+      7.2
+    ],
+    "ph_hard": [
+      4.5,
+      7.8
+    ],
+    "temp": [
+      26,
+      38
+    ],
+    "humidity": [
+      45,
+      60
+    ],
+    "rain": [
+      80,
+      110
+    ],
+    "water_req": "Low",
+    "trend": "up",
+    "mandi_price": 5200,
+    "yield_min": 5,
+    "yield_max": 8,
+    "yield_unit": "Tonnes",
+    "name_en": "🥭 Mango (Aam)",
+    "name_hi": "🥭 आम"
+  }
+}

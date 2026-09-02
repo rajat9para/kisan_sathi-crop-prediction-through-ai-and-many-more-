@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Query
 from app.services.external_apis import fetch_weather_data
+from app.services.disease_risk import compute_disease_risks
 
 router = APIRouter(prefix="/api", tags=["Weather Forecast"])
 
@@ -9,10 +10,11 @@ async def get_weather_forecast(
     lon: float = Query(73.7898, description="Longitude coordinate")
 ):
     """
-    Fetches real 7-day weather forecast, rainfall probability, and agro-spray conditions from Open-Meteo API.
+    Fetches real 7-day weather forecast, rainfall probability, agro-spray conditions,
+    AND weather-driven disease-risk early warnings, all from the live Open-Meteo feed.
     """
     data = fetch_weather_data(lat, lon)
-    
+
     alerts = []
     if data.get("rainfall_7d_total_mm", 0) > 80:
         alerts.append({
@@ -35,5 +37,6 @@ async def get_weather_forecast(
         "latitude": lat,
         "longitude": lon,
         **data,
-        "alerts": alerts
+        "alerts": alerts,
+        "disease_risk_early_warning": compute_disease_risks(data)
     }

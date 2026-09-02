@@ -11,6 +11,30 @@
  */
 
 // =========================================================================
+// 0. BACKEND API BASE — configure where the FastAPI engine lives
+// =========================================================================
+// Leave "" (default) when the frontend is served BY the FastAPI backend
+// (local `python backend/run.py` or Render single-service deployment).
+// When the frontend is hosted on Vercel and the backend on Render/Railway,
+// set the full backend origin here, e.g. "https://kisaan-sathi-api.onrender.com".
+// Priority: inline <script> override > URL ?api= param > this constant.
+window.KISAAN_API_BASE = window.KISAAN_API_BASE || "";
+if (!window.KISAAN_API_BASE) {
+  try {
+    const urlApi = new URLSearchParams(location.search).get("api");
+    if (urlApi) {
+      window.KISAAN_API_BASE = urlApi.replace(/\/+$/, "");
+      localStorage.setItem("kisaan_api_base", window.KISAAN_API_BASE);
+    } else if (location.hostname.endsWith("vercel.app")) {
+      const stored = localStorage.getItem("kisaan_api_base");
+      if (stored) window.KISAAN_API_BASE = stored;
+    }
+  } catch (e) { /* no-op */ }
+}
+const API_BASE = window.KISAAN_API_BASE;
+
+
+// =========================================================================
 // 1. ALL 22 INDIAN BENCHMARK CROPS AGRONOMIC ML KNOWLEDGE BASE
 // =========================================================================
 const CROP_DATABASE = [
@@ -1618,7 +1642,7 @@ async function loadLiveRegionalData(lat, lon) {
 
   // 1. LIVE WEATHER (Open-Meteo satellite feed for these exact coordinates)
   try {
-    const res = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
+    const res = await fetch(`${API_BASE}/api/weather?lat=${lat}&lon=${lon}`);
     if (res.ok) {
       liveWeatherData = await res.json();
       renderLiveWeatherCard(liveWeatherData, isEn);
@@ -1628,7 +1652,7 @@ async function loadLiveRegionalData(lat, lon) {
 
   // 2. LIVE MANDI PRICES (Agmarknet APMC radar for the detected district)
   try {
-    const res = await fetch(`/api/market-prices?state=${encodeURIComponent(state)}&district=${encodeURIComponent(district)}&lat=${lat}&lon=${lon}`);
+    const res = await fetch(`${API_BASE}/api/market-prices?state=${encodeURIComponent(state)}&district=${encodeURIComponent(district)}&lat=${lat}&lon=${lon}`);
     if (res.ok) {
       liveMandiData = await res.json();
       renderWeatherAndMandiTables(hub, isEn); // refresh mandi table with live rows
@@ -1637,7 +1661,7 @@ async function loadLiveRegionalData(lat, lon) {
 
   // 3. LIVE SOIL (ISRIC SoilGrids for these exact coordinates)
   try {
-    const res = await fetch(`/api/soil?lat=${lat}&lon=${lon}`);
+    const res = await fetch(`${API_BASE}/api/soil?lat=${lat}&lon=${lon}`);
     if (res.ok) {
       const soil = await res.json();
       if (soil && soil.source && soil.source.includes("SoilGrids")) {
@@ -2053,7 +2077,7 @@ function setupRecommendForm() {
         }
       };
 
-      const res = await fetch("/api/recommend", {
+      const res = await fetch(`${API_BASE}/api/recommend`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -2245,7 +2269,7 @@ async function runRealLeafScanInference() {
   // Query Backend Diagnostic API
   let diagnosisData = null;
   try {
-    const res = await fetch("/api/doctor/diagnose", {
+    const res = await fetch(`${API_BASE}/api/doctor/diagnose`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -2268,7 +2292,7 @@ async function runRealLeafScanInference() {
     if (laserLine) laserLine.style.display = "none";
     if (scanVisualizer) scanVisualizer.classList.add("scan-complete");
     if (statusBadge) {
-      const conf = diagnosisData ? `${diagnosisData.confidence_pct}%` : "96.4%";
+      const conf = diagnosisData && diagnosisData.confidence_pct != null ? `${diagnosisData.confidence_pct}%` : (isEn ? "symptom-based" : "लक्षण आधारित");
       statusBadge.innerHTML = `<span class="status-dot"></span> <span>${isEn ? `✓ Diagnosis Complete (${conf})` : `✓ निदान पूर्ण हुआ (${conf} सटीकता)`}</span>`;
     }
 
@@ -2293,7 +2317,13 @@ function renderDiagnosisResults(data) {
   if (data) {
     if (cropBadge) cropBadge.textContent = isEn ? data.crop_name_en : data.crop_name_hi;
     if (nameEl) nameEl.textContent = isEn ? data.disease_name_en : data.disease_name_hi;
-    if (confEl) confEl.textContent = isEn ? `${data.confidence_pct}% Reliability` : `${data.confidence_pct}% विश्वसनीयता`;
+    if (confEl) {
+      if (data.confidence_pct != null) {
+        confEl.textContent = isEn ? `${data.confidence_pct}% Reliability` : `${data.confidence_pct}% विश्वसनीयता`;
+      } else {
+        confEl.textContent = isEn ? "ICAR symptom-based guidance" : "ICAR लक्षण-आधारित सलाह";
+      }
+    }
     if (timingEl) timingEl.textContent = isEn ? data.spray_timing_advice_en : data.spray_timing_advice_hi;
     if (organicEl) organicEl.textContent = isEn ? data.organic_remedy_en : data.organic_remedy_hi;
     if (chemEl) chemEl.textContent = isEn ? data.chemical_remedy_en : data.chemical_remedy_hi;
@@ -2324,7 +2354,7 @@ function renderDiagnosisResults(data) {
     
     if (cropBadge) cropBadge.textContent = isEn ? fb.en : fb.hi;
     if (nameEl) nameEl.textContent = isEn ? fb.disease_en : fb.disease_hi;
-    if (confEl) confEl.textContent = isEn ? "96.8% Reliability" : "९६.८% विश्वसनीयता";
+    if (confEl) confEl.textContent = isEn ? "ICAR symptom-based guidance" : "ICAR लक्षण-आधारित सलाह";
     if (timingEl) timingEl.textContent = isEn ? `Clear weather in ${hub.district_en}. Spray early morning (6-8 AM) with sticker.` : `${hub.district_hi} में मौसम अनुकूल है। सुबह 6 से 8 बजे स्टिकर मिलाकर ही छिड़काव करें।`;
     if (organicEl) organicEl.textContent = isEn ? fb.organic_en : fb.organic_hi;
     if (chemEl) chemEl.textContent = isEn ? fb.chem_en : fb.chem_hi;
@@ -2719,7 +2749,7 @@ async function sendVoiceQuery(query) {
   const timeoutId = setTimeout(() => controller.abort(), 15000);
 
   try {
-    const res = await fetch("/api/voice/query", {
+    const res = await fetch(`${API_BASE}/api/voice/query`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       signal: controller.signal,

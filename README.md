@@ -4,7 +4,12 @@
 
 # 🌾 Kisaan_Sathi (किसान साथी)
 ### National Digital Agriculture, Soil Health & Precision Farm Advisory AI Platform
-**Smart India Hackathon 2026 • 18 Agro-Ecological Hubs • 11 Indian Languages • XGBoost (98.6% CV Accuracy) + SHAP TreeExplainer • PyTorch MobileNetV2 Leaf Pathology • Dynamic Sustainability Scoring • Soil Health Card OCR • IoT & Sentinel-2 NDVI • Groq Multilingual LLM • 100% On-Device Offline Inference**
+**Smart India Hackathon 2026 • 18 Agro-Ecological Hubs • 11 Indian Languages • XGBoost (98.6% CV) + SHAP • MobileNetV2 Fine-Tuned on PlantVillage (95.9% val acc) • Live Agmarknet Mandi Prices (data.gov.in) • Sentinel-2 NDVI (Copernicus CDSE) • Weather-Driven Disease-Risk Early Warning • Dynamic Sustainability Scoring • Soil Health Card OCR • IoT Telemetry • Groq Multilingual LLM • 100% On-Device Offline Inference**
+
+> **📖 Data honesty**: every API response carries an explicit `source` field.
+> Real feeds (SoilGrids, Open-Meteo, Agmarknet, Sentinel-2) are used live;
+> graceful fallbacks are always explicitly labelled. See
+> [DATA_PROVENANCE.md](docs/DATA_PROVENANCE.md).
 
 [![Web App](https://img.shields.io/badge/Web%20App-Live%20Ready-2E7D32.svg?logo=googlechrome)](https://kisaansathicroppredictionaiandmanym.vercel.app/)
 [![FastAPI](https://img.shields.io/badge/Backend-FastAPI%20v0.110-009688.svg?logo=fastapi)](https://fastapi.tiangolo.com)
@@ -13,7 +18,7 @@
 [![PyTorch Vision](https://img.shields.io/badge/Computer%20Vision-PyTorch%20MobileNetV2-EE4C2C.svg?logo=pytorch)](https://pytorch.org)
 [![SHAP](https://img.shields.io/badge/Explainability-SHAP%20TreeExplainer-4CAF50.svg)](https://shap.readthedocs.io)
 [![Groq LLM](https://img.shields.io/badge/Voice%20AI-Groq%20LLM%20Multilingual-F55036.svg)](https://groq.com)
-[![CI Tests](https://img.shields.io/badge/Automated%20Tests-12%2F12%20Passing%20(100%25)-16A34A.svg)](#-8-automated-testing--system-verification)
+[![CI Tests](https://img.shields.io/badge/Automated%20Tests-13%2F13%20Passing%20(100%25)-16A34A.svg)](#-8-automated-testing--system-verification)
 
 </div>
 
@@ -60,9 +65,9 @@ Small and marginal farmers across India face critical challenges in accessing ti
         │               │                │              │              │               │
  ┌──────▼───────┐┌──────▼───────┐┌───────▼──────┐┌──────▼───────┐┌─────▼────────┐┌────▼──────────┐
  │ ML Recommend ││ Plant Doctor ││ Market Radar ││ SHC OCR      ││ Soil/Weather ││ IoT & Sentinel │
- │ XGBoost+SHAP ││ PyTorch      ││ Agmarknet/   ││ OpenCV +     ││ SoilGrids v2 ││ /api/iot/      │
- │ Yield & Sust ││ MobileNetV2  ││ e-NAM Feeds  ││ Text Regex   ││ Open-Meteo + ││ /api/satellite/│
- │ Model        ││ 23 Classes   ││ Daily Trends ││ Parameter Ext││ Moisture Pct ││ NDVI & NDRE    │
+ │ XGBoost+SHAP ││ MobileNetV2  ││ Agmarknet via││ OpenCV +     ││ SoilGrids v2 ││ /api/iot/      │
+ │ Yield & Sust ││ PlantVillage ││ data.gov.in  ││ Text Regex   ││ Open-Meteo + ││ /api/satellite/│
+ │ Model        ││ 7 CV Classes ││ 3-Tier Feeds ││ Parameter Ext││ Moisture Pct ││ NDVI (CDSE)    │
  └──────┬───────┘└──────┬───────┘└───────┬──────┘└──────┬───────┘└─────┬────────┘└────┬───────────┘
         │               │                │              │              │              │
         └───────────────┴────────────────┴──────┬───────┴──────────────┴──────────────┘
@@ -83,13 +88,17 @@ Small and marginal farmers across India face critical challenges in accessing ti
 | **Crop Recommendation** | XGBoost Multi-Class Classifier | **98.64%** 5-Fold Cross-Validation (±0.25%) | 2,200 verified Kaggle/ICAR vectors | ✅ Verified & Exported |
 | **Held-Out Test Set** | XGBoost (80/20 Split) | **99.09%** Accuracy, **99.12%** Precision | 440 held-out test vectors | ✅ Verified |
 | **Explainable AI** | SHAP `TreeExplainer` | Local Shapley force vectors for 7 features | Real-time per prediction | ✅ Operational |
-| **Leaf Pathology** | PyTorch `MobileNetV2` (23 Classes) | Softmax class probabilities + validation | Real/synthetic leaf images | ✅ Operational |
+| **Leaf Pathology (CV)** | PyTorch `MobileNetV2` fine-tuned on PlantVillage | **95.87%** val accuracy, **0.959** macro-F1, per-class F1 0.92–0.99 | 630 held-out real leaf images (7 classes) | ✅ Trained & Exported |
+| **Disease Triage Integrity** | Capability-gated hybrid | CV confidence = raw softmax (never floored); non-CV crops honestly labelled "symptom_guidelines" | All 23 pathologies | ✅ Honest by design |
+| **Disease-Risk Early Warning** | ICAR epidemiological thresholds on live Open-Meteo forecast | Quantitative risk index (0–100) per disease | Wheat rust, Rice blast, Late blight, Grape downy mildew | ✅ Operational |
+| **Live Mandi Prices** | Agmarknet via data.gov.in API | Median modal price across matching APMC markets + Supabase 7-day trend snapshots | Real feed → cached snapshot → labelled estimate | ✅ Real, 3-tier |
+| **Live NDVI** | Copernicus Sentinel-2 L2A (CDSE Statistical API) | 60-day parcel NDVI statistics, ≤20% cloud, 5-day means | Real satellite → explicitly-labelled estimate | ✅ Real, 2-tier |
 | **Dynamic Economics** | Agronomic Economic Engine | Expected Yield, Cost, Net Profit (₹/Acre) | Dynamic per soil/weather fit | ✅ Operational |
 | **Sustainability Score**| 4-Pillar Quantitative Index | Water (35%), Soil (35%), Chem (20%), C (10%) | 0 to 100 composite score | ✅ Operational |
 | **Soil Card OCR** | OpenCV + Text Extraction Parser | N, P, K, pH, OC parameter extraction | Physical/digital soil cards | ✅ Operational |
 | **Offline Inference** | Pure Dart On-Device ML Engine | Instant recommendation in Airplane Mode | On-device Flutter runtime | ✅ Operational |
 
-Detailed documentation: [Model Card (`docs/MODEL_CARD.md`)](file:///c:/SmartIndiaHackathon/docs/MODEL_CARD.md) • [Data Provenance (`docs/DATA_PROVENANCE.md`)](file:///c:/SmartIndiaHackathon/docs/DATA_PROVENANCE.md).
+Detailed documentation: [Model Card (`docs/MODEL_CARD.md`)](docs/MODEL_CARD.md) • [Data Provenance (`docs/DATA_PROVENANCE.md`)](docs/DATA_PROVENANCE.md) • [Deployment Guide (`DEPLOYMENT.md`)](DEPLOYMENT.md).
 
 ---
 
@@ -174,7 +183,7 @@ Visit **`http://localhost:8000`** in your browser for the PWA or **`http://local
 
 ## 🧪 8. Automated Testing & System Verification
 
-Run the comprehensive 12-stage system verification suite:
+Run the comprehensive 13-stage system verification suite:
 ```bash
 python backend/tests/test_services.py
 ```
@@ -188,18 +197,21 @@ RUNNING AGRISAATHI COMPLETE SYSTEM VERIFICATION SUITE
 [PASS] 2. Dynamic Yield, Cost & Net Profit Forecasting
 [PASS] 3. Quantitative 4-Pillar Sustainability Scoring
 [PASS] 4. Crop-Specific Agronomic Schedules
-[PASS] 5. PyTorch MobileNetV2 Leaf Pathology Inference
+[PASS] 5. PyTorch MobileNetV2 Leaf Pathology Inference (PlantVillage-trained)
+[PASS] 5b. Honest Symptom Triage for Non-CV Crops
 [PASS] 6. Input Validation (Blank Image Rejection)
-[PASS] 7. Agmarknet APMC Mandi Price Generator
+[PASS] 7. Agmarknet Mandi Price Feed (3-tier: live → cache → labelled estimate)
 [PASS] 8. Soil Health Card OCR Parameter Parser
-[PASS] 9. IoT Telemetry Ingestion Node
-[PASS] 10. Sentinel-2 Satellite NDVI Earth Observation
+[PASS] 9. IoT Telemetry Ingestion Node (Supabase-persisted)
+[PASS] 10. Sentinel-2 Satellite NDVI Earth Observation (CDSE / labelled estimate)
 [PASS] 11. FastAPI /api/recommend Endpoint
 [PASS] 12. USSD / SMS Regional Advisory Gateway
 ================================================================================
-RESULTS: 12/12 TESTS PASSED (100.0%)
+RESULTS: 13/13 TESTS PASSED (100.0%)
 ================================================================================
 ```
+
+Deployment (Render backend + Vercel static frontend): see [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ---
 

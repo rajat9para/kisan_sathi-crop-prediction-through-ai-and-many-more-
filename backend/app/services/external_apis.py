@@ -184,6 +184,207 @@ def fetch_weather_data(lat: float, lon: float) -> Dict[str, Any]:
     res["soil_moisture_pct"] = 30.0
     return res
 
+def _parse_price(value) -> Optional[float]:
+    """Safely parses price strings like '2,450' or '2450.0' from data.gov.in."""
+    try:
+        if value is None:
+            return None
+        s = str(value).replace(",", "").strip()
+        f = float(s)
+        return f if f > 0 else None
+    except (ValueError, TypeError):
+        return None
+
+
+# data.gov.in commodity spellings -> Kisaan_Sathi canonical commodity names
+_COMMODITY_ALIASES = [
+    (("wheat", "gehun"), "Wheat"),
+    (("paddy", "dhan", "rice"), "Paddy (Rice)"),
+    (("maize", "corn", "makka"), "Maize"),
+    (("cotton", "kapas"), "Cotton"),
+    (("soybean",), "Soybean"),
+    (("grape", "angur"), "Grapes"),
+    (("pomegranate", "anar", "dadam"), "Pomegranate"),
+    (("gram", "chickpea", "chana"), "Gram (Chickpea)"),
+    (("onion", "pyaz", "kanda"), "Onion"),
+    (("tomato", "tamatar"), "Tomato"),
+    (("banana", "kela"), "Banana"),
+    (("chilli", "mirch"), "Chilli"),
+    (("mustard", "sarson", "rai"), "Mustard"),
+    (("groundnut", "moongphali"), "Groundnut"),
+    (("sugarcane", "ganna"), "Sugarcane"),
+]
+
+
+def _match_commodity(raw_name: str) -> Optional[str]:
+    n = (raw_name or "").lower()
+    for keys, canonical in _COMMODITY_ALIASES:
+        if any(k in n for k in keys):
+            return canonical
+    return None
+
+def _fetch_datagov_mandi(state: str, district: Optional[str]) -> Optional[List[Dict[str, Any]]]:
+    """
+    Fetches REAL daily mandi prices from the official Agmarknet resource on data.gov.in.
+    Returns canonical commodity rows (median modal price across matching markets) or None.
+    """
+    if not config.DATA_GOV_API_KEY:
+        return None
+
+    base = f"https://api.data.gov.in/resource/{config.DATA_GOV_MANDI_RESOURCE}"
+    # District-filtered first (most precise), then state-wide
+    attempts = []
+    if district:
+        attempts.append({"filters[state]": state, "filters[district]": district, "limit": 300})
+    attempts.append({"filters[state]": state, "limit": 500})
+
+    for params in attempts:
+        try:
+            query = {"api-key": config.DATA_GOV_API_KEY, "format": "json", **params}
+            resp = requests.get(base, params=query, timeout=config.REQUEST_TIMEOUT + 4)
+            if resp.status_code != 200:
+                continue
+            records = resp.json().get("records") or []
+            if not records:
+                continue
+
+            grouped: Dict[str, List[float]] = {}
+            meta: Dict[str, Dict[str, Any]] = {}
+            for r in records:
+                canonical = _match_commodity(str(r.get("commodity", "")))
+                if not canonical:
+                    continue
+                modal = _parse_price(r.get("modal_price"))
+                if modal is None:
+                    continue
+                grouped.setdefault(canonical, []).append(modal)
+                meta.setdefault(canonical, r)
+
+            results = []
+            for canonical, prices in grouped.items():
+                prices.sort()
+                median_modal = prices[len(prices) // 2]
+                ref = meta[canonical]
+                info = COMMODITY_MANDI_BASE.get(canonical, {"variety": "Common", "hi": canonical})
+                results.append({
+                    "commodity": canonical,
+                    "commodity_hi": info.get("hi", canonical),
+                    "variety": str(ref.get("variety", "")) or info.get("variety", "Common"),
+                    "market_name": f"{ref.get('market', 'APMC Mandi')}, {ref.get('district', district or state)}",
+                    "state": str(ref.get("state", state)),
+                    "district": str(ref.get("district", district or "")),
+                    "modal_price_rs_quintal": float(median_modal),
+                    "min_price_rs_quintal": float(_parse_price(ref.get("min_price")) or median_modal * 0.90),
+                    "max_price_rs_quintal": float(_parse_price(ref.get("max_price")) or median_modal * 1.12),
+                    "arrival_date": str(ref.get("arrival_date", "")),
+                    "sample_markets": len(prices),
+                    "source": "Agmarknet Live (data.gov.in)"
+                })
+            if results:
+                results.sort(key=lambda r: -r["modal_price_rs_quintal"])
+                return results
+        except Exception as e:
+            print(f"[!] data.gov.in mandi fetch error: {e}")
+            continue
+    return None
+
+def _persist_and_trend(rows: List[Dict[str, Any]], state: str, district: Optional[str]) -> List[Dict[str, Any]]:
+    """
+    Persists today's REAL snapshot to Supabase (mandi_price_history) and computes a
+    7-day trend from accumulated history. If the DB is unavailable or history is
+    sparse, trends are honestly marked as insufficient ('stable' with 0%).
+    """
+    try:
+        from app.services.supabase_client import supabase_service
+    except Exception:
+        supabase_service = None
+
+    for row in rows:
+        trend_pct = 0.0
+        data_points = 0
+        if supabase_service and supabase_service.client:
+            try:
+                supabase_service.client.table("mandi_price_history").upsert({
+                    "commodity": row["commodity"],
+                    "state": state,
+                    "district": district or "",
+                    "arrival_date": row.get("arrival_date") or datetime.now().strftime("%Y-%m-%d"),
+                    "modal_price_rs_quintal": row["modal_price_rs_quintal"],
+                    "min_price_rs_quintal": row["min_price_rs_quintal"],
+                    "max_price_rs_quintal": row["max_price_rs_quintal"],
+                    "market_name": row.get("market_name", "")
+                }, on_conflict="commodity,state,district,arrival_date").execute()
+
+                week_ago = (datetime.now() - timedelta(days=7)).strftime("%Y-%m-%d")
+                hist = supabase_service.client.table("mandi_price_history").select(
+                    "modal_price_rs_quintal, arrival_date"
+                ).eq("commodity", row["commodity"]).eq("state", state).lt(
+                    "arrival_date", week_ago
+                ).order("arrival_date", desc=True).limit(1).execute()
+
+                old = (hist.data or [{}])[0].get("modal_price_rs_quintal")
+                if old:
+                    base_price = float(old)
+                    if base_price > 0:
+                        trend_pct = round((row["modal_price_rs_quintal"] - base_price) / base_price * 100.0, 1)
+                        data_points = 2
+            except Exception:
+                pass
+
+        row["trend_pct_7d"] = trend_pct
+        row["trend_direction"] = "up" if trend_pct > 0.5 else ("down" if trend_pct < -0.5 else "stable")
+        row["trend_data_points"] = data_points
+        if data_points < 2:
+            row["trend_note"] = "accumulating daily history; trend available after 7+ days of snapshots"
+
+    return rows
+
+def _estimated_fallback_mandi(state: str, district: Optional[str]) -> List[Dict[str, Any]]:
+    """
+    LAST-RESORT deterministic estimates, ONLY used when the real Agmarknet feed and
+    the Supabase cache are both unavailable. Rows are explicitly labelled
+    'estimated_fallback' so the UI never presents them as verified live rates.
+    """
+    today_str = datetime.now().strftime("%Y-%m-%d")
+    state_str = state or "Maharashtra"
+    dist_str = district or "Nashik"
+    market_name = f"{dist_str} APMC (estimated)"
+    day_of_year = datetime.now().timetuple().tm_yday
+
+    target = list(COMMODITY_MANDI_BASE.keys())
+    if "punjab" in state_str.lower():
+        target = ["Wheat", "Paddy (Rice)", "Maize", "Cotton"]
+    elif "andhra" in state_str.lower():
+        target = ["Chilli", "Cotton", "Paddy (Rice)", "Maize"]
+    elif "madhya" in state_str.lower():
+        target = ["Soybean", "Wheat", "Gram (Chickpea)", "Maize"]
+
+    results = []
+    for idx, comm in enumerate(target):
+        info = COMMODITY_MANDI_BASE.get(comm, {"variety": "Common", "base_price": 4000.0, "hi": comm})
+        base = info["base_price"]
+        seed_offset = ((day_of_year * 7 + idx * 13) % 17) - 8
+        modal_price = round(base * (1.0 + seed_offset / 200.0), -1)
+        trend_pct = round(seed_offset / 2.0, 1)
+        results.append({
+            "commodity": comm,
+            "commodity_hi": info.get("hi", comm),
+            "variety": info.get("variety", "Common"),
+            "market_name": market_name,
+            "state": state_str,
+            "district": dist_str,
+            "modal_price_rs_quintal": float(modal_price),
+            "min_price_rs_quintal": float(round(modal_price * 0.90, -1)),
+            "max_price_rs_quintal": float(round(modal_price * 1.12, -1)),
+            "trend_pct_7d": float(trend_pct),
+            "trend_direction": "up" if trend_pct > 0.5 else ("down" if trend_pct < -0.5 else "stable"),
+            "arrival_date": today_str,
+            "source": "estimated_fallback",
+            "note": "Live Agmarknet feed unavailable — indicative estimate, NOT a verified mandi rate."
+        })
+    return results
+
+
 def fetch_market_prices(
     state: str,
     district: Optional[str] = None,
@@ -191,54 +392,65 @@ def fetch_market_prices(
     lon: Optional[float] = None
 ) -> List[Dict[str, Any]]:
     """
-    Fetches real Mandi prices from Agmarknet / APMC Mandi network with dynamic daily dates,
-    live modal prices, min/max spreads, and 7-day trend rates.
+    Fetches mandi prices with a transparent 3-tier strategy:
+
+      Tier 1 (primary):  Official Agmarknet daily prices via data.gov.in API,
+                         median modal price across matching APMC markets.
+      Tier 2 (cache):    Latest real snapshot persisted in Supabase.
+      Tier 3 (fallback): Deterministic estimates explicitly labelled
+                         'estimated_fallback' — never presented as live rates.
+
+    Every returned row carries a 'source' field for full data provenance.
     """
-    today_str = datetime.now().strftime("%Y-%m-%d")
     state_str = state or "Maharashtra"
-    dist_str = district or "Nashik"
 
-    market_name = f"{dist_str} APMC Main Mandi"
-    
-    # Generate dynamic, timestamped market quotes for top commodities in the region
-    results = []
-    
-    # Use deterministic daily hash based on day-of-year so prices update daily
-    day_of_year = datetime.now().timetuple().tm_yday
-    
-    target_commodities = ["Grapes", "Pomegranate", "Cotton", "Soybean", "Wheat", "Maize", "Gram (Chickpea)", "Onion", "Tomato"]
-    if "punjab" in state_str.lower():
-        target_commodities = ["Wheat", "Paddy (Rice)", "Maize", "Cotton"]
-    elif "andhra" in state_str.lower():
-        target_commodities = ["Chilli", "Cotton", "Paddy (Rice)", "Maize"]
-    elif "madhya" in state_str.lower():
-        target_commodities = ["Soybean", "Wheat", "Gram (Chickpea)", "Maize"]
+    # Tier 1: real Agmarknet feed
+    rows = _fetch_datagov_mandi(state_str, district)
+    if rows:
+        rows = _persist_and_trend(rows, state_str, district)
+        return rows
 
-    for idx, comm in enumerate(target_commodities):
-        info = COMMODITY_MANDI_BASE.get(comm, {"variety": "Common", "base_price": 4000.0, "hi": comm})
-        base = info["base_price"]
-        
-        # Fluctuation (+/- 4%) based on day of year + commodity index
-        seed_offset = ((day_of_year * 7 + idx * 13) % 17) - 8 # -8 to +8
-        modal_price = round(base * (1.0 + seed_offset / 200.0), -1)
-        min_price = round(modal_price * 0.90, -1)
-        max_price = round(modal_price * 1.12, -1)
-        
-        trend_pct = round((seed_offset / 2.0), 1)
-        trend_dir = "up" if trend_pct > 0.5 else ("down" if trend_pct < -0.5 else "stable")
+    # Tier 2: latest real cached snapshot from Supabase
+    try:
+        from app.services.supabase_client import supabase_service
+        if supabase_service and supabase_service.client:
+            query = supabase_service.client.table("mandi_price_history").select(
+                "*"
+            ).eq("state", state_str).order("arrival_date", desc=True).limit(60)
+            if district:
+                query = query.eq("district", district)
+            cached = query.execute().data or []
+            if cached:
+                latest_date = cached[0].get("arrival_date", "")
+                rows = []
+                for r in cached:
+                    if r.get("arrival_date") != latest_date:
+                        continue
+                    info = COMMODITY_MANDI_BASE.get(r.get("commodity"), {"hi": r.get("commodity"), "variety": "Common"})
+                    rows.append({
+                        "commodity": r.get("commodity"),
+                        "commodity_hi": info.get("hi", r.get("commodity")),
+                        "variety": info.get("variety", "Common"),
+                        "market_name": r.get("market_name", ""),
+                        "state": r.get("state", state_str),
+                        "district": r.get("district", district or ""),
+                        "modal_price_rs_quintal": float(r.get("modal_price_rs_quintal", 0)),
+                        "min_price_rs_quintal": float(r.get("min_price_rs_quintal", 0)),
+                        "max_price_rs_quintal": float(r.get("max_price_rs_quintal", 0)),
+                        "trend_pct_7d": 0.0,
+                        "trend_direction": "stable",
+                        "arrival_date": latest_date,
+                        "source": "Agmarknet cached snapshot (Supabase)"
+                    })
+                if rows:
+                    print(f"[+] Using {len(rows)} cached real mandi rows from Supabase (date: {latest_date}).")
+                    return rows
+    except Exception as cache_err:
+        print(f"[!] Supabase mandi cache read failed: {cache_err}")
 
-        results.append({
-            "commodity": comm,
-            "commodity_hi": info["hi"],
-            "variety": info["variety"],
-            "market_name": market_name,
-            "state": state_str,
-            "modal_price_rs_quintal": float(modal_price),
-            "min_price_rs_quintal": float(min_price),
-            "max_price_rs_quintal": float(max_price),
-            "trend_pct_7d": float(trend_pct),
-            "trend_direction": trend_dir,
-            "arrival_date": today_str
-        })
+    # Tier 3: clearly-labelled estimates
+    print("[!] Real mandi feed unavailable — returning clearly-labelled estimates.")
+    return _estimated_fallback_mandi(state_str, district)
 
-    return results
+
+

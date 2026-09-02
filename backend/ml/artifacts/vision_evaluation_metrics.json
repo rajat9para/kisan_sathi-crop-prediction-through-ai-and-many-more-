@@ -1,0 +1,157 @@
+{
+  "model": "MobileNetV2 (ImageNet-pretrained frozen backbone + fine-tuned classification head)",
+  "dataset": "PlantVillage (spMohanty/PlantVillage-Dataset, CC-BY-SA) \u2014 verified public leaf imagery",
+  "trained_classes": [
+    "apple_scab",
+    "grape_black_rot",
+    "healthy_leaf",
+    "potato_early_blight",
+    "potato_late_blight",
+    "tomato_early_blight",
+    "tomato_late_blight"
+  ],
+  "classes_without_cv_data": [
+    "wheat_yellow_rust",
+    "wheat_brown_rust",
+    "wheat_leaf_blight",
+    "wheat_powdery_mildew",
+    "rice_blast",
+    "rice_bacterial_blight",
+    "rice_sheath_blight",
+    "tomato_leaf_curl",
+    "cotton_bacterial_blight",
+    "cotton_grey_mildew",
+    "chilli_leaf_curl",
+    "chilli_anthracnose",
+    "mustard_white_rust",
+    "sugarcane_red_rot",
+    "soybean_yellow_mosaic",
+    "chickpea_ascochyta"
+  ],
+  "note_on_untrained_classes": "Crops without verified public leaf-pathology datasets are served by the ICAR/TNAU/PAU symptom-based knowledge base at runtime and are explicitly labelled as such in API responses.",
+  "train_images": 3570,
+  "val_images": 630,
+  "image_size": 160,
+  "epochs": 8,
+  "val_accuracy": 0.9587,
+  "val_macro_f1": 0.9588,
+  "val_weighted_f1": 0.9588,
+  "per_class_metrics": {
+    "apple_scab": {
+      "precision": 0.9888,
+      "recall": 0.9778,
+      "f1_score": 0.9832,
+      "support": 90
+    },
+    "grape_black_rot": {
+      "precision": 1.0,
+      "recall": 0.9889,
+      "f1_score": 0.9944,
+      "support": 90
+    },
+    "healthy_leaf": {
+      "precision": 0.967,
+      "recall": 0.9778,
+      "f1_score": 0.9724,
+      "support": 90
+    },
+    "potato_early_blight": {
+      "precision": 0.9884,
+      "recall": 0.9444,
+      "f1_score": 0.9659,
+      "support": 90
+    },
+    "potato_late_blight": {
+      "precision": 0.9072,
+      "recall": 0.9778,
+      "f1_score": 0.9412,
+      "support": 90
+    },
+    "tomato_early_blight": {
+      "precision": 0.8969,
+      "recall": 0.9667,
+      "f1_score": 0.9305,
+      "support": 90
+    },
+    "tomato_late_blight": {
+      "precision": 0.9753,
+      "recall": 0.8778,
+      "f1_score": 0.924,
+      "support": 90
+    }
+  },
+  "confusion_matrix": [
+    [
+      88,
+      0,
+      2,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      89,
+      0,
+      0,
+      0,
+      1,
+      0
+    ],
+    [
+      1,
+      0,
+      88,
+      0,
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      85,
+      5,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      88,
+      0,
+      2
+    ],
+    [
+      0,
+      0,
+      0,
+      1,
+      2,
+      87,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      0,
+      1,
+      9,
+      79
+    ]
+  ],
+  "class_order": [
+    "apple_scab",
+    "grape_black_rot",
+    "healthy_leaf",
+    "potato_early_blight",
+    "potato_late_blight",
+    "tomato_early_blight",
+    "tomato_late_blight"
+  ]
+}

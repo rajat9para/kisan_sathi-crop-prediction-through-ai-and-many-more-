@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: kisaan-sathi-api
+    runtime: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: starter          # free tier "free" has 512MB RAM; torch + SHAP need ~1GB+
+    healthCheckPath: /health
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false        # set in Render dashboard
+      - key: DATA_GOV_API_KEY
+        sync: false
+      - key: CDSE_CLIENT_ID
+        sync: false
+      - key: CDSE_CLIENT_SECRET
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: ALLOWED_ORIGINS
+        value: https://kisaansathicroppredictionaiandmanym.vercel.app

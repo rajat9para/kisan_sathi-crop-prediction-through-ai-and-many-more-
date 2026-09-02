@@ -197,6 +197,8 @@ class IoTReadingResponse(BaseModel):
     phosphorus_kg_ha: float
     potassium_kg_ha: float
     moisture_status: str # "Optimal", "Dry (Irrigation Needed)", "Waterlogged"
+    persisted_to_database: Optional[bool] = None
+    storage: Optional[str] = None
 
 # Satellite NDVI Schemas
 class SatelliteNDVIResponse(BaseModel):
@@ -211,3 +213,8 @@ class SatelliteNDVIResponse(BaseModel):
     canopy_coverage_pct: float
     advisory_recommendation_en: str
     advisory_recommendation_hi: str
+    # Data provenance (honesty contract)
+    data_mode: Optional[str] = None          # "live_sentinel2" | "estimated"
+    source: Optional[str] = None
+    data_note_en: Optional[str] = None
+    data_note_hi: Optional[str] = None

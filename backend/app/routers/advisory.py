@@ -73,13 +73,21 @@ async def get_crop_recommendations(req: RecommendationRequest):
             "rainfall": float(weather.get("rainfall_7d_total_mm", 75.0))
         }
 
+        # 3.5 Live mandi trends (real Agmarknet/APMC data) feed the market pillar
+        try:
+            live_mandi = fetch_market_prices(req.state or "Maharashtra", req.district, req.latitude, req.longitude)
+        except Exception as mkt_err:
+            print(f"[!] Live mandi fetch failed, using profile trends: {mkt_err}")
+            live_mandi = None
+
         # 4. Run ML Inference, SHAP Calculation, Dynamic Economics & Sustainability Re-ranking
         recommendations = ml_engine.recommend_crops(
             features=features,
             previous_crop=req.previous_crop,
             irrigation=req.irrigation_source or "Borewell",
             farm_size_acres=req.farm_size_acres or 2.5,
-            top_k=4
+            top_k=4,
+            market_prices=live_mandi
         )
 
         # Warnings / Actionable alerts
