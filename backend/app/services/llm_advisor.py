@@ -12,6 +12,11 @@ from groq import Groq
 from app.config import config
 
 MULTILINGUAL_KNOWLEDGE_BASE = {
+    "intercropping": {
+        "hi": "सह-फसल (इंटरक्रॉपिंग) से मुनाफ़ा बढ़ता है और मिट्टी की उर्वरकता बनी रहती है। मुख्य फसल के अनुसार ICAR अनुमोदित जोड़े: गन्ना — आलू, प्याज, लहसुन, चना, धनिया, तरबूज (चौड़ी कतार 120-150 सेमी जोड़ी प्रणाली); कपास — चना, प्याज, गेंदा (कीट नियंत्रण हेतु); मक्का — उड़द, मूंग, कद्दू; आम के बगीचे (फल आने से पहले) — अरहर, अदरक, पपीता; सरसों — चना या मसूर। दाली फसलें (चना, मूंग, उड़द) जड़ों में नाइट्रोजन स्थिर करती हैं, जिससे अगली फसल की खाद लागत 20-25% तक घटती है। ध्यान रखें: लम्बी अवधि वाली फसल के साथ छोटी अवधि (90-110 दिन) वाली फसल ही लें और मुख्य फसल की सिंचाई प्रणाली में बाधा न आए।",
+        "en": "Intercropping raises income and maintains soil fertility. ICAR-approved pairs by main crop: Sugarcane — potato, onion, garlic, gram, coriander, watermelon (wide rows, 120-150 cm paired planting); Cotton — gram, onion, marigold (also deters pests); Maize — urad, moong, pumpkin; Mango orchards (pre-bearing) — tur/pigeonpea, ginger, papaya; Mustard — chickpea or lentil. Pulse intercrops (gram, moong, urad) fix nitrogen in roots, cutting the next season's fertilizer cost by 20-25%. Rule: pair a short-duration (90-110 day) crop with the main crop, and never obstruct the main crop's irrigation layout.",
+        "mr": "अंतर्पीक (इंटरक्रॉपिंग) मुळे उत्पन्न वाढते व जमिनीची सुपीकता टिकते. ICAR मान्य जोड्या: ऊस — बटाटा, कांदा, लसूण, हरभरा, कोथिंबीर, टरबूज (रुंद ओळी 120-150 सेमी); कापूस — हरभरा, कांदा, झेंडू; मका — उडीद, मुग, भोपळा; कडधान्ये नत्र स्थिर करतात, खत खर्च 20-25% कमी होतो.",
+    },
     "khet_irrigation_timing": {
         "hi": "खेत में सिंचाई हमेशा सुबह (6 से 9 बजे) या शाम को (5 बजे के बाद) करनी चाहिए। दोपहर की तेज धूप में पानी लगाने से 30-40% पानी वाष्पीकरण में नष्ट हो जाता है और जड़ों पर विपरीत प्रभाव पड़ता है। ड्रिप व स्प्रिंकलर सिंचाई से 40% तक पानी की बचत होती है।",
         "en": "Irrigate fields early in the morning (6:00 to 9:00 AM) or late evening (after 5:00 PM). Avoid irrigating during hot afternoons as 30-40% water is lost to evaporation and causes root shock. Micro-drip irrigation saves 40% water while maximizing yields.",
@@ -198,19 +203,56 @@ MULTILINGUAL_KNOWLEDGE_BASE = {
 
 class LLMAdvisor:
     # Currently working Groq models (verified 2026-09)
-    # Ordered fast-first with reasoning_effort=low so the total latency
-    # always stays under the frontend's 15s timeout budget.
+    # Ordered fast-first; invalid/retired model names simply fail fast and the
+    # loop continues to the next candidate.
     WORKING_MODELS = [
         "openai/gpt-oss-120b",       # Best quality, ~1s with reasoning_effort=low
+        "llama-3.3-70b-versatile",   # Excellent Hindi/multilingual quality
         "openai/gpt-oss-20b",        # Fast, good quality
-        "qwen/qwen3.8-27b",          # Excellent multilingual Hindi/English
-        "qwen/qwen3.6-27b",          # Alternate multilingual
+        "qwen/qwen3-32b",            # Multilingual alternate
     ]
 
-    # Per-model timeout (s). Worst case 3 models = 18s hard cap, but typical
+    # Per-model timeout (s). Worst case 4 models = 18s hard cap, but typical
     # success is < 2s on the first model.
     MODEL_TIMEOUT_S = 6.0
     MAX_TOKENS = 800
+
+    # Native script Unicode ranges per language code — used to VERIFY that the
+    # LLM actually answered in the requested language (models sometimes ignore
+    # language instructions and reply in English).
+    SCRIPT_RANGES = {
+        "hi": ("\u0900", "\u097F"),  # Devanagari
+        "mr": ("\u0900", "\u097F"),  # Devanagari
+        "pa": ("\u0A00", "\u0A7F"),  # Gurmukhi
+        "gu": ("\u0A80", "\u0AFF"),  # Gujarati
+        "bn": ("\u0980", "\u09FF"),  # Bengali
+        "te": ("\u0C00", "\u0C7F"),  # Telugu
+        "ta": ("\u0B80", "\u0BFF"),  # Tamil
+        "kn": ("\u0C80", "\u0CFF"),  # Kannada
+        "ml": ("\u0D00", "\u0D7F"),  # Malayalam
+        "or": ("\u0B00", "\u0B7F"),  # Odia
+    }
+
+    def _language_ok(self, text: str, language: str) -> bool:
+        """
+        Verifies the response is actually written in the requested language's
+        native script (>= 30% native letters). English must be mostly Latin.
+        """
+        text = (text or "").strip()
+        if not text:
+            return False
+        letters = [ch for ch in text if ch.isalpha()]
+        if not letters:
+            return True
+        if language == "en":
+            latin = sum(1 for ch in letters if ("\u0041" <= ch <= "\u007A"))
+            return (latin / len(letters)) >= 0.7
+        rng = self.SCRIPT_RANGES.get(language)
+        if not rng:
+            return True
+        native = sum(1 for ch in letters if rng[0] <= ch <= rng[1])
+        return (native / len(letters)) >= 0.3
+
 
     def __init__(self):
         self.client = None
@@ -260,11 +302,14 @@ class LLMAdvisor:
 
         # Build a comprehensive system prompt that answers ANY farming question intelligently
         system_prompt = (
-            f"You are Kisaan_Sathi (किसान साथी), India's most knowledgeable AI Agricultural Scientist. "
+            f"You are Kisaan_Sathi (किसान साथी), India's most knowledgeable AI Agricultural Scientist, "
+            f"trained on ICAR / State Agricultural University extension guidelines. "
             f"The farmer is located in {location} and may be growing {crop_context}. "
             f"The farmer's question may be in any Indian language, Romanized Hindi (Hinglish), or English. "
             f"\n\nIMPORTANT RULES:\n"
-            f"1. ALWAYS respond in clear, natural {target_lang}.\n"
+            f"1. THE MOST IMPORTANT RULE: Your ENTIRE response MUST be written in {target_lang}, "
+            f"in its native script (Devanagari for Hindi/Marathi, etc.). NEVER mix English sentences "
+            f"into the answer unless the requested language IS English. Numbers and product names may stay in Latin script.\n"
             f"2. Answer the SPECIFIC question the farmer asked — do NOT give generic advice.\n"
             f"3. If they ask about a specific crop (e.g. maize, wheat, rice, cotton, tomato), give advice ONLY for that crop.\n"
             f"4. Include exact dosages (kg/acre or g/L), timings (days after sowing), and product names.\n"
@@ -274,9 +319,45 @@ class LLMAdvisor:
             f"8. If the question is about irrigation, specify exact timing (morning 6-9AM or evening after 5PM) and method.\n"
             f"9. If the question is about crop selection, recommend top 2-3 crops for the region's soil and climate.\n"
             f"10. Never say 'I don't know' — always provide the best agricultural guidance you can.\n"
+            f"11. INTERCROPPING / COMPANION CROPPING questions (growing a second crop alongside the main crop, "
+            f"'के साथ कौन सी फसल') are very common: recommend ICAR-approved intercrop pairs for the main crop "
+            f"with row arrangement and durations. Examples — Sugarcane: potato, onion, garlic, wheat (autumn cane), "
+            f"gram, coriander, watermelon in wide rows (120-150 cm pair planting). Cotton: gram, onion, marigold. "
+            f"Maize: urad, moong, pumpkin. Mango orchards: tur, ginger, papaya (pre-bearing). Mustard: chickpea/lentil. "
+            f"Always mention the legume nitrogen-fixation benefit and avoid mismatched-duration pairs.\n"
+            f"12. FINAL REMINDER: Respond ONLY in {target_lang}. This instruction overrides everything else.\n"
         )
+        # Hard language directive also attached to the user message — models obey
+        # instructions closest to the query far more reliably.
+        user_content = f"[STRICT: Reply ONLY in {target_lang} — native script, no English.]\n\n{query_text}"
+
+        def _send(model_name: str, reinforced: bool):
+            extra_kwargs = {}
+            if model_name.startswith("openai/gpt-oss"):
+                # gpt-oss models spend tokens on hidden reasoning; low effort
+                # keeps the answer fast and leaves budget for real content.
+                extra_kwargs["extra_body"] = {"reasoning_effort": "low"}
+            msg_user = user_content
+            if reinforced:
+                msg_user = (
+                    f"⚠️ LANGUAGE OVERRIDE: Your previous answer was in the WRONG LANGUAGE. "
+                    f"Rewrite the full answer strictly in {target_lang} using its native script. "
+                    f"Do not write a single sentence of English.\n\n{query_text}"
+                )
+            return self.client.chat.completions.create(
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": msg_user}
+                ],
+                model=model_name,
+                temperature=0.3,
+                max_tokens=self.MAX_TOKENS,
+                timeout=self.MODEL_TIMEOUT_S,
+                **extra_kwargs
+            )
 
         last_error = None
+        lang_failed_answer = None
         import time as _time
         deadline = _time.time() + 13.0  # stay within the frontend's 15s abort window
         for model_name in self.WORKING_MODELS:
@@ -292,23 +373,7 @@ class LLMAdvisor:
                 except Exception:
                     pass
 
-                extra_kwargs = {}
-                if model_name.startswith("openai/gpt-oss"):
-                    # gpt-oss models spend tokens on hidden reasoning; low effort
-                    # keeps the answer fast and leaves budget for real content.
-                    extra_kwargs["extra_body"] = {"reasoning_effort": "low"}
-
-                chat_completion = self.client.chat.completions.create(
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": query_text}
-                    ],
-                    model=model_name,
-                    temperature=0.3,
-                    max_tokens=self.MAX_TOKENS,
-                    timeout=self.MODEL_TIMEOUT_S,
-                    **extra_kwargs
-                )
+                chat_completion = _send(model_name, reinforced=False)
                 raw_text = (chat_completion.choices[0].message.content or "").strip()
                 if not raw_text:
                     # Reasoning tokens can consume the entire budget -> empty
@@ -325,6 +390,18 @@ class LLMAdvisor:
                 if not raw_text:
                     last_error = f"{model_name} returned only think-tags"
                     continue
+
+                # LANGUAGE VERIFICATION: the model must actually answer in the
+                # requested language. If it ignored the instruction, remember the
+                # answer (still more useful than a canned line) but keep trying.
+                if not self._language_ok(raw_text, language):
+                    lang_failed_answer = raw_text
+                    try:
+                        print(f"LLM: {model_name} answered in WRONG LANGUAGE for '{language}', trying next")
+                    except Exception:
+                        pass
+                    continue
+
                 resp_hi = raw_text if language == "hi" else ""
                 resp_en = raw_text if language == "en" else ""
                 try:
@@ -351,6 +428,59 @@ class LLMAdvisor:
                 except Exception:
                     pass
                 continue
+        # REINFORCED RETRY: regular attempts failed or answered in the wrong
+        # language. One final, very explicit attempt on the two best models.
+        if _time.time() < deadline:
+            for model_name in self.WORKING_MODELS[:2]:
+                try:
+                    print(f"[LLM] Reinforced language retry with {model_name}")
+                    chat_completion = _send(model_name, reinforced=True)
+                    raw_text = re.sub(
+                        r'<think>.*?</think>', '',
+                        (chat_completion.choices[0].message.content or "").strip(),
+                        flags=re.DOTALL
+                    ).strip()
+                    if raw_text and self._language_ok(raw_text, language):
+                        resp_hi = raw_text if language == "hi" else ""
+                        resp_en = raw_text if language == "en" else ""
+                        return {
+                            "query": query_text,
+                            "detected_intent": f"groq_{intent_type}",
+                            "intent_type": intent_type,
+                            "model_used": f"{model_name} (language-reinforced)",
+                            "language": language,
+                            "response_text_hi": resp_hi,
+                            "response_text_en": resp_en,
+                            "response_text_regional": raw_text,
+                            "tts_audio_text": raw_text,
+                            "confidence": 0.95,
+                            "suggested_followups": self._get_smart_followups(intent_type, language)
+                        }
+                except Exception as e:
+                    last_error = str(e)
+                    continue
+
+        # If some model DID answer sensibly but in the wrong language, that is
+        # still far more useful than a canned fallback line — return it
+        # transparently (model_used discloses the language was unverified).
+        if lang_failed_answer:
+            resp_hi = lang_failed_answer if language == "hi" else ""
+            resp_en = lang_failed_answer if language == "en" else ""
+            return {
+                "query": query_text,
+                "detected_intent": f"groq_{intent_type}",
+                "intent_type": intent_type,
+                "model_used": "groq_llm (language-unverified)",
+                "language": language,
+                "response_text_hi": resp_hi,
+                "response_text_en": resp_en,
+                "response_text_regional": lang_failed_answer,
+                "tts_audio_text": lang_failed_answer,
+                "confidence": 0.8,
+                "suggested_followups": self._get_smart_followups(intent_type, language)
+            }
+
+
 
         try:
             print(f"[LLM] All models failed. Using fallback.")
@@ -388,6 +518,10 @@ class LLMAdvisor:
                 "en": ["How to apply for PM-KISAN?", "Crop insurance details?", "Drip irrigation subsidy?"],
                 "hi": ["PM-KISAN के लिए आवेदन कैसे करें?", "फसल बीमा की जानकारी?", "ड्रिप सिंचाई सब्सिडी?"]
             },
+            "INTERCROPPING": {
+                "en": ["Best row spacing for intercrop?", "Fertilizer for both crops?", "Mandi rates of intercrop?"],
+                "hi": ["सह-फसल के लिए कतार दूरी?", "दोनों फसलों की खाद?", "सह-फसल का मंडी भाव?"]
+            },
         }
         default = {
             "en": ["Crop recommendation?", "Fertilizer dosage?", "Mandi market rates?"],
@@ -398,6 +532,18 @@ class LLMAdvisor:
 
     def _classify_intent(self, query_text: str) -> str:
         q = (query_text or "").lower()
+
+        # Intercropping / companion cropping ("किस फसल के साथ") — check FIRST,
+        # before generic crop-selection matching, because these questions
+        # usually contain both a crop name and crop-selection phrasing.
+        if re.search(
+            r"intercrop|companion|mixed\s*crop|सह-?फसल|अंतर्फसल|मिश्रित\s*फसल|"
+            r"साथ\s*(में|me|mein)?\s*(कौन|konsa|kya|क्या)?|के\s*साथ|के\s*sath|"
+            r"saath\s*me|sath\s*me|साथ\s*में|mixed\s*farming|இணை|இடை|పంటల\s*మధ్య|"
+            r"ಜೊತೆ|കൂടെ|સાથે|ਨਾਲ|সাথে|ସହିତ",
+            q,
+        ):
+            return "INTERCROPPING"
 
         # ML Crop Recommendation Intent
         if re.search(r"recommend|selection|kaunsi\s*fasal|konsi\s*fasal|best\s*crop|which\s*crop|fasal\s*lagaye|khet\s*me\s*kya\s*boye|kya\s*lagaye|कौनसी\s*फसल|फसल\s*चयन|उत्तम\s*फसल|पीक\s*निवડ|કયો\s*પાક|எந்த\s*பயிர்|ఏ\s*పంట", q):
@@ -447,6 +593,10 @@ class LLMAdvisor:
         # Precision Agronomic Routing
         if intent_type == "ML_CROP_RECOMMENDATION":
             topic = "crop_recommendation_ml"
+        elif intent_type == "INTERCROPPING" or re.search(
+            r"साथ\s*(में|me|mein)?|के\s*साथ|intercrop|companion|saath\s*me|sath\s*me", q
+        ):
+            topic = "intercropping"
         elif is_sugarcane and (is_water or "kab" in q or "sinchai" in q or "kare" in q or "paani" in q):
             topic = "sugarcane_water"
         elif is_sugarcane and is_fert:
@@ -509,7 +659,7 @@ class LLMAdvisor:
             "response_text_en": resp_en,
             "response_text_regional": text,
             "tts_audio_text": text,
-            "confidence": 0.98,
+            "confidence": 0.72,  # offline KB — honest, lower than AI-powered 0.95+
             "suggested_followups": followups
         }
 
