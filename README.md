@@ -4,7 +4,7 @@
 
 # 🌾 Kisaan_Sathi (किसान साथी)
 ### National Digital Agriculture, Soil Health & Precision Farm Advisory AI Platform
-**Smart India Hackathon 2026 • 18 Agro-Ecological Hubs • 11 Indian Languages • XGBoost (98.6% CV) + SHAP • MobileNetV2 Fine-Tuned on PlantVillage (95.9% val acc) • Live Agmarknet Mandi Prices (data.gov.in) • Sentinel-2 NDVI (Copernicus CDSE) • Weather-Driven Disease-Risk Early Warning • Dynamic Sustainability Scoring • Soil Health Card OCR • IoT Telemetry • Groq Multilingual LLM • 100% On-Device Offline Inference**
+**Smart India Hackathon 2026 • 18 Agro-Ecological Hubs • 11 Indian Languages • National-Portal UI (india.gov.in design language) • XGBoost (98.6% CV) + SHAP • MobileNetV2 Fine-Tuned on PlantVillage (95.9% val acc) • Live Agmarknet Mandi Prices (data.gov.in) • Sentinel-2 NDVI (Copernicus CDSE) • Weather-Driven Disease-Risk Early Warning • Dynamic Sustainability Scoring • Soil Health Card OCR • IoT Telemetry • Groq Multilingual LLM • 100% On-Device Offline Inference**
 
 > **📖 Data honesty**: every API response carries an explicit `source` field.
 > Real feeds (SoilGrids, Open-Meteo, Agmarknet, Sentinel-2) are used live;
@@ -50,9 +50,13 @@ Small and marginal farmers across India face critical challenges in accessing ti
 │                                   KISAAN_SATHI TARGET ARCHITECTURE                               │
 └──────────────────────────────────────────────────────────────────────────────────────────────────┘
 
- [ PRESENTATION TIER ]
+ [ PRESENTATION TIER — Government of India National Portal UI ]
  ┌────────────────────────────────────────────────────────────────────────────────────────────────┐
- │  📱 Responsive PWA (Vanilla JS / Modern CSS)          •  📲 Flutter Mobile App (Dart 3.11)     │
+ │  🇮🇳 GOI Portal Chrome: a11y toolbar (A/A+/A++/contrast), utility strip, tricolor divider,      │
+ │     national emblem band (india.gov.in design language, Noto Sans typography)                   │
+ │  🎞️ Hero Carousel (4 scheme-banners, autoplay/dots/swipe)  •  🏛️ Central Scheme Cards →        │
+ │     real portals (PM-KISAN, PMFBY, SHC, e-NAM, PM-KUSUM, AIF, KCC, MY-Scheme)                   │
+ │  📱 Responsive PWA (Vanilla JS / Modern CSS)          •  📲 Flutter Mobile App (Dart 3.11)      │
  │  🧠 100% On-Device Offline Dart ML Engine              •  📷 Real-Time Leaf Photo Diagnostic UI │
  │  🗣️ Web Speech STT / TTS in 11 Indian Languages      •  🖨️ PDF Farmer Advisory Generator     │
  └────────────────────────────────────────┬───────────────────────────────────────────────────────┘
@@ -98,7 +102,7 @@ Small and marginal farmers across India face critical challenges in accessing ti
 | **Soil Card OCR** | OpenCV + Text Extraction Parser | N, P, K, pH, OC parameter extraction | Physical/digital soil cards | ✅ Operational |
 | **Offline Inference** | Pure Dart On-Device ML Engine | Instant recommendation in Airplane Mode | On-device Flutter runtime | ✅ Operational |
 
-Detailed documentation: [Model Card (`docs/MODEL_CARD.md`)](docs/MODEL_CARD.md) • [Data Provenance (`docs/DATA_PROVENANCE.md`)](docs/DATA_PROVENANCE.md) • [Deployment Guide (`DEPLOYMENT.md`)](DEPLOYMENT.md).
+Detailed documentation: [Model Card (`docs/MODEL_CARD.md`)](docs/MODEL_CARD.md) • [Data Provenance (`docs/DATA_PROVENANCE.md`)](docs/DATA_PROVENANCE.md) • [Architecture (`docs/ARCHITECTURE.md`)](docs/ARCHITECTURE.md) • [Deployment Guide (`DEPLOYMENT.md`)](DEPLOYMENT.md).
 
 ---
 
@@ -134,6 +138,25 @@ Kisaan_Sathi includes pre-calibrated soil chemistry profiles and official ICAR K
 Kisaan_Sathi enforces strict **monolingual rendering with 0% language leakage**:
 - **Supported Languages**: Hindi (`hi-IN`), English (`en-IN`), Marathi (`mr-IN`), Punjabi (`pa-IN`), Telugu (`te-IN`), Tamil (`ta-IN`), Gujarati (`gu-IN`), Bengali (`bn-IN`), Kannada (`kn-IN`), Malayalam (`ml-IN`), Odia (`or-IN`).
 - **Feature Phone Access**: SMS / USSD advisory generation endpoint (`/api/advisory/sms-advisory`) providing concise text advice in local languages.
+
+---
+
+## 🇮🇳 5b. Frontend Design — National Portal Experience
+
+The PWA is dressed in the **design language of the Government of India's national portals**
+([india.gov.in](https://www.india.gov.in), [agriwelfare.gov.in](https://agriwelfare.gov.in), [mygov.in](https://www.mygov.in))
+to feel instantly familiar and trustworthy to Indian farmers and officials:
+
+| UI Element | Implementation |
+|---|---|
+| **National portal chrome** | Accessibility toolbar (text size A/A+/A++ & high-contrast, persisted), cross-government utility strip, tricolor divider, navy national band with a wheat-emblem SVG and bilingual portal title |
+| **Typography** | Noto Sans + Noto Sans Devanagari (official-portal standard, full Devanagari coverage, system fallbacks for offline use) |
+| **Hero carousel** | 4 auto-rotating scheme banners (5.5 s autoplay, dots, arrows, touch-swipe, pause-on-hover) linking straight into the app's features |
+| **Quick services strip** | National-portal style service cards that deep-link into each app tab |
+| **Central schemes grid** | 8 real central-sector scheme cards — **PM-KISAN, PMFBY, Soil Health Card, e-NAM, PM-KUSUM, Agriculture Infrastructure Fund, Kisan Call Centre, MY-Scheme** — each redirecting to the official portal in a new tab |
+| **Impact stats strip** | Government-dashboard style platform statistics |
+| **GOI multi-column footer** | Scheme links, government portals, live data-source attribution, Kisan Call Centre helpline (1800-180-1551) and an **honest SIH-prototype disclaimer** |
+| **Architecture** | Pure vanilla JS/CSS overlay (`gov-portal.css` + `gov-portal.js`) layered on top of the app — zero framework, zero build step, works fully offline (font fallbacks included) |
 
 ---
 

@@ -7,8 +7,10 @@
   <meta name="description" content="भारत सरकार के दिशा-निर्देशों पर आधारित डिजिटल कृषि, मृदा स्वास्थ्य एवं फसल रोग निदान पोर्टल।" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@500;600;700;800&family=Rozha+One&family=Tiro+Devanagari+Hindi:ital@0;1&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@500;600;700;800&family=Rozha+One&family=Tiro+Devanagari+Hindi:ital@0;1&family=Mukta:wght@400;500;600;700&family=Noto+Sans:wght@400;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
+  <!-- Government of India national-portal design layer (india.gov.in / agriwelfare.gov.in language) -->
+  <link rel="stylesheet" href="gov-portal.css" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌾</text></svg>">
 </head>
 <body class="theme-indian-agri">
@@ -159,6 +161,60 @@
   </div>
 
   <!-- TOP APP HEADER (GOVERNMENT OF INDIA STANDARD) -->
+  <!-- ============================================================== -->
+  <!-- GOVERNMENT OF INDIA NATIONAL PORTAL CHROME                      -->
+  <!-- (design language of india.gov.in / agriwelfare.gov.in)          -->
+  <!-- ============================================================== -->
+  <a class="gov-skip-link" href="#mainContent">मुख्य सामग्री पर जाएँ | Skip to main content</a>
+
+  <!-- Accessibility toolbar (screen-reader friendly, persisted) -->
+  <div class="gov-a11y-bar" role="region" aria-label="Accessibility tools / सुगम्यता उपकरण">
+    <span class="a11y-group"><span class="a11y-label">Text Size / फ़ॉन्ट आकार:</span>
+      <button id="a11yFontReset" title="Normal text">A</button>
+      <button id="a11yFontLg" title="Large text">A+</button>
+      <button id="a11yFontXl" title="Extra-large text">A++</button>
+    </span>
+    <span class="a11y-group">
+      <button id="a11yContrast" aria-pressed="false" title="High contrast mode / उच्च कंट्रास्ट">◐ High Contrast</button>
+      <a class="a11y-link" href="https://www.mygov.in" target="_blank" rel="noopener">MyGov</a>
+    </span>
+  </div>
+
+  <!-- Cross-government utility strip -->
+  <div class="gov-utility-strip">
+    <nav class="gov-utility-links" aria-label="Government portals">
+      <a href="https://agriwelfare.gov.in" target="_blank" rel="noopener">🏛️ कृषि एवं किसान कल्याण मंत्रालय</a>
+      <a href="https://www.data.gov.in" target="_blank" rel="noopener">📊 data.gov.in</a>
+      <a href="https://www.india.gov.in" target="_blank" rel="noopener">🇮🇳 india.gov.in</a>
+      <a href="https://www.enam.gov.in" target="_blank" rel="noopener">हट e-NAM</a>
+    </nav>
+    <span class="gov-utility-right">स्क्रीन रीडर अनुकूल • Screen Reader Access</span>
+  </div>
+  <div class="gov-tricolor-strip" aria-hidden="true"></div>
+
+  <!-- National header band -->
+  <div class="gov-national-band">
+    <div class="gov-emblem" aria-hidden="true">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M24 42 C24 30, 24 20, 24 8" stroke="#5b4108" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M24 14 C20 13, 17 10, 16 6 C20 7, 23 9, 24 12 M24 14 C28 13, 31 10, 32 6 C28 7, 25 9, 24 12" fill="#7a5a0a" stroke="#5b4108" stroke-width="1"/>
+        <path d="M24 22 C20 21, 17 18, 16 14 C20 15, 23 17, 24 20 M24 22 C28 21, 31 18, 32 14 C28 15, 25 17, 24 20" fill="#7a5a0a" stroke="#5b4108" stroke-width="1"/>
+        <path d="M24 30 C20 29, 17 26, 16 22 C20 23, 23 25, 24 28 M24 30 C28 29, 31 26, 32 22 C28 23, 25 25, 24 28" fill="#7a5a0a" stroke="#5b4108" stroke-width="1"/>
+        <path d="M12 42 C16 39, 20 38, 24 40 M36 42 C32 39, 28 38, 24 40" stroke="#5b4108" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="gov-band-text">
+      <p class="band-motto">सत्यमेव जयते • Digital India • Atmanirbhar Krishi</p>
+      <h1 class="band-title-hi">किसान साथी — राष्ट्रीय डिजिटल कृषि एवं मृदा स्वास्थ्य पोर्टल</h1>
+      <p class="band-title-en">Kisaan_Sathi — National Digital Agriculture &amp; Soil Health Advisory Platform</p>
+    </div>
+    <div class="gov-band-right">
+      <span class="gov-cert-pill">🛡️ SIH 2026 ग्रैंड फिनाले परियोजना</span>
+      <span class="gov-cert-pill">📡 एगमार्कनेट • SoilGrids • Open-Meteo • Sentinel-2</span>
+    </div>
+  </div>
+
+
   <header class="app-header">
     <div class="header-container">
       <div class="brand-group">
@@ -216,7 +272,92 @@
   </header>
 
   <!-- MAIN WRAPPER -->
-  <main class="main-container">
+  <main class="main-container" id="mainContent">
+
+    <!-- ============================================================== -->
+    <!-- NATIONAL HERO CAROUSEL (scheme-banner style, auto-rotating)     -->
+    <!-- ============================================================== -->
+    <div class="gov-carousel" id="govCarousel" aria-roledescription="carousel" aria-label="प्रमुख घोषणाएँ / Featured announcements">
+      <div class="gov-carousel-track">
+
+        <div class="gov-slide active" role="group" aria-label="स्लाइड 1">
+          <img class="slide-img" src="hero_farmer_banner.png" alt="Empowering farmers with soil insights" />
+          <div class="slide-overlay"></div>
+          <div class="slide-content">
+            <span class="slide-kicker">मृदा स्वास्थ्य मिशन • Soil Health Mission</span>
+            <p class="slide-title-hi">मिट्टी की सही जांच, फसल का सही चुनाव</p>
+            <p class="slide-title-en">AI-powered crop advisory from your Soil Health Card, live satellite weather and real mandi rates — in your own language.</p>
+            <button class="slide-cta" type="button" onclick="document.querySelector('.tab-btn[data-tab=&quot;tab-recommend&quot;]').click();">🌱 अभी फसल सलाह पाएँ</button>
+          </div>
+        </div>
+
+        <div class="gov-slide" role="group" aria-label="स्लाइड 2">
+          <img class="slide-img" src="swasth_dhara_banner.png" alt="Swasth Dhara Khet Hara mission" />
+          <div class="slide-overlay"></div>
+          <div class="slide-content">
+            <span class="slide-kicker">स्वस्थ धरा • खेत हरा</span>
+            <p class="slide-title-hi">फसल डॉक्टर — पत्ती की फोटो से रोग की पहचान</p>
+            <p class="slide-title-en">Deep-learning leaf pathology trained on the PlantVillage research dataset, with ICAR-verified organic &amp; chemical remedies.</p>
+            <button class="slide-cta" type="button" onclick="document.querySelector('.tab-btn[data-tab=&quot;tab-doctor&quot;]').click();">🌿 रोग निदान करें</button>
+          </div>
+        </div>
+
+        <div class="gov-slide slide-tricolor" role="group" aria-label="स्लाइड 3">
+          <svg class="slide-chakra" viewBox="0 0 100 100" aria-hidden="true">
+            <circle cx="50" cy="50" r="46" fill="none" stroke="#000080" stroke-width="3"/>
+            <g stroke="#000080" stroke-width="1.4">
+              <line x1="50" y1="4" x2="50" y2="96"/><line x1="4" y1="50" x2="96" y2="50"/>
+              <line x1="17" y1="17" x2="83" y2="83"/><line x1="83" y1="17" x2="17" y2="83"/>
+              <line x1="30" y1="8" x2="70" y2="92"/><line x1="70" y1="8" x2="30" y2="92"/>
+              <line x1="8" y1="30" x2="92" y2="70"/><line x1="92" y1="30" x2="8" y2="70"/>
+            </g>
+            <circle cx="50" cy="50" r="9" fill="none" stroke="#000080" stroke-width="2.6"/>
+          </svg>
+          <div class="slide-content">
+            <span class="slide-kicker">डिजिटल कृषि • Digital Agriculture</span>
+            <p class="slide-title-hi">आपकी भाषा में आपका कृषि सलाहकार</p>
+            <p class="slide-title-en">Voice Saathi answers farmer questions in 11 Indian languages, powered by Groq LLM and an ICAR-grounded agronomic knowledge base.</p>
+            <button class="slide-cta" type="button" onclick="document.querySelector('.tab-btn[data-tab=&quot;tab-voice&quot;]').click();">🎙️ वॉइस साथी से पूछें</button>
+          </div>
+        </div>
+
+        <div class="gov-slide" role="group" aria-label="स्लाइड 4">
+          <img class="slide-img" src="swasth_dhara_banner.png" alt="National agriculture mission banner" style="filter:hue-rotate(15deg) brightness(0.85);" />
+          <div class="slide-overlay" style="background: linear-gradient(90deg, rgba(6,38,10,0.94) 0%, rgba(6,38,10,0.7) 45%, rgba(6,38,10,0.1) 100%);"></div>
+          <div class="slide-content">
+            <span class="slide-kicker" style="background: var(--gov-green); color:#fff;">एगमार्कनेट लाइव • Live Mandi Radar</span>
+            <p class="slide-title-hi">रियल-टाइम मंडी भाव और 7-दिवसीय रुझान</p>
+            <p class="slide-title-en">Verified daily APMC rates streamed from the official Agmarknet (data.gov.in) feed with transparent data-source labeling.</p>
+            <button class="slide-cta" type="button" onclick="document.querySelector('.tab-btn[data-tab=&quot;tab-mandi&quot;]').click();">📊 मंडी रडार खोलें</button>
+          </div>
+        </div>
+
+      </div>
+      <button class="car-arrow car-prev" aria-label="Previous slide">❮</button>
+      <button class="car-arrow car-next" aria-label="Next slide">❯</button>
+      <div class="car-dots"></div>
+    </div>
+
+    <!-- QUICK SERVICES (national portal "Services" strip) -->
+    <div class="gov-quick-services" aria-label="Quick services / त्वरित सेवाएँ">
+      <a class="gov-qs-card" data-target-tab="tab-recommend" href="#mainContent">
+        <span class="qs-icon">🌱</span><span class="qs-title">फसल सलाह</span><span class="qs-sub">AI Crop Advisory</span>
+      </a>
+      <a class="gov-qs-card" data-target-tab="tab-doctor" href="#mainContent">
+        <span class="qs-icon">🌿</span><span class="qs-title">फसल डॉक्टर</span><span class="qs-sub">Disease Diagnosis</span>
+      </a>
+      <a class="gov-qs-card" data-target-tab="tab-voice" href="#mainContent">
+        <span class="qs-icon">🎙️</span><span class="qs-title">वॉइस साथी</span><span class="qs-sub">Voice Consultant</span>
+      </a>
+      <a class="gov-qs-card" data-target-tab="tab-mandi" href="#mainContent">
+        <span class="qs-icon">📊</span><span class="qs-title">मंडी भाव</span><span class="qs-sub">Mandi Rates</span>
+      </a>
+      <a class="gov-qs-card" data-target-tab="tab-helpline" href="#mainContent">
+        <span class="qs-icon">🏛️</span><span class="qs-title">किसान सहायता</span><span class="qs-sub">KVK Helpline</span>
+      </a>
+    </div>
+
+
 
     <!-- ============================================================== -->
     <!-- 1. NATIONAL SOIL MISSION HERO BANNER (IMAGE 1) -->
@@ -1093,25 +1234,174 @@
       </div>
     </div>
 
+
+    <!-- ============================================================== -->
+    <!-- GOVERNMENT SCHEMES & DIRECT BENEFIT PORTALS (real redirects)    -->
+    <!-- ============================================================== -->
+    <section class="gov-schemes-section" aria-label="केंद्र सरकार की कृषि योजनाएँ">
+      <div class="gov-section-head">
+        <span class="head-bar"></span>
+        <div>
+          <h2>🏛️ प्रमुख केंद्र सरकार कृषि योजनाएँ</h2>
+          <span class="head-sub">Central Sector Schemes — official portals for direct benefit transfer &amp; enrolment</span>
+        </div>
+      </div>
+      <div class="gov-schemes-grid">
+
+        <a class="gov-scheme-card" href="https://pmkisan.gov.in" target="_blank" rel="noopener">
+          <div class="sc-band"></div>
+          <div class="sc-body">
+            <div class="sc-ministry">कृषि एवं किसान कल्याण मंत्रालय</div>
+            <p class="sc-name">PM-KISAN सम्मान निधि</p>
+            <p class="sc-desc">प्रति वर्ष ₹6,000 की प्रत्यक्ष आय सहायता — तीन किश्तों में सीधे बैंक खाते में।</p>
+          </div>
+          <span class="sc-link"><span>आवेदन / स्थिति देखें →</span><span class="sc-url">pmkisan.gov.in</span></span>
+        </a>
+
+        <a class="gov-scheme-card" href="https://pmfby.gov.in" target="_blank" rel="noopener">
+          <div class="sc-band"></div>
+          <div class="sc-body">
+            <div class="sc-ministry">कृषि एवं किसान कल्याण मंत्रालय</div>
+            <p class="sc-name">PMFBY फसल बीमा</p>
+            <p class="sc-desc">सूखा, बाढ़ व कीट प्रकोप से फसल बीमा — प्रीमियम खरीफ 2%, रबी 1.5%।</p>
+          </div>
+          <span class="sc-link"><span>बीमा कराएँ →</span><span class="sc-url">pmfby.gov.in</span></span>
+        </a>
+
+        <a class="gov-scheme-card" href="https://soilhealth.dac.gov.in" target="_blank" rel="noopener">
+          <div class="sc-band"></div>
+          <div class="sc-body">
+            <div class="sc-ministry">मृदा स्वास्थ्य कार्ड योजना</div>
+            <p class="sc-name">मृदा स्वास्थ्य कार्ड (SHC)</p>
+            <p class="sc-desc">निःशुल्क मिट्टी जांच रिपोर्ट — NPK, pH व उर्वरक सिफारिश। यहाँ अपना SHC अपलोड करें।</p>
+          </div>
+          <span class="sc-link"><span>कार्ड डाउनलोड →</span><span class="sc-url">soilhealth.dac.gov.in</span></span>
+        </a>
+
+        <a class="gov-scheme-card" href="https://www.enam.gov.in" target="_blank" rel="noopener">
+          <div class="sc-band"></div>
+          <div class="sc-body">
+            <div class="sc-ministry">राष्ट्रीय कृषि बाजार</div>
+            <p class="sc-name">हट e-NAM</p>
+            <p class="sc-desc">1,000+ APMC मंडियों का ऑनलाइन नीलामी नेटवर्क — घर बैठे बिक्री व भुगतान।</p>
+          </div>
+          <span class="sc-link"><span>पोर्टल खोलें →</span><span class="sc-url">enam.gov.in</span></span>
+        </a>
+
+        <a class="gov-scheme-card" href="https://pmkusum.mnre.gov.in" target="_blank" rel="noopener">
+          <div class="sc-band"></div>
+          <div class="sc-body">
+            <div class="sc-ministry">नवीन एवं नवीकरणीय ऊर्जा मंत्रालय</div>
+            <p class="sc-name">PM-KUSUM सोलर पंप</p>
+            <p class="sc-desc">सोलर खेती पंप व ग्रिड-कनेक्टेड सोलर प्लांट पर 60% तक सब्सिडी।</p>
+          </div>
+          <span class="sc-link"><span>आवेदन करें →</span><span class="sc-url">pmkusum.mnre.gov.in</span></span>
+        </a>
+
+        <a class="gov-scheme-card" href="https://agriinfra.gov.in" target="_blank" rel="noopener">
+          <div class="sc-band"></div>
+          <div class="sc-body">
+            <div class="sc-ministry">कृषि अवसंरचना कोष</div>
+            <p class="sc-name">AIF — कृषि इंफ्रा फंड</p>
+            <p class="sc-desc">वेयरहाउस, कोल्ड स्टोरेज व कस्टम हायरिंग सेंटर हेतु 3% ब्याज पर ₹1 लाख करोड़।</p>
+          </div>
+          <span class="sc-link"><span>विवरण देखें →</span><span class="sc-url">agriinfra.gov.in</span></span>
+        </a>
+
+        <a class="gov-scheme-card" href="https://www.kisancallcentre.in" target="_blank" rel="noopener">
+          <div class="sc-band"></div>
+          <div class="sc-body">
+            <div class="sc-ministry">किसान कॉल सेंटर</div>
+            <p class="sc-name">KCC फ्री हेल्पलाइन</p>
+            <p class="sc-desc">कृषि विशेषज्ञों से 11 भाषाओं में निःशुल्क फोन परामर्श — टोल फ्री 1800-180-1551।</p>
+          </div>
+          <span class="sc-link"><span>जानकारी →</span><span class="sc-url">kisancallcentre.in</span></span>
+        </a>
+
+        <a class="gov-scheme-card" href="https://www.myscheme.gov.in" target="_blank" rel="noopener">
+          <div class="sc-band"></div>
+          <div class="sc-body">
+            <div class="sc-ministry">भारत सरकार</div>
+            <p class="sc-name">MY Scheme योजना पोर्टल</p>
+            <p class="sc-desc">केंद्र व राज्य सरकार की 3,000+ योजनाओं की खोज एवं पात्रता जांच।</p>
+          </div>
+          <span class="sc-link"><span>योजनाएँ खोजें →</span><span class="sc-url">myscheme.gov.in</span></span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- PLATFORM IMPACT STATS STRIP -->
+    <div class="gov-stats-strip" aria-label="Platform statistics">
+      <div class="gov-stat"><span class="stat-num">22</span><span class="stat-lbl">फसलें • Crops Ranked</span></div>
+      <div class="gov-stat"><span class="stat-num">98.6%</span><span class="stat-lbl">ML सटीकता • CV Accuracy</span></div>
+      <div class="gov-stat"><span class="stat-num">11</span><span class="stat-lbl">भाषाएँ • Languages</span></div>
+      <div class="gov-stat"><span class="stat-num">18</span><span class="stat-lbl">कृषि हब • Agro Hubs</span></div>
+      <div class="gov-stat"><span class="stat-num">100%</span><span class="stat-lbl">ऑफ़लाइन मोड • Offline Ready</span></div>
+    </div>
+
+
   </main>
 
-  <!-- FOOTER (OFFICIAL CITIZEN PORTAL STYLE) -->
-  <footer class="app-footer">
-    <div class="footer-container">
-      <div class="footer-left">
-        <strong>🌾 किसान साथी (Kisaan_Sathi)</strong>
-        <span data-i18n="footer_sub">राष्ट्रीय डिजिटल कृषि एवं मृदा स्वास्थ्य सलाहकार पोर्टल • भारत सरकार द्वारा जनहित में जारी</span>
+  <!-- GOVERNMENT PORTAL FOOTER -->
+  <footer class="gov-footer">
+    <div class="gov-footer-main">
+      <div>
+        <h4>🌾 किसान साथी / Kisaan_Sathi</h4>
+        <p class="foot-about">राष्ट्रीय डिजिटल कृषि एवं मृदा स्वास्थ्य सलाहकार पोर्टल — मिट्टी परीक्षण, उपग्रह मौसम, एगमार्कनेट मंडी भाव, फसल रोग निदान एवं 11 भारतीय भाषाओं में आवाज़ सलाहकार।<br>
+        National digital agriculture advisory platform: soil testing, satellite weather, live mandi rates, plant pathology and multilingual voice consulting.</p>
+        <div class="foot-helpline">किसान कॉल सेंटर (KCC) — टोल फ्री<br><strong>1800-180-1551</strong></div>
       </div>
-      <div class="footer-tags">
-        <span class="tech-tag" data-i18n="tag_icar">🛡️ ICAR प्रमाणित</span>
-        <span class="tech-tag" data-i18n="tag_shc">🌾 मृदा स्वास्थ्य कार्ड मानक</span>
-        <span class="tech-tag" data-i18n="tag_mandi">📊 एगमार्कनेट मंडी भाव</span>
-        <span class="tech-tag" data-i18n="tag_weather">🛰️ राष्ट्रीय मौसम वेधशाला</span>
-        <span class="tech-tag" data-i18n="tag_langs">🇮🇳 ११ भारतीय भाषाएँ</span>
+      <div>
+        <h4>सरकारी पोर्टल</h4>
+        <ul>
+          <li><a href="https://agriwelfare.gov.in" target="_blank" rel="noopener">कृषि एवं किसान कल्याण मंत्रालय</a></li>
+          <li><a href="https://www.india.gov.in" target="_blank" rel="noopener">राष्ट्रीय पोर्टल — india.gov.in</a></li>
+          <li><a href="https://www.mygov.in" target="_blank" rel="noopener">MyGov जन-भागीदारी</a></li>
+          <li><a href="https://www.data.gov.in" target="_blank" rel="noopener">data.gov.in — खुला डेटा</a></li>
+          <li><a href="https://www.myscheme.gov.in" target="_blank" rel="noopener">myscheme.gov.in — योजनाएँ</a></li>
+        </ul>
       </div>
+      <div>
+        <h4>योजनाएँ (Schemes)</h4>
+        <ul>
+          <li><a href="https://pmkisan.gov.in" target="_blank" rel="noopener">PM-KISAN सम्मान निधि</a></li>
+          <li><a href="https://pmfby.gov.in" target="_blank" rel="noopener">PMFBY फसल बीमा</a></li>
+          <li><a href="https://soilhealth.dac.gov.in" target="_blank" rel="noopener">मृदा स्वास्थ्य कार्ड</a></li>
+          <li><a href="https://www.enam.gov.in" target="_blank" rel="noopener">हट e-NAM</a></li>
+          <li><a href="https://pmkusum.mnre.gov.in" target="_blank" rel="noopener">PM-KUSUM सोलर</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>डेटा स्रोत (Live Data)</h4>
+        <ul>
+          <li>एगमार्कनेट — Agmarknet (data.gov.in)</li>
+          <li>SoilGrids v2.0 — ISRIC World Soil Information</li>
+          <li>Open-Meteo / ECMWF मौसम फ़ीड</li>
+          <li>Copernicus Sentinel-2 (CDSE)</li>
+          <li>ICAR / KVK कृषि विस्तार मानक</li>
+        </ul>
+        <div class="gov-footer-logos">
+          <span>🛡️ ICAR मानक</span><span>📊 एगमार्कनेट</span><span>🛰️ Sentinel-2</span><span>🇮🇳 11 भाषाएँ</span>
+        </div>
+      </div>
+    </div>
+    <div class="gov-footer-bottom">
+      <p>
+        © 2026 किसान साथी पोर्टल • Smart India Hackathon 2026 Grand Finale Project •
+        <a href="https://github.com/rajat9para/kisan_sathi-crop-prediction-through-ai-and-many-more-" target="_blank" rel="noopener">Source Code (GitHub)</a>
+      </p>
+      <p class="disclaimer">
+        ⚠️ सूचना: यह एक स्मार्ट इंडिया हैकाथन 2026 शैक्षिक प्रोटोटाइप पोर्टल है — भारत सरकार का आधिकारिक वेबसाइट नहीं।
+        यह पोर्टल भारत सरकार के राष्ट्रीय पोर्टलों की डिज़ाइन भाषा से प्रेरित है।<br>
+        Disclaimer: This is a Smart India Hackathon 2026 educational prototype inspired by the design
+        language of the National Portal of India — it is NOT an official Government of India website.
+        Data feeds are attributed to their respective public sources.
+      </p>
     </div>
   </footer>
 
+  <script src="gov-portal.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

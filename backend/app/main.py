@@ -98,6 +98,36 @@ async def get_avatar():
         return FileResponse(p, media_type="image/png")
     return Response(status_code=404)
 
+@app.get("/hero_farmer_banner.png")
+async def get_hero_banner():
+    p = find_static_file("hero_farmer_banner.png")
+    if p:
+        return FileResponse(p, media_type="image/png")
+    return Response(status_code=404)
+
+@app.get("/swasth_dhara_banner.png")
+async def get_swasth_banner():
+    p = find_static_file("swasth_dhara_banner.png")
+    if p:
+        return FileResponse(p, media_type="image/png")
+    return Response(status_code=404)
+
+@app.get("/gov-portal.css")
+async def get_gov_css():
+    p = find_static_file("gov-portal.css")
+    if p:
+        with open(p, "r", encoding="utf-8") as f:
+            return Response(content=f.read(), media_type="text/css")
+    return Response(content="/* not found */", media_type="text/css", status_code=200)
+
+@app.get("/gov-portal.js")
+async def get_gov_js():
+    p = find_static_file("gov-portal.js")
+    if p:
+        with open(p, "r", encoding="utf-8") as f:
+            return Response(content=f.read(), media_type="application/javascript")
+    return Response(content="// not found", media_type="application/javascript", status_code=200)
+
 @app.get("/static/{file_path:path}")
 async def serve_static_file(file_path: str):
     p = find_static_file(file_path)
