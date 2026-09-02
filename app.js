@@ -968,6 +968,11 @@ let currentDiagnosisReport = null;
 let currentLeafBase64 = null;
 let debouncePredictionTimer = null;
 
+// LIVE REGIONAL DATA (auto-location → real weather / mandi / soil)
+let liveWeatherData = null;
+let liveMandiData = null;
+let detectedRegion = { district: "", state: "", lat: null, lon: null };
+
 // APP INITIALIZATION
 document.addEventListener("DOMContentLoaded", () => {
   initLanguageManager();
@@ -990,6 +995,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Run initial dynamic prediction
   runDynamicCropPrediction();
+
+  // AUTO-LOCATION BOOT: on page load, detect the farmer's region automatically
+  // and pull live soil / weather / mandi data for THAT exact region.
+  setTimeout(() => { autoLocationBoot(); }, 800);
 });
 
 // =========================================================================
@@ -1228,6 +1237,20 @@ function setLanguage(lang) {
 
   // Run dynamic agronomic ML prediction in active language
   runDynamicCropPrediction();
+
+  // Refresh Voice Saathi orb status for the newly selected language
+  const orbStatusEl = document.getElementById("voiceOrbStatus");
+  if (orbStatusEl) {
+    const langName = dict.name_native || dict.name || "हिंदी";
+    orbStatusEl.innerHTML = isEn
+      ? `Tap the mic and ask anything — you will be answered in <span class="orb-lang-tag">${langName} (selected above)</span>`
+      : `माइक दबाएं और कुछ भी पूछें — उत्तर <span class="orb-lang-tag">${langName} (ऊपर चुनी भाषा)</span> में मिलेगा`;
+  }
+
+  // Re-apply LIVE weather card (selectHub above resets it to static hub data)
+  if (liveWeatherData) {
+    renderLiveWeatherCard(liveWeatherData, isEn);
+  }
 }
 
 function updateMandiTicker(isEn) {
@@ -1486,6 +1509,9 @@ async function matchNearestHubAndSelect(userLat, userLon, showFeedback) {
     // Graceful fallback to nearest agro-ecological hub
   }
 
+  // Remember the exact detected region for live weather/mandi/soil pulls
+  detectedRegion = { district: detectedDistrict, state: detectedState, lat: userLat, lon: userLon };
+
   const hub = DEMO_HUBS[closestHub] || DEMO_HUBS.nashik;
   const isEn = (currentLang === "en");
 
@@ -1519,6 +1545,9 @@ async function matchNearestHubAndSelect(userLat, userLon, showFeedback) {
 
   runDynamicCropPrediction();
 
+  // Pull live weather / mandi / soil for the exact GPS coordinates
+  loadLiveRegionalData(userLat, userLon);
+
   if (showFeedback) {
     const statusEl = document.getElementById("locationDetectStatus");
     if (statusEl) {
@@ -1538,6 +1567,190 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
             Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
             Math.sin(dLon / 2) * Math.sin(dLon / 2);
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
+
+// =========================================================================
+// 6b. AUTO-LOCATION BOOT + LIVE REGIONAL DATA (Soil / Weather / Mandi)
+// =========================================================================
+function autoLocationBoot() {
+  if (!navigator.geolocation) return;
+
+  const statusEl = document.getElementById("locationDetectStatus");
+  const isEn = (currentLang === "en");
+  if (statusEl) {
+    statusEl.style.display = "inline-flex";
+    statusEl.className = "location-status-badge detecting";
+    statusEl.textContent = isEn
+      ? "📡 Auto-detecting your farm region..."
+      : "📡 आपका खेत का क्षेत्र स्वतः पहचाना जा रहा है...";
+  }
+
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      const userLat = pos.coords.latitude;
+      const userLon = pos.coords.longitude;
+      await matchNearestHubAndSelect(userLat, userLon, true);
+      // Pull LIVE soil + weather + mandi data for the detected coordinates
+      await loadLiveRegionalData(userLat, userLon);
+    },
+    () => {
+      // Permission denied / unavailable → still load live data for the
+      // default agro-hub so weather & mandi are real, not static.
+      const hub = DEMO_HUBS[currentHub] || DEMO_HUBS.nashik;
+      loadLiveRegionalData(hub.lat, hub.lon);
+      if (statusEl) {
+        statusEl.className = "location-status-badge error";
+        statusEl.textContent = isEn
+          ? "⚠️ Location off — showing live data for " + hub.district_en
+          : "⚠️ लोकेशन बंद है — " + hub.district_hi + " का लाइव डेटा दिखा रहे हैं";
+        setTimeout(() => { statusEl.style.display = "none"; }, 5000);
+      }
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+async function loadLiveRegionalData(lat, lon) {
+  const hub = DEMO_HUBS[currentHub] || DEMO_HUBS.nashik;
+  const isEn = (currentLang === "en");
+  const state = detectedRegion.state || hub.state_en;
+  const district = detectedRegion.district || hub.district_en;
+
+  // 1. LIVE WEATHER (Open-Meteo satellite feed for these exact coordinates)
+  try {
+    const res = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
+    if (res.ok) {
+      liveWeatherData = await res.json();
+      renderLiveWeatherCard(liveWeatherData, isEn);
+      renderWeatherAndMandiTables(hub, isEn); // refresh forecast table with live rows
+    }
+  } catch (_) { /* offline → hub static data stays */ }
+
+  // 2. LIVE MANDI PRICES (Agmarknet APMC radar for the detected district)
+  try {
+    const res = await fetch(`/api/market-prices?state=${encodeURIComponent(state)}&district=${encodeURIComponent(district)}&lat=${lat}&lon=${lon}`);
+    if (res.ok) {
+      liveMandiData = await res.json();
+      renderWeatherAndMandiTables(hub, isEn); // refresh mandi table with live rows
+    }
+  } catch (_) { /* offline → hub static data stays */ }
+
+  // 3. LIVE SOIL (ISRIC SoilGrids for these exact coordinates)
+  try {
+    const res = await fetch(`/api/soil?lat=${lat}&lon=${lon}`);
+    if (res.ok) {
+      const soil = await res.json();
+      if (soil && soil.source && soil.source.includes("SoilGrids")) {
+        // Live satellite soil beat the cached hub values → adopt it everywhere
+        const nEl = document.getElementById("inputN");
+        const pEl = document.getElementById("inputP");
+        const kEl = document.getElementById("inputK");
+        const phEl = document.getElementById("inputPH");
+        if (nEl) nEl.value = soil.nitrogen;
+        if (pEl) pEl.value = soil.phosphorus;
+        if (kEl) kEl.value = soil.potassium;
+        if (phEl) phEl.value = soil.ph;
+        updatePHDisplay(soil.ph);
+        updateSoilCardPreviewBox({
+          texture: soil.soil_type,
+          n: soil.nitrogen, p: soil.phosphorus, k: soil.potassium,
+          ph: soil.ph, oc: soil.organic_carbon_pct || 0.6
+        });
+        runDynamicCropPrediction();
+      }
+    }
+  } catch (_) { /* offline → hub soil data stays */ }
+}
+
+function renderLiveWeatherCard(data, isEn) {
+  if (!data) return;
+  const hub = DEMO_HUBS[currentHub] || DEMO_HUBS.nashik;
+
+  const hubNameEl = document.getElementById("weatherHubName");
+  const condEl = document.getElementById("weatherCondition");
+  const tempEl = document.getElementById("weatherTemp");
+  const humEl = document.getElementById("weatherHumidity");
+  const rainEl = document.getElementById("weatherRain");
+  const emojiEl = document.getElementById("weatherEmoji");
+  const sprayEl = document.getElementById("weatherSprayText");
+
+  const temp = (typeof data.current_temp_c === "number") ? data.current_temp_c.toFixed(1) : data.current_temp_c;
+  const hum = Math.round(data.current_humidity_pct ?? hub.weather.hum ?? 70);
+  const rain7 = Math.round(data.rainfall_7d_total_mm ?? 0);
+
+  // Derive a human condition + icon from the live 7-day rain profile
+  let condEn = "Pleasant & workable", condHi = "अनुकूल मौसम", icon = "⛅";
+  if (rain7 > 80)      { condEn = "Heavy rain expected this week"; condHi = "इस सप्ताह भारी वर्षा की संभावना"; icon = "🌧️"; }
+  else if (rain7 > 25) { condEn = "Scattered showers this week";  condHi = "इस सप्ताह हल्की बौछारें";      icon = "🌦️"; }
+  else if (temp >= 35) { condEn = "Hot & dry — irrigate on time"; condHi = "गर्म व शुष्क — समय पर सिंचाई करें"; icon = "☀️"; }
+  else if (temp <= 10) { condEn = "Cold — protect crops";         condHi = "ठंडा मौसम — फसल की रक्षा करें";  icon = "❄️"; }
+
+  if (hubNameEl) hubNameEl.textContent = isEn
+    ? `${detectedRegion.district || hub.district_en}, ${detectedRegion.state || hub.state_en}`
+    : `${detectedRegion.district || hub.district_hi}, ${detectedRegion.state || hub.state_hi}`;
+  if (condEl) condEl.textContent = isEn ? condEn : condHi;
+  if (tempEl) tempEl.textContent = `${temp}°C`;
+  if (humEl) humEl.textContent = `${hum}%`;
+  if (rainEl) rainEl.textContent = isEn ? `${rain7} mm / 7 days` : `${rain7} मिमी / ७ दिन`;
+  if (emojiEl) emojiEl.textContent = icon;
+
+  // Live spray alert from the backend's agro-alerts
+  const firstAlert = (data.alerts && data.alerts[0]) || null;
+  if (sprayEl && firstAlert) {
+    sprayEl.textContent = isEn ? firstAlert.message_en : firstAlert.message_hi;
+  }
+}
+
+function localizedDayName(dateStr, isEn) {
+  const HI_DAYS = ["रविवार", "सोमवार", "मंगलवार", "बुधवार", "गुरुवार", "शुक्रवार", "शनिवार"];
+  const EN_DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  try {
+    const d = new Date(dateStr + "T00:00:00");
+    return isEn ? EN_DAYS[d.getDay()] : HI_DAYS[d.getDay()];
+  } catch (_) {
+    return dateStr;
+  }
+}
+
+function renderLiveMandiRows(isEn) {
+  if (!liveMandiData || !Array.isArray(liveMandiData.prices) || liveMandiData.prices.length === 0) return null;
+  return liveMandiData.prices.slice(0, 7).map(p => {
+    const trend = p.trend_direction || "stable";
+    const arrow = trend === "up" ? "▲" : (trend === "down" ? "▼" : "▶");
+    const pct = (p.trend_pct_7d > 0 ? "+" : "") + p.trend_pct_7d + "%";
+    return `
+      <tr>
+        <td>${isEn ? p.commodity : p.commodity_hi}</td>
+        <td>${liveMandiData.district || ""}</td>
+        <td><strong>₹${Math.round(p.modal_price_rs_quintal).toLocaleString("en-IN")}</strong></td>
+        <td><span class="trend ${trend}">${arrow} ${pct}</span></td>
+      </tr>`;
+  }).join("");
+}
+
+function renderLiveForecastRows(isEn) {
+  if (!liveWeatherData || !Array.isArray(liveWeatherData.forecast_7d)) return null;
+  return liveWeatherData.forecast_7d.slice(0, 6).map((d, i) => {
+    const dayName = i === 0 ? (isEn ? "Today" : "आज") : localizedDayName(d.date, isEn);
+    const descEn = d.weather_desc || "";
+    const descHi = descEn.includes("Heavy") ? "भारी वर्षा" : (descEn.includes("Scattered") ? "हल्की फुहार" : "साफ मौसम");
+    const icon = descEn.includes("Heavy") ? "🌧️" : (descEn.includes("Scattered") ? "🌦️" : "☀️");
+    const rainMm = Math.round((d.precipitation_prob || 0) / 10);
+    const rating = d.spray_condition_rating || "Good for Spraying";
+    const isBad = rating.includes("Avoid");
+    const isMid = rating.includes("Moderate") || rating.includes("Caution");
+    const badgeCls = (isBad || isMid) ? "amber" : "green";
+    const badgeTxt = isBad ? (isEn ? "No Spray Today" : "छिड़काव न करें")
+      : (isMid ? (isEn ? "Spray after 4 PM" : "शाम को छिड़काव करें") : (isEn ? "Good for Spray" : "छिड़काव उत्तम"));
+    return `
+      <div class="forecast-day-row">
+        <span class="day-name">${dayName}</span>
+        <span class="day-icon">${icon}</span>
+        <span class="day-cond">${isEn ? descEn : descHi} • ${Math.round(d.temp_max)}°C / ${Math.round(d.temp_min)}°C</span>
+        <span class="day-rain">${isEn ? rainMm + " mm Rain" : rainMm + " मिमी वर्षा"}</span>
+        <span class="badge-spray ${badgeCls}">${badgeTxt}</span>
+      </div>`;
+  }).join("");
 }
 
 function selectHub(key, overrideInputs = true) {
@@ -2134,6 +2347,100 @@ function setupMultilingualVoiceSaathi() {
   const btnClear = document.getElementById("btnClearVoiceInput");
   const micWaves = document.getElementById("micLiveWaves");
   const micIcon = document.getElementById("micIconStatus");
+
+  // ------------------------------------------------------------------
+  // GOOGLE ONE-TAP VOICE ORB: Tap → Listen (in the selected language)
+  // → show what was spoken → auto-answer (spoken aloud) in that language
+  // ------------------------------------------------------------------
+  const voiceOrb = document.getElementById("btnVoiceOrb");
+  const orbIconEl = document.getElementById("voiceOrbIcon");
+  const orbStatus = document.getElementById("voiceOrbStatus");
+  const orbTranscript = document.getElementById("voiceOrbTranscript");
+  const OrbSpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let orbRecognition = null;
+  let orbGotFinal = false;
+
+  function orbIdleText() {
+    const langName = I18N_DICTIONARY[currentLang]?.name_native || I18N_DICTIONARY[currentLang]?.name || "हिंदी";
+    return (currentLang === "en")
+      ? `Tap the mic and ask anything — you will be answered in <span class="orb-lang-tag">${langName} (selected above)</span>`
+      : `माइक दबाएं और कुछ भी पूछें — उत्तर <span class="orb-lang-tag">${langName} (ऊपर चुनी भाषा)</span> में मिलेगा`;
+  }
+
+  function orbSetIdle() {
+    if (voiceOrb) voiceOrb.classList.remove("listening");
+    if (orbIconEl) orbIconEl.textContent = "🎤";
+    if (orbStatus) orbStatus.innerHTML = orbIdleText();
+  }
+
+  function orbSetListening() {
+    if (voiceOrb) voiceOrb.classList.add("listening");
+    if (orbIconEl) orbIconEl.textContent = "🎙️";
+    const langName = I18N_DICTIONARY[currentLang]?.name_native || "हिंदी";
+    if (orbStatus) orbStatus.textContent = (currentLang === "en")
+      ? `Listening… speak now (language: ${langName})`
+      : `सुन रहे हैं… अब बोलिए (भाषा: ${langName})`;
+    if (orbTranscript) { orbTranscript.style.display = "none"; orbTranscript.textContent = ""; }
+  }
+
+  if (voiceOrb && OrbSpeechRecognition) {
+    orbRecognition = new OrbSpeechRecognition();
+    orbRecognition.lang = I18N_DICTIONARY[currentLang]?.speechCode || "hi-IN";
+    orbRecognition.interimResults = true;
+    orbRecognition.continuous = false;
+    orbRecognition.maxAlternatives = 1;
+
+    orbRecognition.onresult = (event) => {
+      let interim = "";
+      let final = "";
+      for (let i = event.resultIndex; i < event.results.length; ++i) {
+        if (event.results[i].isFinal) final += event.results[i][0].transcript;
+        else interim += event.results[i][0].transcript;
+      }
+      const spoken = final || interim;
+      if (orbTranscript && spoken) {
+        orbTranscript.style.display = "flex";
+        orbTranscript.textContent = `🗣️ ${final ? "✅ " : ""}${spoken}`;
+      }
+      if (final && final.trim()) {
+        // Farmer finished speaking → auto-answer in the selected language
+        orbGotFinal = true;
+        if (orbStatus) orbStatus.textContent = (currentLang === "en")
+          ? "🤖 Kisaan_Sathi AI is preparing your answer…"
+          : "🤖 किसान साथी AI आपका उत्तर तैयार कर रहा है…";
+        if (input) { input.value = final.trim(); if (btnClear) btnClear.style.display = "flex"; }
+        sendVoiceQuery(final.trim());
+      }
+    };
+
+    orbRecognition.onerror = () => { orbSetIdle(); };
+    orbRecognition.onend = () => {
+      if (voiceOrb) voiceOrb.classList.remove("listening");
+      if (orbIconEl) orbIconEl.textContent = "🎤";
+      // If the farmer said nothing (no final transcript), reset to idle
+      if (!orbGotFinal) orbSetIdle();
+      orbGotFinal = false;
+    };
+
+    voiceOrb.addEventListener("click", () => {
+      // Stop any TTS playback before listening
+      try {
+        if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+        isCurrentlySpeaking = false;
+      } catch (_) {}
+      orbGotFinal = false;
+      try { orbRecognition.start(); } catch (_) { /* already started */ }
+      orbSetListening();
+    });
+  } else if (voiceOrb) {
+    voiceOrb.addEventListener("click", () => {
+      if (orbStatus) orbStatus.textContent = (currentLang === "en")
+        ? "Voice input is not supported in this browser — please type your question below."
+        : "इस ब्राउज़र में वॉइस इनपुट उपलब्ध नहीं है — कृपया नीचे अपना प्रश्न टाइप करें।";
+      if (input) input.focus();
+    });
+  }
+
   const searchBar = document.getElementById("googleSearchBar");
   const gStatusText = document.getElementById("gStatusText");
   const gStatusDot = document.getElementById("gStatusDot");
@@ -2611,6 +2918,11 @@ function fallbackDynamicVoiceQuery(query, isEn) {
 function renderWeatherAndMandiTables(hub, isEn) {
   const weatherList = document.getElementById("weatherForecastList");
   if (weatherList) {
+    const liveForecast = renderLiveForecastRows(isEn);
+    if (liveForecast) {
+      // LIVE Open-Meteo satellite forecast for the farmer's detected region
+      weatherList.innerHTML = liveForecast;
+    } else
     weatherList.innerHTML = `
       <div class="forecast-day-row">
         <span class="day-name">${isEn ? 'Today' : 'आज'}</span>
@@ -2645,6 +2957,11 @@ function renderWeatherAndMandiTables(hub, isEn) {
 
   const mandiBody = document.getElementById("mandiTableBody");
   if (mandiBody) {
+    const liveMandi = renderLiveMandiRows(isEn);
+    if (liveMandi) {
+      // LIVE APMC mandi rates for the farmer's detected district
+      mandiBody.innerHTML = liveMandi;
+    } else
     mandiBody.innerHTML = `
       <tr>
         <td>${isEn ? '🍇 Grapes' : '🍇 अंगूर'}</td>

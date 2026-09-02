@@ -2339,6 +2339,115 @@ body {
   display: none !important;
 }
 
+/* ==========================================================================
+   GOOGLE ONE-TAP VOICE ORB (Assistant-style listen button)
+   ========================================================================== */
+.voice-orb-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  margin: 1.4rem auto 0.6rem;
+  text-align: center;
+}
+
+.voice-orb {
+  position: relative;
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(135deg, #FFFFFF 0%, #EFF6FF 100%);
+  box-shadow: 0 6px 24px rgba(37, 99, 235, 0.25), 0 2px 6px rgba(0,0,0,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.voice-orb:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 32px rgba(37, 99, 235, 0.35), 0 3px 8px rgba(0,0,0,0.14);
+}
+
+.voice-orb:active {
+  transform: scale(0.97);
+}
+
+.voice-orb-icon {
+  font-size: 2.6rem;
+  line-height: 1;
+  z-index: 2;
+  transition: transform 0.2s ease;
+}
+
+.voice-orb-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(37, 99, 235, 0.45);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Listening state: expanding Google-Assistant rings + blue orb */
+.voice-orb.listening {
+  background: linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%);
+  box-shadow: 0 8px 30px rgba(37, 99, 235, 0.55);
+}
+
+.voice-orb.listening .voice-orb-icon {
+  transform: scale(1.15);
+}
+
+.voice-orb.listening .voice-orb-ring {
+  animation: voiceOrbRing 1.6s ease-out infinite;
+}
+
+.voice-orb.listening .voice-orb-ring.r2 { animation-delay: 0.5s; }
+.voice-orb.listening .voice-orb-ring.r3 { animation-delay: 1.0s; }
+
+@keyframes voiceOrbRing {
+  0%   { transform: scale(1);    opacity: 0.85; }
+  100% { transform: scale(1.85); opacity: 0; }
+}
+
+.voice-orb-status {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1E293B;
+  max-width: 560px;
+  line-height: 1.45;
+}
+
+.voice-orb-status .orb-lang-tag {
+  display: inline-block;
+  margin-top: 0.25rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  background: #DBEAFE;
+  color: #1D4ED8;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.voice-orb-transcript {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 640px;
+  padding: 0.7rem 1.1rem;
+  border-radius: 14px;
+  background: #F0FDF4;
+  border: 1.5px solid #86EFAC;
+  color: #14532D;
+  font-size: 1rem;
+  font-weight: 600;
+  font-style: italic;
+  line-height: 1.5;
+}
+
 /* LIVE SCANNING VISUALIZER WRAP */
 .live-scan-preview-box {
   position: relative;
