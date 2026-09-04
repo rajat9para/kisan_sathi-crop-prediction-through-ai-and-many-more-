@@ -7,27 +7,26 @@
 ## 1. Hardware Architecture (Dual-Track)
 
 Kisan Sathi 2.0 supports a dual-track deployment strategy:
-- **Track A (Maker Prototype - Implemented & Tested)**: Built with low-cost, off-the-shelf components accessible to every Indian agricultural university, polytechnic, and grassroots farmer.
-- **Track B (Industrial Edge AI - Benchmarked & Hub-Ready)**: Qualcomm Dragonwing RB3 Gen 2 Development Kit with Qualcomm QCS6490 Octa-Core SoC and Hexagon NPU (12 TOPS).
+- **Track A (Field-Deployable Build - Implemented & Tested)**: Built with off-the-shelf components designed for rugged field deployment and local maintainability.
+- **Track B (High-Throughput Edge AI Reference Platform)**: Qualcomm Dragonwing RB3 Gen 2 Development Kit with Qualcomm QCS6490 Octa-Core SoC and Hexagon NPU (12 TOPS).
 
 ---
 
-## 2. Track A Bill of Materials (BOM)
+## 2. Track A Bill of Materials (BOM) & Specifications
 
-| Component | Specification / Part | Purpose | Approx Cost (INR) |
+| Component | Specification / Part | Interface | Functional Responsibility |
 | :--- | :--- | :--- | :--- |
-| **Compute SBC** | Raspberry Pi 4 Model B (4GB / 8GB) | Edge inference, decision engine, web server | ₹4,800 |
-| **Camera Module** | Raspberry Pi Camera V2 (8MP Sony IMX219) | Leaf pathology & pest infestation capture | ₹1,650 |
-| **Soil Moisture** | Capacitive Soil Moisture Sensor v1.2 | Corrosion-resistant volumetric soil water % | ₹120 |
-| **ADC Converter** | ADS1115 16-Bit 4-Channel I2C ADC | Digitizes analog capacitive moisture signal | ₹280 |
-| **Air Temp / Humidity** | DHT22 / AM2302 Sensor | Measures ambient $T$ and $RH$ for $ET_0$ water budget | ₹250 |
-| **Rain Inhibitor** | FC-37 / YL-83 Raindrop Sensor Module | Inhibits pump during downpours (conserve water/power) | ₹90 |
-| **Relay Actuator** | 5V 1-Channel Relay Module (Optocoupler) | Switches 12V DC diaphragm irrigation pump / valve | ₹85 |
-| **Pump Actuator** | 12V R385 Mini Diaphragm DC Water Pump | Drives drip lines to demonstration field bed | ₹320 |
-| **Offline GSM/SMS** | SIM800L GPRS / GSM Module | Dispatches regional language SMS without 4G/Wi-Fi | ₹340 |
-| **Long-Range RF** | Reyax RYLR896 LoRa SX1278 (868/915 MHz) | Farm-wide mesh telemetry from remote field zones | ₹650 |
-| **Power Supply** | 12V 2A DC Adapter + LM2596 Step-Down Buck | Powers Pi 4 (5V 3A) and water pump (12V) | ₹380 |
-| **Total BOM** | — | — | **~₹8,965** |
+| **Compute SBC** | Raspberry Pi 4 Model B (4GB / 8GB) | 40-Pin GPIO, CSI, USB | Edge inference, decision state machine, local API |
+| **Camera Module** | Raspberry Pi Camera V2 (8MP Sony IMX219) | 2-Lane MIPI CSI-2 | Optical capture of leaf pathology & insect pests |
+| **Soil Moisture** | Capacitive Soil Moisture Sensor v1.2 | Analog (1.2V–3.0V) | Corrosion-resistant volumetric soil water fraction |
+| **ADC Converter** | ADS1115 16-Bit 4-Channel I2C ADC | I2C (Address `0x48`) | High-resolution digitization of analog moisture signal |
+| **Air Temp / Humidity** | DHT22 / AM2302 Sensor | Single-bus digital (1-Wire)| Ambient dry-bulb $T$ and $RH$ for $ET_0$ water budgeting |
+| **Rain Inhibitor** | FC-37 / YL-83 Raindrop Sensor Module | Digital Comparator (LM393) | Hardware pump inhibition during rainfall events |
+| **Relay Actuator** | 5V 1-Channel Relay Module (Optocoupler) | Active-LOW GPIO input | Galvanically isolated switching of 12V DC water pump |
+| **Pump Actuator** | 12V R385 Mini Diaphragm DC Water Pump | Switched 12V DC leads | Pressurizes demonstration drip irrigation distribution |
+| **Offline GSM/SMS** | SIM800L GPRS / GSM Module | UART0 @ 9600 baud, 8N1 | Regional language SMS dispatch without 4G/Wi-Fi |
+| **Long-Range RF** | Reyax RYLR896 LoRa SX1278 (868 MHz) | SPI0 Bus (`/dev/spidev0.0`)| Sub-GHz mesh telemetry packets across farm plots |
+| **Power Regulation**| Dual-Rail LM2596 Buck Step-Down | DC Rails | Dual 5V 3A and 4.2V 2A rails from 12V 2A supply |
 
 ---
 
