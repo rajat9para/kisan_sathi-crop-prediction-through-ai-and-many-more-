@@ -17,6 +17,7 @@ import 'disease_doctor_screen.dart';
 import 'offline_demo_screen.dart';
 import 'roadmap_schemes_screen.dart';
 import 'language_selection_screen.dart';
+import 'edge_node_controller_screen.dart';
 
 class HomeDashboardScreen extends StatefulWidget {
   const HomeDashboardScreen({super.key});
@@ -97,6 +98,20 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               ).then((_) => setState(() {}));
             },
           ),
+          // Smart Edge Node Controller (Track A RPi 4 & Track B RB3)
+          IconButton(
+            tooltip: "Field Node & Irrigation / स्मार्ट फील्ड नोड",
+            icon: const Icon(
+              Icons.settings_input_antenna_rounded,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const EdgeNodeControllerScreen()),
+              );
+            },
+          ),
           // Airplane Mode Demo Toggle
           IconButton(
             tooltip: "Offline / Airplane Mode Demo",
@@ -137,7 +152,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       const Center(child: CircularProgressIndicator()),
                     const SizedBox(height: 18),
 
-                    // Quick Actions Grid (Advisory, Soil Card, Leaf Doctor, Voice)
+                    // Hero Edge-AI Field Node Card (Track A Raspberry Pi 4 + Qualcomm RB3 Gen 2)
+                    _buildEdgeNodeHeroBanner(context),
+                    const SizedBox(height: 20),
+
+                    // Quick Actions Grid (Advisory, Soil Card, Leaf Doctor, Voice, Edge Node)
                     _buildQuickActionsGrid(context),
                     const SizedBox(height: 20),
 
@@ -237,6 +256,147 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               AppStrings.isHindi ? "बदलें" : "Edit",
               style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEdgeNodeHeroBanner(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(color: const Color(0xFF334155)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF10B981).withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: const Color(0xFF10B981)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: const BoxDecoration(
+                        color: Color(0xFF10B981),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      AppStrings.isHindi ? "हार्डवेयर ट्रैक A सक्रिय" : "HARDWARE TRACK A ONLINE",
+                      style: const TextStyle(
+                        color: Color(0xFF34D399),
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const Spacer(),
+              const Icon(Icons.memory_rounded, color: Color(0xFF94A3B8), size: 16),
+              const SizedBox(width: 4),
+              const Text(
+                "RPi 4 + RB3",
+                style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            AppStrings.isHindi ? "🛰️ स्मार्ट फील्ड नोड व स्वचालित सिंचाई" : "🛰️ Smart Field Node & Autonomous Irrigation",
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            AppStrings.isHindi
+                ? "FAO-56 ET₀ जल बजट, 5V रिले कटऑफ, ऑन-डिवाइस कीट पहचान व LoRa मेश"
+                : "FAO-56 ET₀ water budgeting, 5V relay cutoff, on-device pest AI & LoRa mesh",
+            style: const TextStyle(color: Color(0xFFCBD5E1), fontSize: 12),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: Wrap(
+                  spacing: 12,
+                  runSpacing: 4,
+                  children: [
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.water_drop_rounded, color: Color(0xFF38BDF8), size: 15),
+                        const SizedBox(width: 4),
+                        Text(
+                          AppStrings.isHindi ? "नमी: 21.4%" : "Moisture: 21.4%",
+                          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.shield_rounded, color: Color(0xFFFBBF24), size: 15),
+                        const SizedBox(width: 4),
+                        Text(
+                          AppStrings.isHindi ? "सुरक्षा: 15m वॉचडॉग" : "Safety: 15m Lock",
+                          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF10B981),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                icon: const Icon(Icons.sensors_rounded, size: 16),
+                label: Text(
+                  AppStrings.isHindi ? "कंट्रोलर खोलें" : "Open Node",
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const EdgeNodeControllerScreen()),
+                  );
+                },
+              ),
+            ],
           ),
         ],
       ),

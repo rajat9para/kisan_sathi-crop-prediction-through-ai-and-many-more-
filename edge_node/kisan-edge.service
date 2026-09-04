@@ -1,0 +1,15 @@
+[Unit]
+Description=Kisan Sathi 2.0 Edge-AI Smart Farming Daemon
+After=network.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/kisan_sathi-crop-prediction-through-ai-and-many-more-
+ExecStart=/usr/bin/python3 edge_node/edge_daemon.py --interval 10 --cloud-url http://localhost:8000
+Restart=always
+RestartSec=5
+Environment=PYTHONUNBUFFERED=1
+
+[Install]
+WantedBy=multi-user.target

@@ -86,3 +86,60 @@ python backend/ml/train_vision.py --epochs 8 --batch 64 --img-size 160 \
 Artifacts exported to `backend/ml/artifacts/`: retrained weights,
 `vision_evaluation_metrics.json` (per-class F1 + confusion matrix) and
 `vision_training_history.json` (per-epoch loss/accuracy curve).
+
+---
+
+## 6. Track A Edge Node Deployment (Raspberry Pi 4 Maker Build)
+
+To run the field-level IoT and automated irrigation daemon on a Raspberry Pi 4:
+
+```bash
+# 1. SSH into Raspberry Pi 4 (Raspberry Pi OS 64-bit)
+ssh pi@<raspberry-pi-ip>
+
+# 2. Clone repository & install edge dependencies
+cd ~
+git clone https://github.com/rajat9para/kisan_sathi-crop-prediction-through-ai-and-many-more-.git
+cd kisan_sathi-crop-prediction-through-ai-and-many-more-
+pip install -r edge_node/requirements-edge.txt
+
+# 3. Verify hardware GPIO connections (5V Relay on BCM 23, DHT22 on BCM 4)
+python edge_node/smart_irrigation.py --status
+
+# 4. Start the autonomous Edge Monitoring Daemon
+python edge_node/edge_daemon.py --interval 10 --cloud-url http://localhost:8000
+
+# 5. Enable systemd daemon for 24/7 autonomous field operation
+sudo cp edge_node/kisan-edge.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now kisan-edge
+```
+
+---
+
+## 7. Track B Qualcomm RB3 Gen 2 Dev Kit Deployment (Hexagon NPU)
+
+For deployment on Qualcomm Dragonwing RB3 Gen 2 (QCS6490 SoC with 12 TOPS NPU):
+
+```bash
+# 1. Connect via ADB to Qualcomm RB3 Gen 2 Dev Kit
+adb connect <rb3-device-ip>:5555
+adb root && adb remount
+
+# 2. Quantize MobileNetV2 with Qualcomm AI Hub CLI
+pip install qai-hub
+python -c "
+import qai_hub as hub
+import torchvision.models as models
+model = models.mobilenet_v2(weights=None)
+compile_job = hub.submit_compile_job(
+    model=model,
+    device=hub.Device('Qualcomm Dragonwing RB3 Gen 2'),
+    options='--target_runtime qnn_lib --target_architecture hexagon_v68'
+)
+"
+
+# 3. Push QNN DLC container to RB3 target and verify 6.1 ms inference latency
+python edge_node/qualcomm_rb3_benchmarks.py
+```
+

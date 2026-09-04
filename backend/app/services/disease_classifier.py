@@ -378,6 +378,82 @@ DISEASE_KNOWLEDGE_BASE: Dict[str, Dict[str, str]] = {
         "spray_guide_en": "Spray during cool cloudy weather (15-20°C) with persistent moisture.",
         "spray_guide_hi": "शीत ऋतु में बदली और नमी वाले मौसम में छिड़काव अवश्य करें।"
     },
+    # --- PEST & INSECT ATTACKS (ICAR / NCIPM Extension Guidelines) ---
+    "fall_armyworm": {
+        "crop_key": "maize",
+        "crop_en": "Maize / Corn (Zea mays)", "crop_hi": "मक्का (Zea mays)",
+        "disease_en": "Fall Armyworm Infestation (Spodoptera frugiperda)",
+        "disease_hi": "फॉल आर्मीवॉर्म / लश्करी सुंडी (Spodoptera frugiperda)",
+        "severity": "High",
+        "symptoms_en": "Ragged whorl feeding, large irregular elongated leaf holes with prominent sawdust-like moist fecal frass.",
+        "symptoms_hi": "पौधे की गोभ में बड़े छिद्र, कटी-फटी पत्तियां और बुरादे जैसी बदबूदार विष्ठा (Frass) जमा होती है।",
+        "organic_en": "Release egg parasitoid Trichogramma pretiosum @ 50,000/acre; spray Bacillus thuringiensis (Bt @ 2g/L) or Metarhizium rileyi.",
+        "organic_hi": "ट्राइकोग्रामा परजीवी (50,000 प्रति एकड़) छोड़ें। बैसिलस थुरिंजिएंसिस (Bt @ 2 ग्राम/लीटर) या नीम अर्क (1500 ppm @ 5 मिली/लीटर) छिड़कें।",
+        "chemical_en": "Spray Chlorantraniliprole 18.5% SC (Coragen @ 0.4 ml/L) or Spinetoram 11.7% SC (0.5 ml/L) directly into whorl.",
+        "chemical_hi": "कोराजन (Chlorantraniliprole 18.5% SC @ 0.4 मिली/लीटर) या स्पिनटोरम (0.5 मिली/लीटर) पौधे की गोभ में छिड़कें।",
+        "spray_guide_en": "Direct nozzle directly into plant whorls during late afternoon.",
+        "spray_guide_hi": "दोपहर बाद पौधे की गोभ में सीधा नोजल रखकर छिड़काव करें।"
+    },
+    "aphids_infestation": {
+        "crop_key": "mustard",
+        "crop_en": "Mustard / Rapeseed (Brassica juncea)", "crop_hi": "सरसों / राई",
+        "disease_en": "Aphid / Plant Lice Attack (Lipaphis erysimi / Aphis gossypii)",
+        "disease_hi": "माहू / चेपा कीट प्रकोप (Lipaphis erysimi)",
+        "severity": "Moderate",
+        "symptoms_en": "Colonies of tiny green/black insects on tender shoots and under leaves; sticky honeydew secretion and curled leaves.",
+        "symptoms_hi": "कोमल पत्तियों व टहनियों पर काले-हरे कीटों का जमावड़ा, चिपचिपा मधु जैसा स्राव (Honeydew) और काली फफूंद जमना।",
+        "organic_en": "Install yellow sticky traps (15-20 traps/acre); spray Verticillium lecanii (5g/L) or 5% Neem Seed Kernel Extract.",
+        "organic_hi": "पीले चिपचिपे कार्ड (15-20 प्रति एकड़) लगाएं। नीम का तेल (5 मिली/लीटर) या वर्टिसिलियम लेकानी (5 ग्राम/लीटर) छिड़कें।",
+        "chemical_en": "Spray Imidacloprid 17.8% SL (0.5 ml/L) or Thiamethoxam 25% WG (0.3 g/L water).",
+        "chemical_hi": "इमिडाक्लोप्रिड 17.8% SL (0.5 मिली/लीटर) या थायमेथॉक्सम 25% WG (0.3 ग्राम/लीटर) का छिड़काव करें।",
+        "spray_guide_en": "Spray when 1.5 cm aphid colony length is observed on terminal branches.",
+        "spray_guide_hi": "मुख्य शाखा पर 1.5 से.मी. तक माहू की कॉलोनी दिखने पर तुरंत छिड़काव करें।"
+    },
+    "whitefly_vector": {
+        "crop_key": "cotton",
+        "crop_en": "Cotton / Tomato / Chilli", "crop_hi": "कपास / टमाटर / मिर्च",
+        "disease_en": "Whitefly Infestation & Viral Vector (Bemisia tabaci)",
+        "disease_hi": "सफेद मक्खी व वायरस वाहक (Bemisia tabaci)",
+        "severity": "Critical",
+        "symptoms_en": "Tiny white fluttery flies on leaf underside; yellowing, leaf crinkling, transmission of deadly Gemini viruses.",
+        "symptoms_hi": "पत्तियों के नीचे छोटी सफेद मक्खियां, पत्तियों का पीला पड़ना, ऊपर की ओर मुड़ना व मोजेक वायरस का फैलाव।",
+        "organic_en": "Erect yellow sticky traps @ 25/acre; spray Beauveria bassiana @ 5g/L; conserve predatory ladybird beetles.",
+        "organic_hi": "पीले ट्रैप (25 प्रति एकड़) लगाएं। ब्युवेरिया बासियाना (5 ग्राम/लीटर) या नीम अर्क (5 मिली/लीटर) का छिड़काव करें।",
+        "chemical_en": "Spray Diafenthiuron 50% WP (Pegasus @ 1.2 g/L) or Pyriproxyfen 10% + Bifenthrin 10% EC (2 ml/L).",
+        "chemical_hi": "पेगासस (Diafenthiuron 50% WP @ 1.2 ग्राम/लीटर) या पायरीप्रॉक्सीफेन (2 मिली/लीटर) का छिड़काव करें।",
+        "spray_guide_en": "Spray in early morning with high-volume cone nozzle covering underside of leaves.",
+        "spray_guide_hi": "सुबह के समय पत्तियों की निचली सतह को अच्छी तरह भिगोते हुए छिड़काव करें।"
+    },
+    "stem_borer": {
+        "crop_key": "rice",
+        "crop_en": "Rice / Paddy (Oryza sativa)", "crop_hi": "धान / चावल (Oryza sativa)",
+        "disease_en": "Yellow Stem Borer (Scirpophaga incertulas)",
+        "disease_hi": "तना छेदक / पीला सुंडी (Scirpophaga incertulas)",
+        "severity": "High",
+        "symptoms_en": "Dead heart in vegetative stage (central tiller dries and pulls easily); white earheads at heading stage.",
+        "symptoms_hi": "वानस्पतिक अवस्था में 'डेड हार्ट' (बीच की गोभ सूखकर आसानी से खिंच आती है) और बाली अवस्था में 'सफेद बाली'।",
+        "organic_en": "Install pheromone traps (Scirpo-lure @ 5 traps/acre); release Trichogramma japonicum egg cards @ 1 lakh/ha.",
+        "organic_hi": "फेरोमोन ट्रैप (5 प्रति एकड़) लगाएं। ट्राइकोग्रामा जपोनिकम परजीवी कार्ड (40,000 प्रति एकड़) लगाएं।",
+        "chemical_en": "Broadcast Cartap Hydrochloride 4% Granules @ 10 kg/acre or spray Fipronil 5% SC @ 2 ml/L.",
+        "chemical_hi": "कार्टाप हाइड्रोक्लोराइड 4% दानेदार (10 किग्रा/एकड़) डालें या फिप्रोनिल 5% SC (2 मिली/लीटर) का छिड़काव करें।",
+        "spray_guide_en": "Apply Cartap granules in 2-3 cm standing water layer in field.",
+        "spray_guide_hi": "खेत में 2-3 सेमी पानी भरा रहने पर दानेदार कीटनाशक का बुरकाव करें।"
+    },
+    "bollworm": {
+        "crop_key": "cotton",
+        "crop_en": "Cotton / Tomato / Gram", "crop_hi": "कपास / टमाटर / चना",
+        "disease_en": "American Bollworm / Fruit Borer (Helicoverpa armigera)",
+        "disease_hi": "कपास की सुंडी / फल व टेंड़ छेदक (Helicoverpa armigera)",
+        "severity": "High",
+        "symptoms_en": "Circular bore holes in squares, flowers, and bolls; caterpillar feeds inside with its rear end protruding out.",
+        "symptoms_hi": "फूलों, कलियों और फलों/टेंड़ों में गोल छेद, सुंडी फल के अंदर घुसकर खाती है और बाहर विष्ठा छोड़ती है।",
+        "organic_en": "Install Helilure pheromone traps (5/acre); spray HaNPV (Helicoverpa Nuclear Polyhedrosis Virus @ 250 LE/ha).",
+        "organic_hi": "हेलिल्योर फेरोमोन ट्रैप (5 प्रति एकड़) लगाएं। HaNPV वायरस घोल (250 LE/हेक्टेयर) या नीम तेल छिड़कें।",
+        "chemical_en": "Spray Emamectin Benzoate 5% SG (Proclaim @ 0.5 g/L) or Flubendiamide 39.35% SC (Fame @ 0.3 ml/L).",
+        "chemical_hi": "इमामेक्टिन बेंजोएट 5% SG (0.5 ग्राम/लीटर) या फेम (Flubendiamide @ 0.3 मिली/लीटर) का छिड़काव करें।",
+        "spray_guide_en": "Spray during dusk hours when larvae come out to feed.",
+        "spray_guide_hi": "शाम के समय छिड़काव करें जब सुंडी बाहर निकलकर भोजन करती है।"
+    },
     "healthy_leaf": {
         "crop_key": "general",
         "crop_en": "Healthy Crop Leaf", "crop_hi": "स्वस्थ फसल पत्ती",
@@ -497,6 +573,16 @@ class DiseaseClassifier:
     # All other crops are served by the symptom-based knowledge base with an
     # honest "symptom_guidelines" diagnosis_method label.
     CV_TRAINED_CROPS = {"apple", "grape", "grapes", "potato", "tomato", "auto", ""}
+
+    def diagnose(
+        self,
+        crop_hint: Optional[str] = None,
+        image_bytes: Optional[bytes] = None,
+        language: str = "hi",
+        is_en: bool = False
+    ) -> Dict[str, Any]:
+        lang = "en" if is_en else language
+        return self.diagnose_image(image_bytes=image_bytes, crop_hint=crop_hint, language=lang)
 
     def diagnose_image(
         self,
@@ -626,6 +712,18 @@ class DiseaseClassifier:
         hint = (crop_hint or "").lower().strip()
         yellow_pct = metrics.get("chlorosis_yellow_pct", 0.0)
         spot_pct = metrics.get("lesion_spot_pct", 0.0)
+
+        # 1. Agricultural Pest & Insect keyword triage
+        if any(w in hint for w in ["armyworm", "fall", "लश्करी", "frugiperda"]):
+            return "fall_armyworm"
+        if any(w in hint for w in ["aphid", "माहू", "चेपा", "lice"]):
+            return "aphids_infestation"
+        if any(w in hint for w in ["whitefly", "मक्खी", "tabaci"]):
+            return "whitefly_vector"
+        if any(w in hint for w in ["borer", "छेदक", "dead heart", "incertulas"]):
+            return "stem_borer"
+        if any(w in hint for w in ["bollworm", "सुंडी", "armigera", "fruit borer"]):
+            return "bollworm"
 
         if any(w in hint for w in ["wheat", "गेहूं", "gehu", "kanak"]):
             if any(w in hint for w in ["yellow", "stripe", "पीला"]):

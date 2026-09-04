@@ -3,7 +3,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import config
-from app.routers import advisory, soil, weather, market, voice, ocr, doctor, iot, satellite
+from app.routers import advisory, soil, weather, market, voice, ocr, doctor, iot, satellite, edge
 from app.services.supabase_client import supabase_service
 
 app = FastAPI(
@@ -42,6 +42,7 @@ app.include_router(voice.router)
 app.include_router(ocr.router)
 app.include_router(iot.router)
 app.include_router(satellite.router)
+app.include_router(edge.router)
 
 import os
 from typing import Optional
