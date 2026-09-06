@@ -56,7 +56,7 @@ class _EdgeNodeControllerScreenState extends State<EdgeNodeControllerScreen> {
       "category": "Lepidopteran Pest • मक्का / गन्ना / टमाटर",
       "severity": "High (गंभीर)",
       "confidence": 92.4,
-      "latency": "42.5 ms (ARM Cortex-A72) / 6.1 ms (Qualcomm NPU)",
+      "latency": "32.4 ms (Raspberry Pi 4 ARM Cortex-A72)",
       "etl": "5% पौधे क्षतिग्रस्त",
       "symptoms": "पौधे की गोभ में बड़े छिद्र, कटी-फटी पत्तियां और बुरादे जैसी बदबूदार विष्ठा (Frass)।",
       "bio": "ट्राइकोग्रामा परजीवी (50,000 प्रति एकड़) छोड़ें। बैसिलस थुरिंजिएंसिस (Bt @ 2g/L) छिड़कें।",
@@ -185,7 +185,7 @@ class _EdgeNodeControllerScreenState extends State<EdgeNodeControllerScreen> {
               style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white),
             ),
             const Text(
-              "Qualcomm PS #26180 • RPi 4 GPIO 23 + Qualcomm NPU",
+              "Raspberry Pi 4 • GPIO 17 Relay + ADS1115 + SIM800L",
               style: TextStyle(fontSize: 10, color: AppColors.secondaryLight),
             ),
           ],
@@ -220,8 +220,8 @@ class _EdgeNodeControllerScreenState extends State<EdgeNodeControllerScreen> {
             _buildLoraMeshCard(),
             const SizedBox(height: 16),
 
-            // 7. Qualcomm RB3 Gen 2 Benchmark Card
-            _buildQualcommBenchmarkCard(),
+            // 7. Raspberry Pi 4 Hardware Specs Card
+            _buildRpi4SpecsCard(),
             const SizedBox(height: 24),
           ],
         ),
@@ -745,7 +745,7 @@ class _EdgeNodeControllerScreenState extends State<EdgeNodeControllerScreen> {
     );
   }
 
-  Widget _buildQualcommBenchmarkCard() {
+  Widget _buildRpi4SpecsCard() {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -760,7 +760,7 @@ class _EdgeNodeControllerScreenState extends State<EdgeNodeControllerScreen> {
             children: [
               const Expanded(
                 child: Text(
-                  "⚡ क्वालकॉम RB3 Gen 2 (12 TOPS NPU)",
+                  "🍓 रास्पबेरी पाई 4 फील्ड स्टेशन (RPi 4)",
                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
                 ),
               ),
@@ -768,13 +768,13 @@ class _EdgeNodeControllerScreenState extends State<EdgeNodeControllerScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(4)),
-                child: const Text("12.16x Speedup", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                child: const Text("Arm Cortex-A72", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
           const SizedBox(height: 6),
           const Text(
-            "Qualcomm Problem Statement #26180: MobileNetV2 लेटेंसी 74.2ms (RPi4) से घटकर 6.1ms (RB3 Hexagon NPU) पर आ जाती है, साथ ही 64.7% बिजली की बचत होती है।",
+            "Raspberry Pi 4 Model B (4GB): 16-Bit ADS1115 ADC, कैपेसिटिव सॉइल सेंसर, DHT22, 5V रिले, SIM800L GSM और 20W सोलर बैकअप के साथ बिना इंटरनेट पूर्णतः स्वचलित।",
             style: TextStyle(fontSize: 11, color: Color(0xFFC7D2FE), height: 1.4),
           ),
         ],

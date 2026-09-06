@@ -37,7 +37,6 @@ try:
     from alert_engine import alert_engine
     from gsm_sms import gsm_driver
     from lora_mesh import lora_gateway
-    from qualcomm_rb3_benchmarks import get_qualcomm_benchmark_summary
 except ImportError:
     from edge_node.smart_irrigation import irrigation_controller
     from edge_node.vision_detector import edge_vision_detector, PEST_KNOWLEDGE_BASE
@@ -45,7 +44,6 @@ except ImportError:
     from edge_node.alert_engine import alert_engine
     from edge_node.gsm_sms import gsm_driver
     from edge_node.lora_mesh import lora_gateway
-    from edge_node.qualcomm_rb3_benchmarks import get_qualcomm_benchmark_summary
 
 router = APIRouter(prefix="/api/edge", tags=["Edge-AI & Smart Irrigation"])
 
@@ -353,13 +351,3 @@ async def get_lora_mesh_nodes():
         "total_active_nodes": len(nodes),
         "nodes": nodes
     }
-
-
-@router.get("/benchmarks/qualcomm")
-async def get_qualcomm_benchmarks():
-    """
-    Returns Qualcomm Dragonwing RB3 Gen 2 / QCS6490 NPU hardware specifications,
-    benchmarking comparisons against Raspberry Pi 4, and Qualcomm AI Hub quantization recipes
-    for Qualcomm Problem Statement #26180 evaluation.
-    """
-    return get_qualcomm_benchmark_summary()

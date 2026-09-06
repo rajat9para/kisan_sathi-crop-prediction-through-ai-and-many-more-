@@ -1,16 +1,15 @@
 # 🌾 Kisan Sathi 2.0 (किसान साथी)
 ### Edge-AI Smart Farming Assistant & Autonomous Closed-Loop Field Node
-**Target:** Smart India Hackathon (SIH 2026) | **Problem Statement:** #26180 (Qualcomm Inc.)  
+**Target:** Smart India Hackathon (SIH 2026) | **Problem Statement:** #26180  
 **Category:** Hardware | **Theme:** Agriculture, FoodTech & Rural Development  
-**Primary Focus:** **Track A (Field-Deployable Maker Build on Raspberry Pi 4 — Live Hackathon Demo)**  
-**Enterprise Reference:** **Track B (Qualcomm RB3 Gen 2 Dev Kit with Hexagon 12 TOPS NPU)**
+**Hardware Build:** **Field-Deployable Raspberry Pi 4 Model B Maker Prototype (₹9,850 INR / ~$118 USD)**
 
 ---
 
 ## 📑 Table of Contents
 - [1. Hackathon Overview & Problem Statement #26180](#1-hackathon-overview--problem-statement-26180)
 - [2. System Architecture & End-to-End Dataflow](#2-system-architecture--end-to-end-dataflow)
-- [3. Things Needed to Build the Project (Track A BOM & Costs)](#3-things-needed-to-build-the-project-track-a-bom--costs)
+- [3. Things Needed to Build the Project (Hardware BOM & Costs)](#3-things-needed-to-build-the-project-hardware-bom--costs)
 - [4. Hardware Wiring & Pin Interconnect Guide](#4-hardware-wiring--pin-interconnect-guide)
 - [5. How the System Works & Key Features](#5-how-the-system-works--key-features)
   - [5.1 Closed-Loop Smart Irrigation & 15-Minute Watchdog](#51-closed-loop-smart-irrigation--15-minute-watchdog)
@@ -26,21 +25,20 @@
   - [6.4 Operating & Controlling via Web Dashboard](#64-operating--controlling-via-web-dashboard)
   - [6.5 Operating via Flutter Mobile Application](#65-operating-via-flutter-mobile-application)
   - [6.6 How to Safely Stop the Project](#66-how-to-safely-stop-the-project)
-- [7. Track B: Qualcomm RB3 Gen 2 Enterprise Edge-AI Alignment](#7-track-b-qualcomm-rb3-gen-2-enterprise-edge-ai-alignment)
-- [8. Automated Verification & Testing Suite (19/19 Passing)](#8-automated-verification--testing-suite-1919-passing)
-- [9. Repository Structure](#9-repository-structure)
-- [10. Deep Architectural Documentation](#10-deep-architectural-documentation)
+- [7. Automated Verification & Testing Suite (18/18 Passing)](#7-automated-verification--testing-suite-1818-passing)
+- [8. Repository Structure](#8-repository-structure)
+- [9. Deep Architectural Documentation](#9-deep-architectural-documentation)
 
 ---
 
 ## 1. Hackathon Overview & Problem Statement #26180
 
-**Problem Statement #26180 (Qualcomm Inc.)** requires an intelligent, field-deployable smart farming assistant that improves agricultural productivity, water stewardship, and rural connectivity.
+**Problem Statement #26180** calls for a **field-deployable smart farming assistant** that improves agricultural productivity, water stewardship, and rural resilience under unpredictable climatic conditions.
 
-Most hackathon solutions present passive software forms that depend on continuous cloud connectivity and provide only generic text recommendations. **Kisan Sathi 2.0** replaces this with an **autonomous cyber-physical edge station**:
+Most hackathon solutions present passive software forms that depend on continuous cloud connectivity and provide only generic text tips. **Kisan Sathi 2.0** replaces this with an **autonomous cyber-physical edge station**:
 - **Senses** physical soil moisture, microclimate, and precipitation via dedicated hardware buses.
 - **Filters & Gates** camera frames using Laplacian blur checks and green chromaticity ratios.
-- **Infers** plant pathology and agricultural pest infestations locally using **ONNX MobileNetV2**.
+- **Infers** plant pathology and agricultural pest infestations locally using **ONNX MobileNetV2** directly on ARM CPU.
 - **Decides** exact volumetric crop water demand via **FAO-56 Hargreaves evapotranspiration math**.
 - **Actuates** a physical 12V irrigation pump via an optocoupled relay protected by an autonomous **15-minute fail-safe hardware watchdog**.
 - **Alerts** smallholders via **Devanagari Hindi SMS (SIM800L)** and **868MHz LoRa mesh packets** when off the grid.
@@ -83,7 +81,7 @@ Most hackathon solutions present passive software forms that depend on continuou
               │ I2C Bus (Pins 3 & 5)          │ Single-Bus (Pin 7)            │ GPIO 27 (Pin 13)
               ▼                               ▼                               ▼
  ┌───────────────────────────────────────────────────────────────────────────────────────────┐
- │                   2. EDGE COMPUTING LAYER (Raspberry Pi 4 Model B - Track A)              │
+ │                   2. EDGE COMPUTING LAYER (Raspberry Pi 4 Model B)                        │
  │                                                                                           │
  │  ┌─────────────────────────────────────────────────────────────────────────────────────┐  │
  │  │                         edge_daemon.py Autonomous Loop                              │  │
@@ -119,9 +117,9 @@ Most hackathon solutions present passive software forms that depend on continuou
 
 ---
 
-## 3. Things Needed to Build the Project (Track A BOM & Costs)
+## 3. Things Needed to Build the Project (Hardware BOM & Costs)
 
-The physical prototype (**Track A**) is constructed from off-the-shelf, cost-effective components readily available in India:
+The physical prototype is constructed from off-the-shelf, cost-effective components readily available in India:
 
 | # | Component Name | Model / Specification | Interface / Pinout | Qty | Price (INR) | Price (USD) |
 |---|---|---|---|:---:|:---:|:---:|
@@ -138,10 +136,8 @@ The physical prototype (**Track A**) is constructed from off-the-shelf, cost-eff
 | 11 | **Solar Charge Controller** | 10A 12V PWM with Dual USB | Battery & Panel Terminals | 1 | ₹380 | $4.55 |
 | 12 | **Deep-Cycle Battery** | 12V 7Ah VRLA Lead-Acid Battery | Faston F1 Terminals | 1 | ₹790 | $9.50 |
 | 13 | **DC-DC Step-Down Buck** | LM2596 Dual Rail (5V & 4.2V) | Screw Terminals | 2 | ₹190 | $2.30 |
-| 14 | **Optical Camera Sensor** | Pi Camera Module V2 (8MP IMX219) | 15-Pin MIPI CSI-2 Ribbon | 1 | ₹1,450 | $17.40 |
-| 15 | **Weatherproof Enclosure** | IP65 ABS Junction Box + Glands | Wall Mount | 1 | ₹450 | $5.40 |
-| **Total** | **Complete Field Node Prototype** | | | | **₹11,550** | **~$138 USD** |
-| **Base** | **Sensing & Actuation Core (No Camera)** | | | | **₹9,850** | **~$118 USD** |
+| 14 | **Weatherproof Enclosure** | IP65 ABS Junction Box + Glands | Wall Mount | 1 | ₹450 | $5.40 |
+| **Total** | **Complete Core Field Node** | | | | **₹9,850** | **~$118 USD** |
 
 ---
 
@@ -151,7 +147,7 @@ The physical prototype (**Track A**) is constructed from off-the-shelf, cost-eff
 
 | RPi 4 Pin # | Pin Name / BCM | Wire Color | Connected Component & Pin | Functional Description |
 |---|---|---|---|---|
-| **Pin 1** | `+3.3V Power` | Red | DHT22 `Pin 1 (VCC)` | Clean 3.3V logic supply |
+| **Pin 1** | `+3.3V Power` | Red | DHT22 `Pin 1 (VCC)` & Probe `VCC` | Clean 3.3V sensor supply |
 | **Pin 2** | `+5.0V Power` | Red | Relay `VCC` & ADS1115 `VDD` | 5V actuator & ADC rail |
 | **Pin 3** | `GPIO 2 (I2C1 SDA)`| Green | ADS1115 `SDA` Pin | I2C Serial Data line |
 | **Pin 5** | `GPIO 3 (I2C1 SCL)`| Yellow | ADS1115 `SCL` Pin | I2C Serial Clock line |
@@ -199,11 +195,11 @@ The physical prototype (**Track A**) is constructed from off-the-shelf, cost-eff
 - **Agronomic Math**: Computes reference evapotranspiration ($ET_0$) via the **FAO-56 Hargreaves model** and scales by crop growth stage coefficients ($ET_c = K_c \times ET_0$).
 - **Volumetric Deficit ($D_{\text{soil}}$)**: Converts ADS1115 voltage ($1.2\text{V} - 3.0\text{V}$) to soil moisture percentage, calculating exact liters required per square meter.
 - **Hardware Rain Lockout**: If rain is detected by the FC-37 sensor, the pump is immediately turned OFF and disabled.
-- **15-Minute Fail-Safe Watchdog**: A strict automatic timer shuts off the pump if it runs continuously for $\ge 15.0$ minutes, eliminating pump burnout, borehole depletion, or waterlogging.
+- **15-Minute Fail-Safe Watchdog**: A strict automatic timer shuts off the pump if it runs continuously for $\ge 15.0$ minutes, preventing pump burnout, borehole depletion, or waterlogging.
 
 ### 5.2 On-Device Vision, Quality Gating & Pest AI
 - **Quality Gates**: Computes **Laplacian blur variance** ($\sigma^2 < 100$ flags motion blur) and **green-chromaticity ratio** ($\ge 12\%$ validates leaf foliage).
-- **ONNX MobileNetV2**: Runs on-device inference for 7 foliar diseases with 95.87% validation accuracy.
+- **ONNX MobileNetV2**: Runs on-device inference for 7 foliar diseases with 95.87% validation accuracy (~32ms on RPi 4 CPU).
 - **5 Major Indian Pests with ICAR ETLs**: Fall Armyworm, Cotton Aphid, Whitefly Vector, Yellow Stem Borer, and Cotton Bollworm with biological and chemical control remedies.
 
 ### 5.3 Multi-Factor Environmental Risk & Bilingual Micro-Alerts
@@ -288,7 +284,7 @@ python backend/run.py
 
 Open `http://localhost:8000` in your web browser:
 
-1. **Edge Field Node Tab (Track A Live Prototype)**:
+1. **Edge Field Node Tab (Raspberry Pi 4 Maker Prototype)**:
    - **Telemetry HUD**: View real-time Volumetric Soil Moisture (%), Ambient Temperature (°C), Relative Humidity (%), and Rain Conduction Sensor status.
    - **Manual Relay Override**: Click **`⚡ Toggle Pump Relay`** to immediately engage or disengage the physical pump relay.
    - **Autonomous Mode Switch**: Toggle between Closed-Loop Automatic Irrigation and Manual Override.
@@ -336,20 +332,7 @@ flutter run
 
 ---
 
-## 7. Track B: Qualcomm RB3 Gen 2 Enterprise Edge-AI Alignment
-
-For commercial mass production under Qualcomm's smart agriculture ecosystem, Kisan Sathi 2.0 provides an industrial reference build on the **Qualcomm Dragonwing RB3 Gen 2 Development Kit**:
-
-- **Qualcomm QCS6490 Octa-Core SoC**: Kryo 670 CPU complex @ up to 2.7 GHz.
-- **Qualcomm Hexagon Tensor Processor (HTP) NPU**: **12 TOPS INT8 acceleration**.
-- **Performance Profiling**:
-  - Raspberry Pi 4B CPU: **32.4 ms** latency | **30.8 FPS** | 4.1 W peak
-  - Qualcomm RB3 Gen 2 Hexagon NPU: **6.10 ms** latency | **163.9 FPS** | 1.8 W peak
-  - **12.1x speedup** and **91.7% energy reduction per inference**, enabling high-speed optical inspection from agricultural drones or autonomous rovers.
-
----
-
-## 8. Automated Verification & Testing Suite (19/19 Passing)
+## 7. Automated Verification & Testing Suite (18/18 Passing)
 
 Execute the complete end-to-end verification suite:
 
@@ -383,16 +366,15 @@ RUNNING SUITE: Edge Node Hardware & IoT Services
   [PASS] test_fastapi_edge_endpoints
   [PASS] test_gsm_sms_dispatcher
   [PASS] test_lora_mesh_protocol
-  [PASS] test_qualcomm_rb3_benchmarks
   [PASS] test_smart_irrigation_controller
-Suite Edge Node Hardware & IoT Services: 6 passed, 0 failed
+Suite Edge Node Hardware & IoT Services: 5 passed, 0 failed
 
-TOTAL: 19 passed, 0 failed (100% SUCCESS RATE)
+TOTAL: 18 passed, 0 failed (100% SUCCESS RATE)
 ```
 
 ---
 
-## 9. Repository Structure
+## 8. Repository Structure
 
 ```
 kisan_sathi/
@@ -403,8 +385,7 @@ kisan_sathi/
 │   ├── environmental_risk.py        # Drought, flood, heat, and disease risk engines
 │   ├── alert_engine.py              # Structured bilingual micro-alerts generator
 │   ├── gsm_sms.py                   # SIM800L UART Devanagari Hindi SMS driver
-│   ├── lora_mesh.py                 # LoRa SX1278 14-byte binary mesh protocol
-│   └── qualcomm_rb3_benchmarks.py   # Qualcomm QCS6490 Hexagon NPU benchmarks
+│   └── lora_mesh.py                 # LoRa SX1278 14-byte binary mesh protocol
 │
 ├── backend/                         # FastAPI REST Microservices & ML Pipelines
 │   ├── app/
@@ -435,7 +416,7 @@ kisan_sathi/
 
 ---
 
-## 10. Deep Architectural Documentation
+## 9. Deep Architectural Documentation
 
 For the exhaustive technical reference manual covering exact mathematical proofs, competitive matrices, complete pinout schematics, and deep agronomic formulations, consult:
 
@@ -445,4 +426,4 @@ For the exhaustive technical reference manual covering exact mathematical proofs
 
 ---
 
-*Authored for the Smart India Hackathon (SIH 2026) Evaluation Committee & Qualcomm Inc. Technical Mentors.*
+*Authored for the Smart India Hackathon (SIH 2026) Evaluation Committee & Technical Mentors.*

@@ -1,44 +1,43 @@
 # Hardware Bill of Materials (BOM) & Edge Engineering Specifications
-**Kisan Sathi — Autonomous Agro-Climatic Intelligence & Soil Health Node**  
-**Target:** Smart India Hackathon (SIH 2026) | **Problem Statement:** #26180 (Qualcomm Inc.) | **Category:** Hardware
+**Kisan Sathi 2.0 — Autonomous Agro-Climatic Intelligence & Soil Health Node**  
+**Target:** Smart India Hackathon (SIH 2026) | **Problem Statement:** #26180 | **Category:** Hardware
 
 ---
 
-## 1. Dual-Track Hardware Strategy
+## 1. Hackathon Hardware Architecture: Field-Deployable Maker Build
 
-To achieve top marks on both **real physical feasibility (hackathon table demo)** and **Qualcomm enterprise alignment**, Kisan Sathi implements a two-tier hardware approach:
+Kisan Sathi 2.0 is engineered around an accessible, high-reliability, and affordable embedded hardware stack designed for direct physical demonstration on the hackathon jury table and rugged deployment in rural Indian fields:
 
-| Attribute | **Track A: Field-Deployable Maker Build** *(Hackathon Live Demo)* | **Track B: Industrial Edge-AI Reference Build** *(Commercial Scale)* |
-|---|---|---|
-| **Target Role** | **Active Physical Prototype for SIH Table Presentation** | **Production Edge Node for Qualcomm Enterprise Deployment** |
-| **Compute Core** | Raspberry Pi 4 Model B (Quad-core Arm Cortex-A72 @ 1.5 GHz, 4GB RAM) | Qualcomm® Dragonwing™ RB3 Gen 2 Dev Kit (Qualcomm QCS6490 Octa-Core Kryo™ 670 @ 2.7 GHz) |
-| **AI Inference** | ONNX Runtime / TFLite (INT8 quantized CPU inference, ~32ms latency) | Qualcomm Hexagon™ NPU (12 TOPS INT8 acceleration, 6.1ms latency via Qualcomm AI Hub) |
-| **Sensor Interface** | I2C (ADS1115 16-Bit ADC) + 1-Wire (DHT22) + Digital GPIO | Dedicated Sensor DSP (Hexagon) + RS-485 Modbus + I2C/SPI |
-| **Connectivity** | SIM800L GSM (2G/GPRS SMS/HTTP) + Reyax RYLR896 LoRa (SX1278 868MHz) | Quectel SC668A Smart LTE/5G Module + LoRaWAN Class C + Wi-Fi 6E |
-| **Power Solution** | 20W Monocrystalline Solar Panel + 12V 7Ah Battery + 12V/5V DC-DC Buck | 50W Monocrystalline Solar Panel + 12V 24Ah LiFePO4 Battery + MPPT Controller |
-| **Total BOM Cost** | **₹9,850 INR (~$118 USD)** | **₹43,500 INR (~$520 USD)** |
+- **Compute Core**: Raspberry Pi 4 Model B (Quad-core Arm Cortex-A72 @ 1.5 GHz, 4GB LPDDR4)
+- **Local AI Inference**: ONNX Runtime INT8 quantized execution on Arm CPU (~32ms latency)
+- **Sensor Digitization**: 16-Bit ADS1115 I2C ADC Module (0.125 mV/LSB precision)
+- **Corrosion-Proof Moisture**: Capacitive Soil Moisture Sensor v1.2 (1.2V saturated to 3.0V dry)
+- **Microclimate Tracking**: DHT22 / AM2302 (1-Wire digital temperature and relative humidity)
+- **Precipitation Sensing**: FC-37 Rain Conduction Sensor Plate with LM393 Comparator
+- **Actuation & Safety**: 5V Optocoupled Relay driving 12V DC R385 Pump with 15-Minute Watchdog Cutoff
+- **Rural Communications**: SIM800L Quad-Band GSM (Devanagari SMS) + Reyax RYLR896 LoRa (868 MHz)
+- **Off-Grid Solar Power**: 20W Monocrystalline PV Panel + 12V 7Ah VRLA Battery + LM2596 Buck Converters
+- **Total Prototype Build Cost**: **₹9,850 INR (~$118 USD)**
 
 ---
 
-## 2. Track A: Field-Deployable Maker Build (Hackathon Demo)
-
-### Complete Bill of Materials (BOM)
+## 2. Complete Bill of Materials (BOM) & Cost Matrix
 
 | Item | Component Description | Make / Part No. | Interface / Pinout | Qty | Unit Price (INR) | Total (INR) |
 |---|---|---|---|:---:|:---:|:---:|
-| 1 | Single-Board Computer | Raspberry Pi 4 Model B (4GB) | 40-Pin GPIO Header | 1 | ₹4,200 | ₹4,200 |
-| 2 | High-Precision ADC | ADS1115 16-Bit I2C ADC Module | I2C (SDA: Pin 3, SCL: Pin 5) | 1 | ₹280 | ₹280 |
-| 3 | Soil Moisture Sensor | Capacitive Soil Moisture Sensor v1.2 (Corrosion Resistant) | Analog Out -> ADS1115 A0 | 1 | ₹180 | ₹180 |
-| 4 | Ambient Temp & Humidity | DHT22 (AM2302) Digital Sensor | 1-Wire Digital (GPIO 4 / Pin 7) | 1 | ₹320 | ₹320 |
-| 5 | Rain Conduction Sensor | FC-37 Raindrop Detector + LM393 Comparator | Digital Out (GPIO 27 / Pin 13) | 1 | ₹110 | ₹110 |
-| 6 | Actuation Relay | 5V 1-Channel Optocoupled Relay (10A 250VAC / 30VDC) | Control: GPIO 17 (Pin 11), VCC: 5V, GND | 1 | ₹120 | ₹120 |
-| 7 | Irrigation Pump | 12V DC Submersible Diaphragm Micro-Pump (1.5L/min) | Switched by Relay via 12V Rail | 1 | ₹450 | ₹450 |
-| 8 | Cellular Modem | SIM800L GPRS / GSM Quad-band Module + Antenna | UART (TX: GPIO 15, RX: GPIO 14) + Reset: GPIO 18 | 1 | ₹680 | ₹680 |
-| 9 | Long-Range Mesh Radio | Reyax RYLR896 LoRa SX1278 (868/915 MHz) Transceiver | UART (TX: GPIO 10, RX: GPIO 8 / USB-UART) | 1 | ₹1,250 | ₹1,250 |
-| 10 | Solar Panel | 20W 18V Monocrystalline PV Panel | MC4 / Screw Terminal to MPPT | 1 | ₹1,100 | ₹1,100 |
-| 11 | Solar Charge Controller | 10A 12V PWM / Mini-MPPT Charge Controller with USB | Battery +/- and Panel +/- Terminals | 1 | ₹380 | ₹380 |
-| 12 | Power Storage | 12V 7Ah Valve Regulated Sealed Lead Acid (VRLA) Battery | Faston F1 Terminals | 1 | ₹790 | ₹790 |
-| Total | | | | | | **₹9,850 INR** |
+| 1 | **Single-Board Computer** | Raspberry Pi 4 Model B (4GB) | 40-Pin GPIO Header | 1 | ₹4,200 | ₹4,200 |
+| 2 | **High-Precision ADC** | ADS1115 16-Bit I2C ADC Module | I2C (SDA: Pin 3, SCL: Pin 5) | 1 | ₹280 | ₹280 |
+| 3 | **Soil Moisture Sensor** | Capacitive Soil Moisture Sensor v1.2 | Analog Out -> ADS1115 A0 | 1 | ₹180 | ₹180 |
+| 4 | **Ambient Temp & Humidity** | DHT22 (AM2302) Digital Sensor | 1-Wire Digital (GPIO 4 / Pin 7) | 1 | ₹320 | ₹320 |
+| 5 | **Rain Conduction Sensor** | FC-37 Raindrop Detector + LM393 | Digital Out (GPIO 27 / Pin 13) | 1 | ₹110 | ₹110 |
+| 6 | **Actuation Relay** | 5V 1-Channel Optocoupled Relay | Control: GPIO 17 (Pin 11), 5V, GND | 1 | ₹120 | ₹120 |
+| 7 | **Irrigation Pump** | 12V DC Submersible Diaphragm Micro-Pump | Switched by Relay via 12V Rail | 1 | ₹450 | ₹450 |
+| 8 | **Cellular Modem** | SIM800L GPRS / GSM Quad-band Module | UART (TX: GPIO 15, RX: GPIO 14) | 1 | ₹680 | ₹680 |
+| 9 | **Long-Range Mesh Radio** | Reyax RYLR896 LoRa SX1278 (868 MHz) | SPI / UART (MOSI: Pin 19, MISO: Pin 21) | 1 | ₹1,250 | ₹1,250 |
+| 10 | **Solar PV Panel** | 20W 18V Monocrystalline Panel | MC4 / Screw Terminal to MPPT | 1 | ₹1,100 | ₹1,100 |
+| 11 | **Solar Charge Controller** | 10A 12V PWM with Dual 5V USB | Battery +/- and Panel +/- Terminals | 1 | ₹380 | ₹380 |
+| 12 | **Deep-Cycle Battery** | 12V 7Ah Sealed Lead Acid (VRLA) Battery | Faston F1 Terminals | 1 | ₹790 | ₹790 |
+| **Total** | **Complete Core Field Node** | | | | | **₹9,850 INR (~$118 USD)** |
 
 ---
 
@@ -50,11 +49,14 @@ To achieve top marks on both **real physical feasibility (hackathon table demo)*
                  +3.3V (Pin 1)| [x]  [ ] (Pin 2)  +5V -> (Relay VCC, ADS1115 VDD)
   ADS1115 SDA (GPIO 2 / Pin 3)| [x]  [ ] (Pin 4)  +5V -> (DC-DC Converter 5V Rail)
   ADS1115 SCL (GPIO 3 / Pin 5)| [x]  [x] (Pin 6)  GND -> (Common System Ground)
-    DHT22 Data (GPIO 4 / Pin 7)| [x]  [ ] (Pin 8)  UART TX (LoRa Alternative)
-                   GND (Pin 9)| [x]  [ ] (Pin 10) UART RX (LoRa Alternative)
- Relay Control (GPIO 17/Pin 11)| [x]  [ ] (Pin 12) GPIO 18 (SIM800L Reset)
+    DHT22 Data (GPIO 4 / Pin 7)| [x]  [ ] (Pin 8)  UART TX (SIM800L RXD via divider)
+                   GND (Pin 9)| [x]  [ ] (Pin 10) UART RX (SIM800L TXD)
+ Relay Control (GPIO 17/Pin 11)| [x]  [ ] (Pin 12) GPIO 18 (Heartbeat LED)
     FC-37 Rain (GPIO 27/Pin 13)| [x]  [ ] (Pin 14) GND
-   SIM800L TXD (GPIO 14/Pin 15)| [x]  [x] (Pin 16) SIM800L RXD (GPIO 15)
+   SIM800L TXD (GPIO 14/Pin 15)| [x]  [x] (Pin 16) GPIO 23 (Aux Actuator)
+   LoRa MOSI (GPIO 10 / Pin 19)| [x]  [x] (Pin 20) GND
+    LoRa MISO (GPIO 9 / Pin 21)| [x]  [ ] (Pin 22) GPIO 25 (LoRa Reset)
+   LoRa SCLK (GPIO 11 / Pin 23)| [x]  [x] (Pin 24) GPIO 8 (LoRa Chip Select CE0)
                               +----------------+
 
   ANALOG SENSING SUB-SYSTEM (ADS1115 I2C ADC):
@@ -101,33 +103,22 @@ The edge node is engineered for remote Indian field deployment where grid power 
 ### Solar Panel & Battery Capacity Sizing
 
 1. **Daily Energy Requirement ($E_{\text{day}}$)**:  
-   $E_{\text{day}} = 59.49\text{ Wh} \times 1.25\text{ (system losses & DC-DC conversion efficiency)} = \mathbf{74.36\text{ Wh/day}}$
+   $$E_{\text{day}} = 59.49\text{ Wh} \times 1.25\text{ (system losses & DC-DC conversion efficiency)} = \mathbf{74.36\text{ Wh/day}}$$
 
 2. **Solar Insolation Assumption**:  
    Average Indian rural minimum winter peak sun hours = **4.0 hours/day**.  
    Required Solar Panel Wattage = $\frac{74.36\text{ Wh}}{4.0\text{ h}} = \mathbf{18.59\text{ W}} \implies \mathbf{20\text{W Panel Selected}}$.
 
 3. **48-Hour Reserve Battery Capacity (2 Days Zero-Sun Autonomy)**:  
-   Reserve Energy Needed = $74.36\text{ Wh/day} \times 2\text{ days} = 148.72\text{ Wh}$.  
-   At 12V Nominal: $\frac{148.72\text{ Wh}}{12\text{V}} = 12.39\text{ Ah}$.  
-   With a 12V 7Ah SLA Battery (or upgraded 12V 12Ah LiFePO4), standard duty cycle ensures **over 48 hours of continuous autonomous field operation** without solar recharge, protected by the 15-minute fail-safe pump cutoff timer.
+   $$\text{Reserve Energy Needed} = 74.36\text{ Wh/day} \times 2\text{ days} = 148.72\text{ Wh}$$
+   $$\text{At 12V Nominal}: \frac{148.72\text{ Wh}}{12\text{V}} = 12.39\text{ Ah}$$
+   With a 12V 7Ah SLA Battery (or standard 12V 12Ah field battery), standard duty cycle ensures **continuous autonomous field operation** without solar recharge, protected by the 15-minute fail-safe pump cutoff timer.
 
 ---
 
-## 5. Track B: Qualcomm RB3 Gen 2 Industrial Edge-AI Reference Build
+## 5. Weatherproofing & Enclosure Specifications
 
-For mass commercial deployment under Qualcomm's smart agriculture ecosystem, the production node transitions to the **Qualcomm Dragonwing RB3 Gen 2 Development Kit**:
-
-### Key Industrial Advantages
-
-1. **Qualcomm QCS6490 Octa-Core SoC**:
-   - 1x Kryo Gold Prime @ 2.7 GHz
-   - 3x Kryo Gold @ 2.4 GHz
-   - 4x Kryo Silver @ 1.9 GHz
-2. **Dedicated Qualcomm Hexagon NPU**:
-   - **12 TOPS** INT8 throughput.
-   - **6.1ms** latency per leaf pathology inference (vs 74.2ms on Raspberry Pi 4B CPU), consuming less than 1.8W peak.
-3. **Qualcomm AI Hub Model Compilation**:
-   - Compiles PyTorch / ONNX models directly into quantized `.tflite` or `.dlc` (Deep Learning Container) formats targeted to Hexagon Vector eXtensions (HVX).
-4. **Automotive & Industrial Temperature Range**:
-   - -40°C to +85°C ambient operational envelope inside an IP67 enclosure, avoiding field thermal throttling.
+- **Enclosure**: IP65 Rated Polycarbonate / ABS Weatherproof Enclosure ($200\text{mm} \times 150\text{mm} \times 100\text{mm}$).
+- **Cable Glands**: PG7 / PG9 nylon strain relief cable glands for sensor entry.
+- **Operating Temperature Envelope**: -10°C to +60°C ambient tolerance with integrated 5V passive cooling heatsinks on Raspberry Pi 4 SoC.
+- **Corrosion Protection**: Capacitive moisture sensor PCB coated with polyurethane conformal coating over non-sensing copper traces.

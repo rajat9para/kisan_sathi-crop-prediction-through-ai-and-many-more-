@@ -4,11 +4,15 @@
 
 ---
 
-## 1. Hardware Architecture (Dual-Track)
+## 1. Hardware Architecture: Raspberry Pi 4 Field-Deployable Station
 
-Kisan Sathi 2.0 supports a dual-track deployment strategy:
-- **Track A (Field-Deployable Build - Implemented & Tested)**: Built with off-the-shelf components designed for rugged field deployment and local maintainability.
-- **Track B (High-Throughput Edge AI Reference Platform)**: Qualcomm Dragonwing RB3 Gen 2 Development Kit with Qualcomm QCS6490 Octa-Core SoC and Hexagon NPU (12 TOPS).
+Kisan Sathi 2.0 is built on an accessible, reliable, and affordable embedded hardware stack designed for direct physical demonstration and field deployment:
+- **Central SBC**: Raspberry Pi 4 Model B (4GB) running Linux, Python 3.11, and ONNX Runtime.
+- **Sensing Suite**: ADS1115 16-bit I2C ADC, Capacitive Soil Probe v1.2, DHT22 Microclimate, FC-37 Rain Conduction Sensor.
+- **Physical Actuation**: Galvanically isolated 5V Optocoupled Relay driving a 12V DC R385 Pump with a 15-minute fail-safe watchdog timer.
+- **Zero-Internet Telemetry**: SIM800L Quad-Band GSM (Devanagari Hindi SMS) and Reyax RYLR896 LoRa SX1278 (868MHz Mesh).
+- **Power Autonomy**: 20W Monocrystalline PV Panel + 12V 7Ah VRLA Battery + LM2596 Step-Down Buck Converters.
+- **Total Build Cost**: ₹9,850 INR (~$118 USD).
 
 ---
 

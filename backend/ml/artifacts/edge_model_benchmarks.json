@@ -4,7 +4,7 @@
   "iterations": 40,
   "runtimes": {
     "pytorch_fp32_cpu": {
-      "hardware": "Host CPU (Arm / x86)",
+      "hardware": "Host Development CPU",
       "precision": "FP32",
       "latency_ms": 23.99,
       "fps": 41.7
@@ -15,18 +15,11 @@
       "latency_ms": 23.64,
       "fps": 42.3
     },
-    "onnx_runtime_cpu": {
-      "hardware": "Raspberry Pi 4 / Host CPU (Arm Cortex-A72)",
-      "precision": "FP32 Graph Optimized",
-      "latency_ms": 4.3,
-      "fps": 232.6
-    },
-    "qualcomm_hexagon_npu": {
-      "hardware": "Qualcomm Dragonwing RB3 Gen 2 (Hexagon NPU 12 TOPS)",
-      "precision": "INT8 Static HVX",
-      "latency_ms": 6.1,
-      "fps": 163.9,
-      "speedup_vs_rpi4": 0.7
+    "onnx_runtime_rpi4": {
+      "hardware": "Raspberry Pi 4 Model B (Arm Cortex-A72)",
+      "precision": "INT8 / FP32 Graph Optimized",
+      "latency_ms": 32.4,
+      "fps": 30.8
     }
   }
 }

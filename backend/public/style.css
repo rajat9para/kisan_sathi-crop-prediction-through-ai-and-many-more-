@@ -4229,67 +4229,6 @@ body {
   justify-content: space-between;
   color: #64748B;
   font-size: 0.7rem;
-  margin-bottom: 2px;
-}
-
-/* Qualcomm RB3 Gen 2 Sponsor Showcase Card */
-.qualcomm-showcase-card {
-  background: linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #1E1B4B 100%);
-  color: #FFFFFF;
-  border-radius: 16px;
-  padding: 1.6rem 1.8rem;
-  box-shadow: 0 10px 25px -5px rgba(30, 27, 75, 0.4);
-}
-
-.qualcomm-heading {
-  font-size: 1.25rem;
-  font-weight: 800;
-  margin: 0;
-  color: #C7D2FE;
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-.qualcomm-sub {
-  font-size: 0.85rem;
-  color: #A5B4FC;
-  margin: 0.3rem 0 1.2rem 0;
-}
-
-.qualcomm-table-wrap {
-  overflow-x: auto;
-}
-
-.qualcomm-bench-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.82rem;
-  color: #E0E7FF;
-}
-
-.qualcomm-bench-table th {
-  background: rgba(255, 255, 255, 0.08);
-  padding: 0.65rem 0.8rem;
-  text-align: left;
-  font-weight: 700;
-  color: #C7D2FE;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-}
-
-.qualcomm-bench-table td {
-  padding: 0.65rem 0.8rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.speedup-pill {
-  background: #10B981;
-  color: #FFFFFF;
-  font-weight: 800;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.72rem;
-  display: inline-block;
 }
 
 /* ============================================================== */

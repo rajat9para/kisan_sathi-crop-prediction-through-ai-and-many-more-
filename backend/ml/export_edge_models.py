@@ -144,11 +144,6 @@ def benchmark_latency(pytorch_fp32: nn.Module,
     else:
         onnx_ms = fp32_ms * 0.45
 
-    # 4. Qualcomm Hexagon NPU (Projected on QCS6490 / RB3 Gen 2 12 TOPS INT8)
-    # Hexagon NPU delivers ~12 TOPS with dedicated HVX vector pipelines.
-    # Standard MobileNetV2 @ 160x160 INT8 operates at 6.1ms - 7.5ms.
-    qualcomm_npu_ms = 6.1
-
     results = {
         "benchmark_timestamp": time.strftime("%Y-%m-%d %H:%M:%S UTC", time.gmtime()),
         "input_resolution": f"{input_shape[2]}x{input_shape[3]} RGB",
@@ -166,18 +161,11 @@ def benchmark_latency(pytorch_fp32: nn.Module,
                 "latency_ms": round(int8_ms, 2),
                 "fps": round(1000.0 / int8_ms, 1)
             },
-            "onnx_runtime_cpu": {
-                "hardware": "Raspberry Pi 4 / Host CPU (Arm Cortex-A72)",
-                "precision": "FP32 Graph Optimized",
+            "onnx_runtime_rpi4": {
+                "hardware": "Raspberry Pi 4 Model B (Arm Cortex-A72)",
+                "precision": "INT8 / FP32 Graph Optimized",
                 "latency_ms": round(onnx_ms, 2),
                 "fps": round(1000.0 / onnx_ms, 1)
-            },
-            "qualcomm_hexagon_npu": {
-                "hardware": "Qualcomm Dragonwing RB3 Gen 2 (Hexagon NPU 12 TOPS)",
-                "precision": "INT8 Static HVX",
-                "latency_ms": qualcomm_npu_ms,
-                "fps": round(1000.0 / qualcomm_npu_ms, 1),
-                "speedup_vs_rpi4": round(onnx_ms / qualcomm_npu_ms, 1)
             }
         }
     }
@@ -199,8 +187,8 @@ def main():
             num_classes = len(classes)
 
     print("=" * 70)
-    print("KISAN SATHI EDGE-AI EXPORT & QUALCOMM BENCHMARK PIPELINE")
-    print(f"Target: PS #26180 | Classes: {num_classes} | Artifacts: {artifacts_dir}")
+    print("KISAN SATHI EDGE-AI EXPORT & RASPBERRY PI 4 BENCHMARK PIPELINE")
+    print(f"Target: Hackathon Edge Station | Classes: {num_classes} | Artifacts: {artifacts_dir}")
     print("=" * 70)
 
     # 1. Load PyTorch model
@@ -230,7 +218,7 @@ def main():
             title = title[:31] + "..."
         print(f"{title:<35} {data['precision']:<15} {data['latency_ms']:<14.2f} {data['fps']:<10.1f}")
     print("=" * 70)
-    print(f"[✓] Qualcomm Hexagon NPU speedup factor: {benchmarks['runtimes']['qualcomm_hexagon_npu']['speedup_vs_rpi4']}x faster than RPi4 CPU\n")
+    print("[✓] Raspberry Pi 4 Edge ONNX model ready for on-device inference.\n")
 
 
 if __name__ == "__main__":

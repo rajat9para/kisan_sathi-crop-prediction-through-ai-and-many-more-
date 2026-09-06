@@ -152,7 +152,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                       const Center(child: CircularProgressIndicator()),
                     const SizedBox(height: 18),
 
-                    // Hero Edge-AI Field Node Card (Track A Raspberry Pi 4 + Qualcomm RB3 Gen 2)
+                    // Hero Edge-AI Field Node Card (Raspberry Pi 4 Maker Build)
                     _buildEdgeNodeHeroBanner(context),
                     const SizedBox(height: 20),
 

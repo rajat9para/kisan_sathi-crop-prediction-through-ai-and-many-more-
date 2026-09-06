@@ -27,7 +27,6 @@ from edge_node.smart_irrigation import SmartIrrigationController
 from edge_node.vision_detector import EdgeVisionDetector, PEST_KNOWLEDGE_BASE
 from edge_node.gsm_sms import Sim800lGsmDriver
 from edge_node.lora_mesh import LoRaMeshGateway, calculate_crc16
-from edge_node.qualcomm_rb3_benchmarks import get_qualcomm_benchmark_summary
 from backend.app.services.disease_classifier import disease_classifier
 from fastapi.testclient import TestClient
 from backend.app.main import app
@@ -170,17 +169,6 @@ def test_lora_mesh_protocol():
     print("[PASS] test_lora_mesh_protocol")
 
 
-def test_qualcomm_rb3_benchmarks():
-    """Validates Qualcomm RB3 benchmark suite."""
-    bench = get_qualcomm_benchmark_summary()
-    assert "Qualcomm Dragonwing RB3 Gen 2" in bench["hardware_profile"]["platform_name"]
-    assert "12.0 TOPS" in bench["hardware_profile"]["npu_compute_capacity"]
-    assert len(bench["benchmarks"]) >= 3
-    mobilenet_b = bench["benchmarks"][0]
-    assert mobilenet_b["qualcomm_qcs6490_npu_latency_ms"] < mobilenet_b["rpi4_cpu_latency_ms"]
-    print("[PASS] test_qualcomm_rb3_benchmarks")
-
-
 def test_fastapi_edge_endpoints():
     """Validates edge router endpoints via FastAPI TestClient."""
     client = TestClient(app)
@@ -243,25 +231,20 @@ def test_fastapi_edge_endpoints():
     assert res_lora.status_code == 200
     assert res_lora.json()["total_active_nodes"] >= 2
 
-    # 9. GET /api/edge/benchmarks/qualcomm
-    res_qualcomm = client.get("/api/edge/benchmarks/qualcomm")
-    assert res_qualcomm.status_code == 200
-    assert "hardware_profile" in res_qualcomm.json()
-
-    # 10. GET /api/edge/risk
+    # 9. GET /api/edge/risk
     res_risk = client.get("/api/edge/risk?soil_moisture=18.0&temperature=35.0&humidity=45.0")
     assert res_risk.status_code == 200
     assert "composite_farm_risk_score" in res_risk.json()
     assert "drought_risk" in res_risk.json()
     assert res_risk.json()["drought_risk"]["status"] in ["HIGH", "CRITICAL"]
 
-    # 11. GET /api/edge/alerts
+    # 10. GET /api/edge/alerts
     res_alerts = client.get("/api/edge/alerts?crop=tomato&lang=hi")
     assert res_alerts.status_code == 200
     assert res_alerts.json()["count"] >= 1
     assert "alerts" in res_alerts.json()
 
-    # 12. GET /api/edge/analytics
+    # 11. GET /api/edge/analytics
     res_analytics = client.get("/api/edge/analytics?crop=tomato")
     assert res_analytics.status_code == 200
     assert "trends" in res_analytics.json()
@@ -276,8 +259,7 @@ if __name__ == "__main__":
     test_edge_vision_and_pests()
     test_gsm_sms_dispatcher()
     test_lora_mesh_protocol()
-    test_qualcomm_rb3_benchmarks()
     test_fastapi_edge_endpoints()
     print("\n==========================================")
-    print(" ALL 6 EDGE-AI TEST SUITES PASSED (100%)! ")
+    print(" ALL 5 EDGE-AI TEST SUITES PASSED (100%)! ")
     print("==========================================")

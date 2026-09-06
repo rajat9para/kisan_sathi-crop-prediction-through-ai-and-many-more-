@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:agrisaathi_app/screens/edge_node_controller_screen.dart';
 
 void main() {
-  testWidgets('EdgeNodeControllerScreen renders telemetry, relay, and Qualcomm RB3 specs', (WidgetTester tester) async {
+  testWidgets('EdgeNodeControllerScreen renders telemetry, relay, and Raspberry Pi 4 specs', (WidgetTester tester) async {
     // Set a viewport height large enough to lay out the full dashboard page
     tester.view.physicalSize = const Size(1080, 4000);
     tester.view.devicePixelRatio = 1.0;
@@ -27,9 +27,9 @@ void main() {
     expect(find.textContaining('5V रिले'), findsWidgets);
     expect(find.textContaining('वॉचडॉग'), findsWidgets);
 
-    // Verify Qualcomm RB3 Gen 2 Card
-    expect(find.textContaining('क्वालकॉम RB3 Gen 2'), findsOneWidget);
-    expect(find.textContaining('12 TOPS'), findsOneWidget);
+    // Verify Raspberry Pi 4 Field Station Card
+    expect(find.textContaining('रास्पबेरी पाई 4'), findsOneWidget);
+    expect(find.textContaining('Arm Cortex-A72'), findsOneWidget);
 
     // Test Toggling Relay Button (Motor ON)
     final motorOnBtn = find.text('मोटर चालू (ON)');
