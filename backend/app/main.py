@@ -136,6 +136,24 @@ async def serve_static_file(file_path: str):
         return FileResponse(p)
     return Response(status_code=404)
 
+@app.get("/hardware/BOM.md")
+async def get_hardware_bom():
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    bom_path = os.path.join(root, "hardware", "BOM.md")
+    if os.path.exists(bom_path):
+        with open(bom_path, "r", encoding="utf-8") as f:
+            return Response(content=f.read(), media_type="text/markdown; charset=utf-8")
+    return Response(content="# Hardware BOM not found", media_type="text/markdown", status_code=404)
+
+@app.get("/docs/kvk_network.md")
+async def get_kvk_network():
+    root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+    kvk_path = os.path.join(root, "docs", "kvk_network.md")
+    if os.path.exists(kvk_path):
+        with open(kvk_path, "r", encoding="utf-8") as f:
+            return Response(content=f.read(), media_type="text/markdown; charset=utf-8")
+    return Response(content="# KVK Network Directory not found", media_type="text/markdown", status_code=404)
+
 @app.get("/", response_class=HTMLResponse)
 async def root():
     p = find_static_file("index.html")

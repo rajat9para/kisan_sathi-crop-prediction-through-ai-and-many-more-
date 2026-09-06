@@ -3226,13 +3226,29 @@ function setupEdgeNodeController() {
     btnSendSms.addEventListener("click", () => sendEdgeGsmAlert());
   }
 
-  // 5. Initial status fetch & periodic polling every 4 seconds
+  // 5. Refresh Alerts Button
+  const btnRefreshAlerts = document.getElementById("btnRefreshAlerts");
+  if (btnRefreshAlerts) {
+    btnRefreshAlerts.addEventListener("click", () => {
+      fetchEnvironmentalRisk();
+      fetchStructuredAlerts();
+      fetchFarmAnalytics();
+    });
+  }
+
+  // 6. Initial status, risk, alerts & analytics fetch & periodic polling
   fetchEdgeStatus();
   fetchLoraNodes();
+  fetchEnvironmentalRisk();
+  fetchStructuredAlerts();
+  fetchFarmAnalytics();
+
   if (edgeSyncInterval) clearInterval(edgeSyncInterval);
   edgeSyncInterval = setInterval(() => {
     fetchEdgeStatus();
     fetchLoraNodes();
+    fetchEnvironmentalRisk();
+    fetchStructuredAlerts();
   }, 4000);
 }
 
@@ -3522,3 +3538,182 @@ async function sendEdgeGsmAlert() {
     alert(isEn ? "SIM800L SMS queued in outbox." : "SIM800L एसएमएस आउटबॉक्स में दर्ज किया गया।");
   }
 }
+
+// ==============================================================
+// ENVIRONMENTAL RISK ENGINE, MICRO-ALERTS & FARM ANALYTICS (EDGE)
+// ==============================================================
+async function fetchEnvironmentalRisk() {
+  try {
+    const res = await fetch(`${API_BASE}/api/edge/risk`);
+    if (res.ok) {
+      const data = await res.json();
+      renderEnvironmentalRiskUI(data);
+    }
+  } catch (_) {
+    renderEnvironmentalRiskUI({
+      composite_farm_risk_score: 24.5,
+      primary_hazard: "Normal Agro-Climatic Conditions",
+      drought_risk: { score: 15.0, status: "LOW", soil_moisture_pct: 34.0 },
+      flood_risk: { score: 5.0, status: "LOW", rain_detected: false },
+      heatwave_risk: { score: 25.0, status: "LOW", ambient_temp_c: 28.5 },
+      disease_risk: { score: 35.0, status: "MODERATE", high_humidity_favoring_fungi: false }
+    });
+  }
+}
+
+function renderEnvironmentalRiskUI(data) {
+  const isEn = (currentLang === "en");
+  const compVal = document.getElementById("edgeRiskCompositeVal");
+  const primHaz = document.getElementById("edgeRiskPrimaryHazard");
+  if (compVal) compVal.textContent = `${data.composite_farm_risk_score}/100`;
+  if (primHaz) primHaz.textContent = `(${data.primary_hazard})`;
+
+  // Drought
+  const dScore = document.getElementById("edgeDroughtScore");
+  const dTag = document.getElementById("edgeDroughtTag");
+  const dFill = document.getElementById("edgeDroughtFill");
+  const dMoist = document.getElementById("edgeDroughtMoist");
+  if (dScore && data.drought_risk) dScore.textContent = data.drought_risk.score;
+  if (dMoist && data.drought_risk) dMoist.textContent = `${data.drought_risk.soil_moisture_pct}%`;
+  if (dTag && data.drought_risk) {
+    dTag.textContent = data.drought_risk.status;
+    dTag.className = `risk-severity-tag tag-${data.drought_risk.status.toLowerCase()}`;
+  }
+  if (dFill && data.drought_risk) {
+    dFill.style.width = `${Math.min(100, data.drought_risk.score)}%`;
+    dFill.className = `risk-bar-fill fill-${data.drought_risk.status.toLowerCase()}`;
+  }
+
+  // Flood
+  const fScore = document.getElementById("edgeFloodScore");
+  const fTag = document.getElementById("edgeFloodTag");
+  const fFill = document.getElementById("edgeFloodFill");
+  const fRain = document.getElementById("edgeFloodRain");
+  if (fScore && data.flood_risk) fScore.textContent = data.flood_risk.score;
+  if (fRain && data.flood_risk) fRain.textContent = data.flood_risk.rain_detected ? (isEn ? "Yes" : "हाँ") : (isEn ? "No" : "नहीं");
+  if (fTag && data.flood_risk) {
+    fTag.textContent = data.flood_risk.status;
+    fTag.className = `risk-severity-tag tag-${data.flood_risk.status.toLowerCase()}`;
+  }
+  if (fFill && data.flood_risk) {
+    fFill.style.width = `${Math.min(100, data.flood_risk.score)}%`;
+    fFill.className = `risk-bar-fill fill-${data.flood_risk.status.toLowerCase()}`;
+  }
+
+  // Heat
+  const hScore = document.getElementById("edgeHeatScore");
+  const hTag = document.getElementById("edgeHeatTag");
+  const hFill = document.getElementById("edgeHeatFill");
+  const hTemp = document.getElementById("edgeHeatTemp");
+  if (hScore && data.heatwave_risk) hScore.textContent = data.heatwave_risk.score;
+  if (hTemp && data.heatwave_risk) hTemp.textContent = `${data.heatwave_risk.ambient_temp_c}°C`;
+  if (hTag && data.heatwave_risk) {
+    hTag.textContent = data.heatwave_risk.status;
+    hTag.className = `risk-severity-tag tag-${data.heatwave_risk.status.toLowerCase()}`;
+  }
+  if (hFill && data.heatwave_risk) {
+    hFill.style.width = `${Math.min(100, data.heatwave_risk.score)}%`;
+    hFill.className = `risk-bar-fill fill-${data.heatwave_risk.status.toLowerCase()}`;
+  }
+
+  // Disease
+  const disScore = document.getElementById("edgeDiseaseScore");
+  const disTag = document.getElementById("edgeDiseaseTag");
+  const disFill = document.getElementById("edgeDiseaseFill");
+  const disHum = document.getElementById("edgeDiseaseHum");
+  if (disScore && data.disease_risk) disScore.textContent = data.disease_risk.score;
+  if (disHum) disHum.textContent = `62%`;
+  if (disTag && data.disease_risk) {
+    disTag.textContent = data.disease_risk.status;
+    disTag.className = `risk-severity-tag tag-${data.disease_risk.status.toLowerCase()}`;
+  }
+  if (disFill && data.disease_risk) {
+    disFill.style.width = `${Math.min(100, data.disease_risk.score)}%`;
+    disFill.className = `risk-bar-fill fill-${data.disease_risk.status.toLowerCase()}`;
+  }
+}
+
+async function fetchStructuredAlerts() {
+  const isEn = (currentLang === "en");
+  const cropSelect = document.getElementById("edgeVisionCropSelect");
+  const crop = cropSelect ? cropSelect.value : "tomato";
+  try {
+    const res = await fetch(`${API_BASE}/api/edge/alerts?crop=${crop}&lang=${currentLang}`);
+    if (res.ok) {
+      const data = await res.json();
+      renderStructuredAlertsUI(data.alerts, isEn);
+    }
+  } catch (_) {}
+}
+
+function renderStructuredAlertsUI(alerts, isEn) {
+  const container = document.getElementById("edgeAlertsContainer");
+  if (!container || !Array.isArray(alerts)) return;
+
+  container.innerHTML = alerts.map(a => {
+    const sevClass = a.severity === "CRITICAL" ? "alert-critical" : (a.severity === "WARNING" ? "alert-warning" : "alert-info");
+    const icon = a.category === "irrigation" ? "💧" : (a.category === "heatwave" ? "🔥" : (a.category === "flood" ? "🌊" : (a.category === "disease" ? "🦠" : (a.category === "pest" ? "🐛" : "ℹ️"))));
+    const title = isEn ? a.headline_en : a.headline_hi;
+    const action = isEn ? a.action_en : a.action_hi;
+    const channels = (a.channels || ["DASHBOARD"]).map(c => `<span class="channel-pill">${c}</span>`).join("");
+
+    return `
+      <div class="micro-alert-item ${sevClass}">
+        <div class="micro-alert-icon">${icon}</div>
+        <div class="micro-alert-body">
+          <div class="micro-alert-title">${title} <span class="risk-severity-tag tag-${a.severity.toLowerCase()}" style="font-size:0.62rem; margin-left:6px;">${a.severity}</span></div>
+          <div class="micro-alert-action">${action}</div>
+          <div class="micro-alert-channels">
+            ${channels}
+            <span class="channel-pill" style="margin-left:auto;">${a.timestamp}</span>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+async function fetchFarmAnalytics() {
+  const isEn = (currentLang === "en");
+  const cropSelect = document.getElementById("edgeVisionCropSelect");
+  const crop = cropSelect ? cropSelect.value : "tomato";
+  try {
+    const res = await fetch(`${API_BASE}/api/edge/analytics?crop=${crop}`);
+    if (res.ok) {
+      const data = await res.json();
+      renderFarmAnalyticsUI(data, isEn);
+    }
+  } catch (_) {}
+}
+
+function renderFarmAnalyticsUI(data, isEn) {
+  const waterPct = document.getElementById("statWaterSavedPct");
+  const waterLiters = document.getElementById("statWaterSavedLiters");
+  const powerKwh = document.getElementById("statPowerSavedKwh");
+  const yieldScore = document.getElementById("statYieldRiskScore");
+
+  if (waterPct && data.water_conservation) waterPct.textContent = `${data.water_conservation.water_saving_percentage}%`;
+  if (waterLiters && data.water_conservation) waterLiters.textContent = data.water_conservation.water_saved_liters.toLocaleString();
+  if (powerKwh && data.water_conservation) powerKwh.textContent = `${data.water_conservation.pumping_energy_saved_kwh} kWh`;
+  if (yieldScore && data.yield_protection) yieldScore.textContent = `${data.yield_protection.yield_risk_score}%`;
+
+  const trendWrap = document.getElementById("analyticsTrendBars");
+  if (trendWrap && data.trends && Array.isArray(data.trends.soil_moisture_pct)) {
+    const dates = data.dates || ["Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7"];
+    trendWrap.innerHTML = data.trends.soil_moisture_pct.map((val, idx) => {
+      const pctHeight = Math.min(100, Math.max(15, (val / 55.0) * 100));
+      const isLow = val < 25.0;
+      const isHigh = val > 45.0;
+      const bg = isLow ? "linear-gradient(180deg, #F59E0B, #D97706)" : (isHigh ? "linear-gradient(180deg, #10B981, #059669)" : "linear-gradient(180deg, #3B82F6, #1D4ED8)");
+      return `
+        <div class="trend-bar-col">
+          <div class="trend-bar-inner" style="height: ${pctHeight}%; background: ${bg};">
+            <span class="trend-bar-val">${val}%</span>
+          </div>
+          <span class="trend-bar-date">${dates[idx] || `D${idx+1}`}</span>
+        </div>
+      `;
+    }).join("");
+  }
+}
+

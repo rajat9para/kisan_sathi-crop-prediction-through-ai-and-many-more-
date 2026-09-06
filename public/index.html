@@ -984,6 +984,198 @@
           </div>
         </div>
 
+        <!-- ============================================================== -->
+        <!-- ENVIRONMENTAL RISK ENGINE & STRUCTURED BILINGUAL MICRO-ALERTS  -->
+        <!-- ============================================================== -->
+        <div class="env-risk-deck">
+          <div class="env-risk-header">
+            <div>
+              <h3 class="edge-card-heading" style="margin:0;">
+                <span>⚠️</span>
+                <span>पर्यावरणीय जोखिम सूचकांक व द्वैभाषी माइक्रो-अलर्ट (Risk Engine & Alerts)</span>
+              </h3>
+              <p style="margin: 3px 0 0 0; font-size: 0.8rem; color: #64748B;">
+                मृदा नमी, तापमान, आर्द्रता व वर्षा के संगम से 4 प्रमुख जोखिम सूचकांकों का ऑन-डिवाइस मूल्यांकन।
+              </p>
+            </div>
+            <div class="composite-score-badge">
+              <span>समग्र खेत जोखिम (Farm Vulnerability):</span>
+              <span class="score-val" id="edgeRiskCompositeVal">24.5/100</span>
+              <span id="edgeRiskPrimaryHazard" style="font-size:0.75rem; color:#78350F;">(अनुकूल परिस्थिति)</span>
+            </div>
+          </div>
+
+          <!-- 4 Risk Gauges Grid -->
+          <div class="risk-gauges-grid">
+            <!-- 1. Drought Risk -->
+            <div class="risk-gauge-card">
+              <div class="risk-gauge-top">
+                <span class="risk-gauge-name">🌵 सूखा / नमी अभाव (Drought)</span>
+                <span class="risk-severity-tag tag-low" id="edgeDroughtTag">LOW</span>
+              </div>
+              <div class="risk-bar-track">
+                <div class="risk-bar-fill fill-low" id="edgeDroughtFill" style="width: 15%;"></div>
+              </div>
+              <div class="risk-gauge-footer">
+                <span>सूचकांक: <strong id="edgeDroughtScore">15.0</strong>/100</span>
+                <span>नमी: <strong id="edgeDroughtMoist">34.0%</strong></span>
+              </div>
+            </div>
+
+            <!-- 2. Flood / Waterlogging Risk -->
+            <div class="risk-gauge-card">
+              <div class="risk-gauge-top">
+                <span class="risk-gauge-name">🌊 जलभराव / बाढ़ (Flood)</span>
+                <span class="risk-severity-tag tag-low" id="edgeFloodTag">LOW</span>
+              </div>
+              <div class="risk-bar-track">
+                <div class="risk-bar-fill fill-low" id="edgeFloodFill" style="width: 5%;"></div>
+              </div>
+              <div class="risk-gauge-footer">
+                <span>सूचकांक: <strong id="edgeFloodScore">5.0</strong>/100</span>
+                <span>वर्षा: <strong id="edgeFloodRain">नहीं</strong></span>
+              </div>
+            </div>
+
+            <!-- 3. Heatwave / Thermal Stress -->
+            <div class="risk-gauge-card">
+              <div class="risk-gauge-top">
+                <span class="risk-gauge-name">🔥 तीव्र ताप / लू (Heatwave)</span>
+                <span class="risk-severity-tag tag-low" id="edgeHeatTag">LOW</span>
+              </div>
+              <div class="risk-bar-track">
+                <div class="risk-bar-fill fill-low" id="edgeHeatFill" style="width: 25%;"></div>
+              </div>
+              <div class="risk-gauge-footer">
+                <span>सूचकांक: <strong id="edgeHeatScore">25.0</strong>/100</span>
+                <span>तापमान: <strong id="edgeHeatTemp">28.5°C</strong></span>
+              </div>
+            </div>
+
+            <!-- 4. Disease Outbreak Risk -->
+            <div class="risk-gauge-card">
+              <div class="risk-gauge-top">
+                <span class="risk-gauge-name">🦠 रोग प्रकोप जोखिम (Disease)</span>
+                <span class="risk-severity-tag tag-moderate" id="edgeDiseaseTag">MODERATE</span>
+              </div>
+              <div class="risk-bar-track">
+                <div class="risk-bar-fill fill-moderate" id="edgeDiseaseFill" style="width: 35%;"></div>
+              </div>
+              <div class="risk-gauge-footer">
+                <span>सूचकांक: <strong id="edgeDiseaseScore">35.0</strong>/100</span>
+                <span>आर्द्रता: <strong id="edgeDiseaseHum">62%</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Structured Micro-Alerts Banner List -->
+          <div style="margin-top: 1.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <strong style="font-size:0.85rem; color:#1E293B;">📢 सक्रिय फील्ड माइक्रो-अलर्ट (Actionable Bilingual Advisories):</strong>
+              <button type="button" id="btnRefreshAlerts" class="btn-actuator btn-auto" style="padding:0.25rem 0.6rem; font-size:0.75rem;">
+                🔄 रिफ्रेश
+              </button>
+            </div>
+            <div class="structured-alerts-container" id="edgeAlertsContainer">
+              <div class="micro-alert-item alert-info">
+                <div class="micro-alert-icon">ℹ️</div>
+                <div class="micro-alert-body">
+                  <div class="micro-alert-title">Nominal: Agro-Climatic Conditions Optimal / सामान्य स्थिति</div>
+                  <div class="micro-alert-action">Soil moisture at 34.0%. Continue standard crop monitoring / खेत में नमी व मौसमी परिस्थितियां अनुकूल हैं।</div>
+                  <div class="micro-alert-channels">
+                    <span class="channel-pill">DASHBOARD</span>
+                    <span class="channel-pill">GSM READY</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- 7-DAY FARM ANALYTICS, WATER CONSERVATION & YIELD METRICS       -->
+        <!-- ============================================================== -->
+        <div class="farm-analytics-deck">
+          <div class="edge-card-title-bar">
+            <div>
+              <h3 class="edge-card-heading" style="margin:0;">
+                <span>📊</span>
+                <span>फार्म एनालिटिक्स, जल संरक्षण व उपज सुरक्षा (7-Day Intelligence)</span>
+              </h3>
+              <p style="margin: 3px 0 0 0; font-size: 0.8rem; color: #64748B;">
+                परंपरागत बाढ़ सिंचाई (Flood Irrigation) की तुलना में जल व बिजली की सटीक बचत।
+              </p>
+            </div>
+            <span class="badge-rec" style="font-size:0.7rem; padding:0.25rem 0.6rem;">FAO-56 Grounded</span>
+          </div>
+
+          <!-- Water & Yield Impact Stats -->
+          <div class="water-stats-grid">
+            <div class="water-stat-box">
+              <div class="water-stat-num" id="statWaterSavedPct">42.0%</div>
+              <div class="water-stat-lbl">जल संरक्षण (Water Conserved vs Flood)</div>
+              <div style="font-size:0.72rem; color:#15803D; margin-top:3px;">
+                बचत: <strong id="statWaterSavedLiters">1,520</strong> लीटर प्रति चक्र
+              </div>
+            </div>
+
+            <div class="water-stat-box energy">
+              <div class="water-stat-num" id="statPowerSavedKwh">0.68 kWh</div>
+              <div class="water-stat-lbl">पंपिंग बिजली बचत (Pumping Energy Saved)</div>
+              <div style="font-size:0.72rem; color:#1D4ED8; margin-top:3px;">
+                सौर बैटरी डिस्चार्ज व ग्रिड लागत में कमी
+              </div>
+            </div>
+
+            <div class="water-stat-box yield">
+              <div class="water-stat-num" id="statYieldRiskScore">14.5%</div>
+              <div class="water-stat-lbl">उपज जोखिम सूचकांक (Yield-Risk: LOW)</div>
+              <div style="font-size:0.72rem; color:#854D0E; margin-top:3px;">
+                जड़ हाइपोक्सिया रोकथाम व इष्टतम वायुसंचार
+              </div>
+            </div>
+          </div>
+
+          <!-- 7-Day Sensor Trend Bars (Soil Moisture VWC %) -->
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; font-weight:700; color:#334155; margin-bottom:0.4rem;">
+              <span>📈 विगत ७-दिवसीय मृदा नमी रुझान (Soil Moisture VWC % Daily Trend):</span>
+              <span style="font-size:0.72rem; color:#64748B;">अनुकूल पट्टी: 25% - 55%</span>
+            </div>
+            <div class="trend-bars-wrapper" id="analyticsTrendBars">
+              <!-- Rendered dynamically by app.js -->
+              <div class="trend-bar-col"><div class="trend-bar-inner" style="height: 69%;"><span class="trend-bar-val">38%</span></div><span class="trend-bar-date">Day 1</span></div>
+              <div class="trend-bar-col"><div class="trend-bar-inner" style="height: 62%;"><span class="trend-bar-val">34%</span></div><span class="trend-bar-date">Day 2</span></div>
+              <div class="trend-bar-col"><div class="trend-bar-inner" style="height: 56%;"><span class="trend-bar-val">31%</span></div><span class="trend-bar-date">Day 3</span></div>
+              <div class="trend-bar-col"><div class="trend-bar-inner" style="height: 48%;"><span class="trend-bar-val">26%</span></div><span class="trend-bar-date">Day 4</span></div>
+              <div class="trend-bar-col"><div class="trend-bar-inner" style="height: 41%; background:linear-gradient(180deg, #F59E0B, #D97706);"><span class="trend-bar-val">23%</span></div><span class="trend-bar-date">Day 5</span></div>
+              <div class="trend-bar-col"><div class="trend-bar-inner" style="height: 88%; background:linear-gradient(180deg, #10B981, #059669);"><span class="trend-bar-val">49%</span></div><span class="trend-bar-date">Day 6</span></div>
+              <div class="trend-bar-col"><div class="trend-bar-inner" style="height: 74%;"><span class="trend-bar-val">41%</span></div><span class="trend-bar-date">Day 7</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- HARDWARE BILL OF MATERIALS & ICAR KVK DIRECTORY QUICK ACCESS   -->
+        <!-- ============================================================== -->
+        <div class="hardware-ref-strip">
+          <a href="/hardware/BOM.md" target="_blank" class="hw-ref-card">
+            <span class="hw-ref-icon">📋</span>
+            <div>
+              <div class="hw-ref-title">हार्डवेयर सामग्री सूची (Hardware BOM.md)</div>
+              <div class="hw-ref-desc">RPi 4B पिनआउट, ADS1115 ADC, DHT22, FC-37, SIM800L, LoRa, 48-घंटे सौर बजट (₹9,850 INR / $118 USD)।</div>
+            </div>
+          </a>
+
+          <a href="/docs/kvk_network.md" target="_blank" class="hw-ref-card">
+            <span class="hw-ref-icon">🏛️</span>
+            <div>
+              <div class="hw-ref-title">18-हब ICAR कृषि विज्ञान केंद्र (KVK) निर्देशिका</div>
+              <div class="hw-ref-desc">अधिकृत वैज्ञानिक नाम, प्रत्यक्ष फोन, ईमेल, मृदा प्रकार व जीपीएस निर्देशांक (docs/kvk_network.md)।</div>
+            </div>
+          </a>
+        </div>
+
       </div>
     </section>
 

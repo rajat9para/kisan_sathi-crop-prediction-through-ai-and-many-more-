@@ -1,7 +1,10 @@
 """
 Kisan Sathi 2.0 - Edge Daemon Service (Autonomous Monitoring Loop)
-Orchestrates continuous sensor reading, camera inference, ET_0 water budgeting,
-relay pump actuation, SIM800L SMS dispatch, and LoRa mesh telemetry collection.
+Target: SIH 2026 Problem Statement #26180 (Qualcomm Inc.)
+
+Orchestrates continuous sensor acquisition, camera inference, FAO-56 water budgeting,
+relay pump actuation, environmental risk evaluation, bilingual micro-alert synthesis,
+SIM800L SMS dispatch, and LoRa mesh telemetry collection.
 
 Can be run standalone as a systemd service on Raspberry Pi 4:
   python edge_daemon.py --crop tomato --interval 5 --phone +919876543210
@@ -23,6 +26,8 @@ if hasattr(sys.stdout, "reconfigure"):
 
 from smart_irrigation import irrigation_controller
 from vision_detector import edge_vision_detector
+from environmental_risk import environmental_risk_engine
+from alert_engine import alert_engine
 from gsm_sms import gsm_driver
 from lora_mesh import lora_gateway
 
@@ -55,18 +60,19 @@ class EdgeDaemon:
         self.last_sms_sent_at = 0.0
 
         # Simulated or hardware baseline metrics
-        self.current_moisture_pct = 24.0
-        self.current_temp_c = 28.5
-        self.current_humidity_pct = 54.0
+        self.current_moisture_pct = 22.5
+        self.current_temp_c = 29.5
+        self.current_humidity_pct = 62.0
+        self.rain_detected = False
 
     def start(self):
         self.running = True
-        logger.info("=" * 60)
+        logger.info("=" * 65)
         logger.info("🌾 Kisan Sathi 2.0 - Edge Daemon Started (Track A Prototype)")
         logger.info(f"Target Crop: {self.crop.title()} | Loop Interval: {self.loop_interval_sec}s")
         logger.info(f"Hardware Mode: {irrigation_controller.hardware_mode}")
         logger.info(f"Emergency SMS Contact: {self.phone_number}")
-        logger.info("=" * 60)
+        logger.info("=" * 65)
 
         while self.running:
             try:
@@ -82,37 +88,59 @@ class EdgeDaemon:
                 time.sleep(2.0)
 
     def run_cycle(self) -> Dict[str, Any]:
-        """Executes one single monitoring-decision-actuation cycle."""
+        """Executes one single monitoring-decision-actuation-alerting cycle."""
         # 1. Update/Simulate sensor dynamics
         if irrigation_controller.pump_state:
             # When pump is running, moisture increases
-            self.current_moisture_pct = min(68.0, round(self.current_moisture_pct + 1.2, 1))
+            self.current_moisture_pct = min(68.0, round(self.current_moisture_pct + 1.5, 1))
         else:
             # Gradual soil drying
-            self.current_moisture_pct = max(14.0, round(self.current_moisture_pct - 0.2, 1))
+            self.current_moisture_pct = max(14.0, round(self.current_moisture_pct - 0.25, 1))
 
         # 2. Evaluate Irrigation Logic & Actuate Relay
         irrigation_result = irrigation_controller.evaluate_irrigation(
             soil_moisture_pct=self.current_moisture_pct,
             temperature_c=self.current_temp_c,
             humidity_pct=self.current_humidity_pct,
+            rain_detected=self.rain_detected,
             crop=self.crop
         )
 
-        # 3. Check for Emergency Moisture Alerts -> Dispatch SMS via SIM800L
+        # 3. Evaluate Multi-Factor Environmental Risk
+        env_risk = environmental_risk_engine.evaluate_all(
+            soil_moisture_pct=self.current_moisture_pct,
+            temperature_c=self.current_temp_c,
+            humidity_pct=self.current_humidity_pct,
+            rain_detected=self.rain_detected
+        )
+
+        # 4. Generate Structured Bilingual Micro-Alerts
+        active_alerts = alert_engine.generate_alerts(
+            irrigation_data=irrigation_result,
+            environmental_risk=env_risk,
+            crop_name=self.crop
+        )
+
+        # 5. Check for Critical Alerts -> Dispatch SMS via SIM800L
         now = time.time()
-        if (self.current_moisture_pct < 18.0) and (now - self.last_sms_sent_at > 300) and self.enable_sms:
-            logger.warning(f"CRITICAL MOISTURE ({self.current_moisture_pct}%)! Dispatching SIM800L SMS alert...")
+        critical_alerts = [a for a in active_alerts if a["severity"] == "CRITICAL"]
+        if critical_alerts and (now - self.last_sms_sent_at > 300) and self.enable_sms:
+            primary_crit = critical_alerts[0]
+            logger.warning(f"CRITICAL CONDITION DETECTED! Dispatching SIM800L SMS: {primary_crit['headline_en']}")
             sms_res = gsm_driver.dispatch_alert(
                 phone_number=self.phone_number,
-                alert_type="low_moisture",
-                details={"moisture_pct": self.current_moisture_pct, "crop": self.crop},
+                alert_type="low_moisture" if primary_crit["category"] == "irrigation" else "custom",
+                details={
+                    "moisture_pct": self.current_moisture_pct,
+                    "crop": self.crop,
+                    "text": primary_crit["headline_hi"] + " - " + primary_crit["action_hi"]
+                },
                 lang="hi"
             )
             self.last_sms_sent_at = now
-            logger.info(f"SMS Sent: {sms_res['message']} (Status: {sms_res['status']})")
+            logger.info(f"SMS Dispatch result: {sms_res['status']}")
 
-        # 4. Process LoRa Mesh Network Nodes
+        # 6. Process LoRa Mesh Network Nodes
         lora_nodes = lora_gateway.get_all_nodes()
 
         # Log cycle heartbeat
@@ -121,12 +149,15 @@ class EdgeDaemon:
                 f"[Cycle #{self.cycle_count}] Moisture: {self.current_moisture_pct}% | "
                 f"Temp: {self.current_temp_c}°C | ETc: {irrigation_result['crop_water_demand_etc_mm_day']} mm/day | "
                 f"Pump: {'ON (RUNNING)' if irrigation_result['pump_active'] else 'OFF (STANDBY)'} | "
-                f"LoRa Nodes: {len(lora_nodes)}"
+                f"Farm Risk: {env_risk['composite_farm_risk_score']}/100 ({env_risk['primary_hazard']}) | "
+                f"Alerts: {len(active_alerts)}"
             )
 
         return {
             "cycle": self.cycle_count,
             "irrigation": irrigation_result,
+            "environmental_risk": env_risk,
+            "alerts": active_alerts,
             "lora_nodes": lora_nodes
         }
 
@@ -161,7 +192,10 @@ if __name__ == "__main__":
 
     if args.once:
         res = daemon.run_cycle()
-        print("Single cycle completed successfully:", res)
+        print("Single cycle completed successfully:")
+        print(f"  Moisture: {res['irrigation']['moisture_pct']}% | Pump: {res['irrigation']['pump_active']}")
+        print(f"  Risk: {res['environmental_risk']['composite_farm_risk_score']}/100")
+        print(f"  Active Alerts: {len(res['alerts'])}")
         daemon.stop()
     else:
         daemon.start()

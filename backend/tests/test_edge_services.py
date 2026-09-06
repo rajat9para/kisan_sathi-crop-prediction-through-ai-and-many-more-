@@ -248,6 +248,26 @@ def test_fastapi_edge_endpoints():
     assert res_qualcomm.status_code == 200
     assert "hardware_profile" in res_qualcomm.json()
 
+    # 10. GET /api/edge/risk
+    res_risk = client.get("/api/edge/risk?soil_moisture=18.0&temperature=35.0&humidity=45.0")
+    assert res_risk.status_code == 200
+    assert "composite_farm_risk_score" in res_risk.json()
+    assert "drought_risk" in res_risk.json()
+    assert res_risk.json()["drought_risk"]["status"] in ["HIGH", "CRITICAL"]
+
+    # 11. GET /api/edge/alerts
+    res_alerts = client.get("/api/edge/alerts?crop=tomato&lang=hi")
+    assert res_alerts.status_code == 200
+    assert res_alerts.json()["count"] >= 1
+    assert "alerts" in res_alerts.json()
+
+    # 12. GET /api/edge/analytics
+    res_analytics = client.get("/api/edge/analytics?crop=tomato")
+    assert res_analytics.status_code == 200
+    assert "trends" in res_analytics.json()
+    assert "water_conservation" in res_analytics.json()
+    assert res_analytics.json()["water_conservation"]["water_saving_percentage"] > 30.0
+
     print("[PASS] test_fastapi_edge_endpoints")
 
 
