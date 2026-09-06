@@ -1,6 +1,6 @@
 """
 Kisan Sathi 2.0 - Edge-AI Field Node & Smart Actuation Router
-Qualcomm Problem Statement #26180 (Agriculture, FoodTech & Rural Development)
+Problem Statement #26180 (Agriculture, FoodTech & Rural Development)
 
 Provides complete REST API endpoints for:
 - Live Edge Node Status & FAO-56 ET_0 Water Budget
@@ -11,7 +11,7 @@ Provides complete REST API endpoints for:
 - Farm Analytics & 7-Day Sensor Trends (Water Conservation Metrics)
 - SIM800L Offline GSM SMS Emergency Alerting
 - LoRa SX1278 Multi-Node Mesh Field Telemetry
-- Qualcomm Dragonwing RB3 Gen 2 (QCS6490 NPU) vs Raspberry Pi 4 Benchmarks
+- Raspberry Pi 4 Edge Node Benchmarks & Optimization Metrics
 """
 
 import os

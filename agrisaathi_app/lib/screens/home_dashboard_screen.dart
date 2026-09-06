@@ -98,7 +98,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               ).then((_) => setState(() {}));
             },
           ),
-          // Smart Edge Node Controller (Track A RPi 4 & Track B RB3)
+          // Smart Edge Node Controller (RPi 4 Maker Node)
           IconButton(
             tooltip: "Field Node & Irrigation / स्मार्ट फील्ड नोड",
             icon: const Icon(
@@ -307,7 +307,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      AppStrings.isHindi ? "हार्डवेयर ट्रैक A सक्रिय" : "HARDWARE TRACK A ONLINE",
+                      AppStrings.isHindi ? "हार्डवेयर नोड सक्रिय" : "HARDWARE NODE ONLINE",
                       style: const TextStyle(
                         color: Color(0xFF34D399),
                         fontSize: 10,
@@ -322,7 +322,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
               const Icon(Icons.memory_rounded, color: Color(0xFF94A3B8), size: 16),
               const SizedBox(width: 4),
               const Text(
-                "RPi 4 + RB3",
+                "RPi 4 Edge Node",
                 style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11, fontWeight: FontWeight.bold),
               ),
             ],

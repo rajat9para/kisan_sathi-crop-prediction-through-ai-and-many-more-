@@ -1,6 +1,6 @@
 """
 Kisan Sathi 2.0 - Environmental Risk Engine
-Target: SIH 2026 Problem Statement #26180 (Qualcomm Inc.)
+Target: SIH 2026 Problem Statement #26180 (Agriculture, FoodTech & Rural Development)
 
 Computes multi-factor environmental risk indices on-device:
 1. Drought Risk Index (0-100): Moisture depletion, high evapotranspiration, rain absence

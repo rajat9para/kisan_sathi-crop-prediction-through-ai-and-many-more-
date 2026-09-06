@@ -1,6 +1,6 @@
 # ICAR Krishi Vigyan Kendra (KVK) Regional Extension Network
 **Kisan Sathi — Autonomous Agro-Climatic Intelligence & Soil Health Node**  
-**Target:** Smart India Hackathon (SIH 2026) | **Problem Statement:** #26180 (Qualcomm Inc.)
+**Target:** Smart India Hackathon (SIH 2026) | **Problem Statement:** #26180 (Agriculture, FoodTech & Rural Development)
 
 ---
 

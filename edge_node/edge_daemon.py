@@ -1,6 +1,6 @@
 """
 Kisan Sathi 2.0 - Edge Daemon Service (Autonomous Monitoring Loop)
-Target: SIH 2026 Problem Statement #26180 (Qualcomm Inc.)
+Target: SIH 2026 Problem Statement #26180 (Agriculture, FoodTech & Rural Development)
 
 Orchestrates continuous sensor acquisition, camera inference, FAO-56 water budgeting,
 relay pump actuation, environmental risk evaluation, bilingual micro-alert synthesis,
@@ -68,7 +68,7 @@ class EdgeDaemon:
     def start(self):
         self.running = True
         logger.info("=" * 65)
-        logger.info("🌾 Kisan Sathi 2.0 - Edge Daemon Started (Track A Prototype)")
+        logger.info("🌾 Kisan Sathi 2.0 - Edge Daemon Started (Raspberry Pi 4 Prototype)")
         logger.info(f"Target Crop: {self.crop.title()} | Loop Interval: {self.loop_interval_sec}s")
         logger.info(f"Hardware Mode: {irrigation_controller.hardware_mode}")
         logger.info(f"Emergency SMS Contact: {self.phone_number}")

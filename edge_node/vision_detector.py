@@ -1,6 +1,6 @@
 """
-Kisan Sathi 2.0 - Edge Vision Detector (Track A: RPi 4 / Track B: Qualcomm RB3 Gen 2)
-Target: SIH 2026 Problem Statement #26180 (Qualcomm Inc.)
+Kisan Sathi 2.0 - Edge Vision Detector (Raspberry Pi 4 Model B)
+Target: SIH 2026 Problem Statement #26180
 
 Performs local on-device inference for Leaf Pathology & Agricultural Pest Detection:
 - ONNX Runtime INT8/FP32 Engine for MobileNetV2 (PlantVillage trained)
@@ -11,7 +11,7 @@ Performs local on-device inference for Leaf Pathology & Agricultural Pest Detect
     * Whitefly Vector (Bemisia tabaci)
     * Yellow Stem Borer (Scirpophaga incertulas)
     * Cotton Bollworm (Helicoverpa armigera)
-- Projected Qualcomm Hexagon NPU (12 TOPS) hardware acceleration profiling
+- On-device Arm Cortex-A72 CPU acceleration profiling (~32ms latency)
 """
 
 import os
@@ -233,7 +233,7 @@ DISEASE_METADATA = {
 class EdgeVisionDetector:
     """
     Autonomous on-device edge vision inference engine.
-    Supports ONNX Runtime execution on Raspberry Pi 4 CPU and Qualcomm Hexagon NPU.
+    Supports ONNX Runtime execution on Raspberry Pi 4 CPU (Arm Cortex-A72).
     Includes quality control gates (Laplacian blur & foliage ratio verification).
     """
 
@@ -377,8 +377,7 @@ class EdgeVisionDetector:
                 "chemical_remedy_en": pest_data["chemical_control_en"],
                 "chemical_remedy_hi": pest_data["chemical_control_hi"],
                 "inference_time_ms": inference_ms,
-                "projected_qualcomm_npu_latency_ms": 6.1,
-                "hardware_acceleration": "ONNX Runtime CPU / Qualcomm Hexagon NPU ready",
+                "hardware_acceleration": "ONNX Runtime CPU (Arm Cortex-A72)",
                 "image_quality": quality_info,
                 "bounding_boxes": [
                     {"x": 140, "y": 95, "w": 210, "h": 180, "label": pest_data["common_name_en"], "score": 0.92}
@@ -423,8 +422,7 @@ class EdgeVisionDetector:
                     "chemical_remedy_en": meta["chem_remedy_en"],
                     "chemical_remedy_hi": meta["chem_remedy_hi"],
                     "inference_time_ms": inference_ms,
-                    "projected_qualcomm_npu_latency_ms": 6.1,
-                    "hardware_acceleration": "ONNX Runtime MobileNetV2 (Arm Cortex-A72 / Hexagon NPU)",
+                    "hardware_acceleration": "ONNX Runtime MobileNetV2 (Arm Cortex-A72 NEON)",
                     "image_quality": quality_info,
                     "bounding_boxes": [
                         {"x": 80, "y": 60, "w": 320, "h": 280, "label": meta["label_en"], "score": round(confidence / 100.0, 2)}
@@ -464,8 +462,7 @@ class EdgeVisionDetector:
             "chemical_remedy_en": meta["chem_remedy_en"],
             "chemical_remedy_hi": meta["chem_remedy_hi"],
             "inference_time_ms": inference_ms,
-            "projected_qualcomm_npu_latency_ms": 6.1,
-            "hardware_acceleration": "ONNX Runtime CPU / Qualcomm Hexagon NPU ready",
+            "hardware_acceleration": "ONNX Runtime (Arm Cortex-A72 NEON)",
             "image_quality": quality_info,
             "bounding_boxes": [
                 {"x": 80, "y": 60, "w": 320, "h": 280, "label": meta["label_en"], "score": 0.89}
@@ -488,7 +485,7 @@ if __name__ == "__main__":
     print("\n--- Test 1: Plant Pathology Inference (Crop: Tomato) ---")
     res1 = edge_vision_detector.detect_pest_or_disease(crop_hint="tomato")
     print(f"Detected: {res1['label_en']} ({res1['confidence_pct']}%)")
-    print(f"Inference Latency: {res1['inference_time_ms']} ms | Projected Qualcomm NPU: {res1['projected_qualcomm_npu_latency_ms']} ms")
+    print(f"Inference Latency: {res1['inference_time_ms']} ms (Arm Cortex-A72)")
     print(f"ETL Threshold: {res1['etl_threshold']}")
     print(f"Organic Remedy: {res1['bio_remedy_en']}")
     print(f"Chemical Remedy: {res1['chemical_remedy_en']}")

@@ -378,7 +378,7 @@ TOTAL: 18 passed, 0 failed (100% SUCCESS RATE)
 
 ```
 kisan_sathi/
-├── edge_node/                       # Track A Edge Hardware Daemon & Drivers
+├── edge_node/                       # Edge Hardware Daemon & Drivers (Raspberry Pi 4)
 │   ├── edge_daemon.py               # Main autonomous monitoring & actuation loop
 │   ├── smart_irrigation.py          # ADS1115 ADC driver, FAO-56 ET₀, 15-min watchdog
 │   ├── vision_detector.py           # ONNX MobileNetV2, blur gate, 5 insect pests

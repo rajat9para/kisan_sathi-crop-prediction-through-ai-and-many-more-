@@ -1,6 +1,6 @@
 """
-Kisan Sathi 2.0 - Smart Irrigation Actuation Engine (Track A: Raspberry Pi 4 + Physical Sensors + Relay)
-Target: SIH 2026 Problem Statement #26180 (Qualcomm Inc.)
+Kisan Sathi 2.0 - Smart Irrigation Actuation Engine (Raspberry Pi 4 + Physical Sensors + Relay)
+Target: SIH 2026 Problem Statement #26180 (Agriculture, FoodTech & Rural Development)
 
 Acquires multi-sensor telemetry:
 1. Capacitive Soil Moisture Sensor v1.2 via ADS1115 16-Bit I2C ADC (1.2V saturated wet to 3.0V bone dry)

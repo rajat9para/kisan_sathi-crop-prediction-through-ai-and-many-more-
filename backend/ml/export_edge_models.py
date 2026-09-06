@@ -1,11 +1,10 @@
 """
 Export & Benchmark MobileNetV2 Leaf Pathology Model for Edge Deployment.
-Target: SIH 2026 Problem Statement #26180 (Qualcomm Inc.)
+Target: SIH 2026 Problem Statement #26180 (Agriculture, FoodTech & Rural Development)
 
 1. Exports PyTorch weights to ONNX (Open Neural Network Exchange).
 2. Generates INT8 dynamically quantized PyTorch model.
-3. Benchmarks latency across PyTorch FP32, PyTorch INT8, ONNX Runtime CPU,
-   and projects Qualcomm Hexagon NPU (12 TOPS) acceleration.
+3. Benchmarks latency across PyTorch FP32, PyTorch INT8, and ONNX Runtime (Arm Cortex-A72 NEON).
 4. Saves benchmarks to backend/ml/artifacts/edge_model_benchmarks.json.
 """
 

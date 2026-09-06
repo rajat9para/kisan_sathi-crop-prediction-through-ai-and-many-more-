@@ -3163,7 +3163,7 @@ function generateAndExportOfficialReport() {
 
 // =========================================================================
 // 14. KISAN SATHI 2.0 — EDGE-AI FIELD NODE & SMART IRRIGATION CONTROLLER
-// Qualcomm Problem Statement #26180 (RPi 4 Relay Actuation + Vision AI)
+// SIH Problem Statement #26180 (RPi 4 Relay Actuation + Vision AI)
 // =========================================================================
 let edgeSyncInterval = null;
 let edgeCurrentVisionMode = "auto";

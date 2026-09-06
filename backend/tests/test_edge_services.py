@@ -5,7 +5,7 @@ Tests:
 - Edge Vision Detector (Pests: Fall Armyworm, Aphids, Whiteflies, Bollworm & Plant Pathologies)
 - SIM800L GSM SMS Dispatcher (Bilingual alerts & outbox recording)
 - LoRa SX1278 Multi-Node Mesh (Packet binary packing, CRC16 verification, node registry)
-- Qualcomm RB3 Gen 2 Benchmark Profile
+- Raspberry Pi 4 Optimization & Edge Benchmark Profile
 - FastAPI Edge Endpoints via TestClient
 """
 

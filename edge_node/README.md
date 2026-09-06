@@ -1,6 +1,6 @@
 # Kisan Sathi 2.0 — Edge Node Hardware Specification & Wiring Guide
 
-**Targeting Qualcomm Problem Statement #26180 (Agriculture, FoodTech & Rural Development)**
+**Targeting Smart India Hackathon (SIH 2026) Problem Statement #26180 (Agriculture, FoodTech & Rural Development)**
 
 ---
 
@@ -16,7 +16,7 @@ Kisan Sathi 2.0 is built on an accessible, reliable, and affordable embedded har
 
 ---
 
-## 2. Track A Bill of Materials (BOM) & Specifications
+## 2. Hardware Bill of Materials (BOM) & Specifications
 
 | Component | Specification / Part | Interface | Functional Responsibility |
 | :--- | :--- | :--- | :--- |

@@ -1,6 +1,6 @@
 """
 Kisan Sathi 2.0 - Structured Bilingual Micro-Alert Engine
-Target: SIH 2026 Problem Statement #26180 (Qualcomm Inc.)
+Target: SIH 2026 Problem Statement #26180 (Agriculture, FoodTech & Rural Development)
 
 Generates actionable, punchy micro-alerts in English and Hindi for:
 1. "Irrigate now / delay irrigation" (soil deficit or rain lockout)
