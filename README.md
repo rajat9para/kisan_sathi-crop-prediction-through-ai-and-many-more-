@@ -1,7 +1,7 @@
-# 🌾 Kisan Sathi 2.0 (किसान साथी)
+# 🌾 Kisaan Sathi 2.0 (किसान साथी)
 ### Edge-AI Smart Farming Assistant & Autonomous Closed-Loop Field Node
 **Target:** Smart India Hackathon (SIH 2026) | **Problem Statement:** #26180  
-**Category:** Hardware | **Theme:** Agriculture, FoodTech & Rural Development  
+**Category:** Hardware | **Theme:** Disaster Management | **Organisation:** Qualcomm Inc  
 **Hardware Build:** **Field-Deployable Raspberry Pi 4 Model B Maker Prototype (₹9,850 INR / ~$118 USD)**
 
 ---
@@ -33,14 +33,14 @@
 
 ## 1. Hackathon Overview & Problem Statement #26180
 
-**Problem Statement #26180** calls for a **field-deployable smart farming assistant** that improves agricultural productivity, water stewardship, and rural resilience under unpredictable climatic conditions.
+**Problem Statement #26180** calls for a **field-deployable smart farming assistant** under the **Disaster Management** theme (sponsored by **Qualcomm Inc**) that improves agricultural productivity, water stewardship, and rural resilience against droughts, floods, heatwaves, nutrient deficiencies, and crop epidemics.
 
-Most hackathon solutions present passive software forms that depend on continuous cloud connectivity and provide only generic text tips. **Kisan Sathi 2.0** replaces this with an **autonomous cyber-physical edge station**:
+Most hackathon solutions present passive software forms that depend on continuous cloud connectivity and provide only generic text tips. **Kisaan Sathi 2.0** replaces this with an **autonomous cyber-physical edge station**:
 - **Senses** physical soil moisture, microclimate, and precipitation via dedicated hardware buses.
 - **Filters & Gates** camera frames using Laplacian blur checks and green chromaticity ratios.
-- **Infers** plant pathology and agricultural pest infestations locally using **ONNX MobileNetV2** directly on ARM CPU.
-- **Decides** exact volumetric crop water demand via **FAO-56 Hargreaves evapotranspiration math**.
-- **Actuates** a physical 12V irrigation pump via an optocoupled relay protected by an autonomous **15-minute fail-safe hardware watchdog**.
+- **Infers** plant pathology on-device using **ONNX MobileNetV2 INT8** (32.4 ms on Arm Cortex-A72), with an honest declared capability boundary: 7 CNN-verified classes, 16 crops served by ICAR symptom guidance (`confidence: null`), and 5 major pests via ICAR ETL thresholds.
+- **Decides** exact volumetric crop water demand via **FAO-56 Hargreaves evapotranspiration math** (cost-engineered to save ~₹8,000 on sensor overhead).
+- **Actuates** a physical 12V irrigation pump via an optocoupled relay (GPIO 17) protected by a **hardware rain lockout** (GPIO 27) and an autonomous **15-minute fail-safe hardware watchdog**.
 - **Alerts** smallholders via **Devanagari Hindi SMS (SIM800L)** and **868MHz LoRa mesh packets** when off the grid.
 - **Escalates** severe agricultural anomalies directly to scientists across **18 Regional ICAR Krishi Vigyan Kendras (KVKs)**.
 
@@ -51,7 +51,7 @@ Most hackathon solutions present passive software forms that depend on continuou
 │   ┌────────────────┐      ┌────────────────┐      ┌────────────────┐                   │
 │   │ 1. SENSE       │ ───► │ 2. INFER       │ ───► │ 3. DECIDE      │                   │
 │   │ Capacitive VWC │      │ ONNX MobileNet │      │ FAO-56 ET₀     │                   │
-│   │ DHT22 & Rain   │      │ 5 Pests + 23 Dx│      │ Risk Engines   │                   │
+│   │ DHT22 & Rain   │      │ 7 CNN + 16 Dx  │      │ Risk Engines   │                   │
 │   └────────────────┘      └────────────────┘      └───────┬────────┘                   │
 │                                                           │                            │
 │                                                           ▼                            │
@@ -192,27 +192,32 @@ The physical prototype is constructed from off-the-shelf, cost-effective compone
 ## 5. How the System Works & Key Features
 
 ### 5.1 Closed-Loop Smart Irrigation & 15-Minute Watchdog
-- **Agronomic Math**: Computes reference evapotranspiration ($ET_0$) via the **FAO-56 Hargreaves model** and scales by crop growth stage coefficients ($ET_c = K_c \times ET_0$).
-- **Volumetric Deficit ($D_{\text{soil}}$)**: Converts ADS1115 voltage ($1.2\text{V} - 3.0\text{V}$) to soil moisture percentage, calculating exact liters required per square meter.
-- **Hardware Rain Lockout**: If rain is detected by the FC-37 sensor, the pump is immediately turned OFF and disabled.
-- **15-Minute Fail-Safe Watchdog**: A strict automatic timer shuts off the pump if it runs continuously for $\ge 15.0$ minutes, preventing pump burnout, borehole depletion, or waterlogging.
+- **Agronomic Math**: Computes reference evapotranspiration ($ET_0$) via the **FAO-56 Hargreaves model** ($ET_0 = 0.0023 \times (T_{\text{mean}} + 17.8) \times \sqrt{T_{\text{max}} - T_{\text{min}}} \times R_a$) and scales by crop growth stage coefficients ($ET_c = K_c \times ET_0$).
+  * *Why Hargreaves instead of Penman-Monteith?* Penman-Monteith requires net radiation and wind speed sensors (pyranometer + anemometer), adding ~₹8,000 on a ₹9,850 node. Hargreaves is FAO-56's sanctioned reduced-data alternative, representing disciplined cost engineering.
+- **Volumetric Deficit ($D_{\text{soil}}$)**: Converts ADS1115 voltage ($1.2\text{V} - 3.0\text{V}$) to soil moisture percentage, calculating exact liters required per square meter and converting directly to pump runtime.
+- **Hardware Rain Lockout**: If rain is detected by the FC-37 sensor (GPIO 27), the pump is immediately turned OFF and inhibited regardless of soil moisture.
+- **15-Minute Fail-Safe Watchdog**: A strict automatic hardware timer shuts off the pump if it runs continuously for $\ge 15.0$ minutes, preventing pump burnout, borehole depletion, or waterlogging.
 
-### 5.2 On-Device Vision, Quality Gating & Pest AI
+### 5.2 On-Device Vision, Quality Gating & Declared Capability Boundary
 - **Quality Gates**: Computes **Laplacian blur variance** ($\sigma^2 < 100$ flags motion blur) and **green-chromaticity ratio** ($\ge 12\%$ validates leaf foliage).
-- **ONNX MobileNetV2**: Runs on-device inference for 7 foliar diseases with 95.87% validation accuracy (~32ms on RPi 4 CPU).
-- **5 Major Indian Pests with ICAR ETLs**: Fall Armyworm, Cotton Aphid, Whitefly Vector, Yellow Stem Borer, and Cotton Bollworm with biological and chemical control remedies.
+- **Declared Capability Boundary ("We do not claim neural coverage we cannot evidence")**:
+  - **7 Verified CNN Classes**: Fine-tuned MobileNetV2 INT8 on PlantVillage achieves **95.87% validation accuracy** at **32.4 ms** per frame on Raspberry Pi 4 Arm Cortex-A72 CPU (Apple Scab, Grape Black Rot, Healthy Leaf, Potato Early/Late Blight, Tomato Early/Late Blight).
+  - **16 Unverified Crops**: Crops lacking verified public leaf datasets (wheat rust, rice blast, cotton blight, etc.) are served by ICAR/TNAU/PAU symptom guidance, returned with `confidence: null` and clearly labelled in the UI.
+  - **5 Major Indian Insect Pests**: Fall Armyworm, Cotton Aphid, Whitefly Vector, Yellow Stem Borer, and Cotton Bollworm handled via ICAR Economic Threshold Level (ETL) advisory with verified biological and chemical controls.
+- **Qualcomm Silicon Roadmap**: Prototype benchmarked on Raspberry Pi 4 (ONNX Runtime INT8, 32.4 ms). The same ONNX graph ports to a Qualcomm Dragonwing / QCS-class NPU via QNN or LiteRT (planned for the build phase, not yet benchmarked).
 
-### 5.3 Multi-Factor Environmental Risk & Bilingual Micro-Alerts
-- Computes four distinct agricultural indices: **Drought Deficit**, **Flood & Waterlogging**, **Canopy Heat Stress**, and **Fungal Pathogen Outbreak**, producing a composite 0–100 Farm Vulnerability Score.
+### 5.3 Multi-Factor Environmental Risk & Disaster Resilience
+- Computes four distinct agricultural hazard indices (0–100): **Drought Deficit**, **Flood & Waterlogging**, **Canopy Heat Stress**, and **Fungal Pathogen Outbreak**, fusing local telemetry with Open-Meteo 7-day forecasts and SoilGrids data.
 - Synthesizes structured, bilingual micro-alerts in English and Hindi for immediate action on feature phones.
+- **Resilience Communication**: If cellular drops, the node degrades gracefully from Dashboard $\to$ SIM800L Devanagari SMS $\to$ 868MHz LoRa mesh $\to$ autonomous pump & buzzer.
 
 ### 5.4 Zero-Internet Rural Redundancy (SIM800L SMS & LoRa Mesh)
 - **SIM800L GSM Module**: Sends automated Devanagari Hindi SMS directly to the farmer's phone via UART AT-commands.
 - **Reyax LoRa SX1278 Radio**: Broadcasts 14-byte binary telemetry packets validated with **CRC-16-CCITT** over an 868MHz local mesh network.
 
 ### 5.5 Transparent Explainable AI (XGBoost + SHAP)
-- Multi-class crop recommender trained on 2,200 verified vectors achieves **99.09% accuracy**.
-- **SHAP TreeExplainer**: Computes exact log-odds attributions for every feature ($N, P, K, \text{pH}, \text{temp}, \text{humidity}, \text{rainfall}$), showing farmers *why* each crop was recommended.
+- Multi-class crop recommender trained on 2,200 verified vectors achieves **99.09% held-out test accuracy** (with **98.64% ± 0.25% 5-fold cross-validation mean**).
+- **SHAP TreeExplainer**: Computes exact log-odds attributions for every feature ($N, P, K, \text{pH}, \text{temp}, \text{humidity}, \text{rainfall}$), translated into spoken explanations in 11 Indian languages.
 
 ### 5.6 18-Hub ICAR Krishi Vigyan Kendra (KVK) Network
 - Integrated with 18 agro-ecological extension centers across India, providing verified scientist contact details, soil typologies, and one-tap WhatsApp diagnostic escalation.
@@ -225,8 +230,8 @@ The physical prototype is constructed from off-the-shelf, cost-effective compone
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/rajat9para/kisan_sathi-crop-prediction-through-ai-and-many-more-.git
-cd kisan_sathi-crop-prediction-through-ai-and-many-more-
+git clone https://github.com/rajat9para/kisaan-sathi-sih2026.git
+cd kisaan-sathi-sih2026
 
 # 2. Set up virtual environment
 python -m venv venv

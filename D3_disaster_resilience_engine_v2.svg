@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 850" width="100%" height="100%" style="background:#0F172A; font-family:'Segoe UI',system-ui,sans-serif;">
+  <defs>
+    <linearGradient id="gradD3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#0F172A"/>
+    </linearGradient>
+    <filter id="shadowD3" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Title Header Banner -->
+  <rect x="30" y="25" width="1220" height="85" rx="12" fill="#1E293B" stroke="#334155" stroke-width="1.5" filter="url(#shadowD3)"/>
+  <text x="60" y="60" font-size="22" font-weight="700" fill="#F8FAFC">D3: Disaster Management &amp; Agro-Climatic Resilience Engine</text>
+  <text x="60" y="85" font-size="13" fill="#94A3B8">SIH 2026 Theme: Disaster Management · Four Graded Early-Warning Risk Indices (0–100) with Autonomous Field Interventions</text>
+  <rect x="1080" y="42" width="150" height="32" rx="6" fill="#DC2626" fill-opacity="0.2" stroke="#EF4444" stroke-width="1.5"/>
+  <text x="1155" y="63" font-size="12" font-weight="700" fill="#F87171" text-anchor="middle">DISASTER THEME</text>
+
+  <!-- 4 HAZARD INDEX CARDS (2x2 GRID) -->
+
+  <!-- 1. DROUGHT RISK -->
+  <rect x="30" y="135" width="595" height="260" rx="12" fill="#1E293B" stroke="#F59E0B" stroke-width="2" filter="url(#shadowD3)"/>
+  <rect x="30" y="135" width="595" height="42" rx="12" fill="#D97706" fill-opacity="0.25"/>
+  <text x="55" y="162" font-size="16" font-weight="700" fill="#FBBF24">1. DROUGHT DEFICIT INDEX (0–100)</text>
+  <rect x="490" y="142" width="120" height="26" rx="4" fill="#F59E0B" fill-opacity="0.2"/>
+  <text x="550" y="160" font-size="11" font-weight="700" fill="#FBBF24" text-anchor="middle">SOIL &amp; RAIN DEFICIT</text>
+
+  <text x="55" y="202" font-size="13" font-weight="700" fill="#CBD5E1">Mathematical Formulation &amp; Input Telemetry:</text>
+  <text x="55" y="224" font-size="12" fill="#94A3B8">• Capacitive Soil VWC (%) trajectory over 72 hours</text>
+  <text x="55" y="244" font-size="12" fill="#94A3B8">• Open-Meteo 7-day cumulative precipitation forecast vs. historical ETc</text>
+  <text x="55" y="264" font-size="12" fill="#94A3B8">• Soil texture water retention capacity from ISRIC SoilGrids v2.0</text>
+
+  <rect x="50" y="280" width="555" height="100" rx="8" fill="#0F172A" stroke="#334155"/>
+  <text x="65" y="304" font-size="12" font-weight="700" fill="#FBBF24">Autonomous Edge Interventions &amp; Farmer Action:</text>
+  <text x="65" y="324" font-size="12" fill="#E2E8F0">1. Pre-emptive Irrigation Pulse: Triggers deep root-zone wetting before canal shutdown.</text>
+  <text x="65" y="344" font-size="12" fill="#E2E8F0">2. Mulching Alert: Dispatches Hindi SMS advising organic mulch to cut soil evaporation.</text>
+  <text x="65" y="364" font-size="12" fill="#E2E8F0">3. Anti-Transpirant Advisory: Recommends 2% Kaolin spray to conserve canopy moisture.</text>
+
+  <!-- 2. FLOOD & WATERLOGGING RISK -->
+  <rect x="655" y="135" width="595" height="260" rx="12" fill="#1E293B" stroke="#38BDF8" stroke-width="2" filter="url(#shadowD3)"/>
+  <rect x="655" y="135" width="595" height="42" rx="12" fill="#0284C7" fill-opacity="0.25"/>
+  <text x="680" y="162" font-size="16" font-weight="700" fill="#38BDF8">2. FLOOD &amp; WATERLOGGING RISK (0–100)</text>
+  <rect x="1115" y="142" width="120" height="26" rx="4" fill="#38BDF8" fill-opacity="0.2"/>
+  <text x="1175" y="160" font-size="11" font-weight="700" fill="#38BDF8" text-anchor="middle">DELUGE &amp; HYPOXIA</text>
+
+  <text x="680" y="202" font-size="13" font-weight="700" fill="#CBD5E1">Mathematical Formulation &amp; Input Telemetry:</text>
+  <text x="680" y="224" font-size="12" fill="#94A3B8">• FC-37 Rain sensor state fused with high-rate rainfall forecasts (&gt;50mm/24h)</text>
+  <text x="680" y="244" font-size="12" fill="#94A3B8">• Capacitive sensor voltage &lt; 1.30V (indicates complete soil saturation / pooling)</text>
+  <text x="680" y="264" font-size="12" fill="#94A3B8">• Topographic parcel drainage factor from Digital Elevation Models (DEM)</text>
+
+  <rect x="675" y="280" width="555" height="100" rx="8" fill="#0F172A" stroke="#334155"/>
+  <text x="690" y="304" font-size="12" font-weight="700" fill="#38BDF8">Autonomous Edge Interventions &amp; Farmer Action:</text>
+  <text x="690" y="324" font-size="12" fill="#E2E8F0">1. Instant Pump Hardware Lockout: Software and hardware inhibit relay closure.</text>
+  <text x="690" y="344" font-size="12" fill="#E2E8F0">2. Trench Drainage Alert: Audio alarm and SMS to clear field discharge channels.</text>
+  <text x="690" y="364" font-size="12" fill="#E2E8F0">3. Root Hypoxia Guard: Nitrogen top-dress postponement to prevent nitrate leaching.</text>
+
+  <!-- 3. CANOPY HEATWAVE STRESS -->
+  <rect x="30" y="415" width="595" height="260" rx="12" fill="#1E293B" stroke="#EF4444" stroke-width="2" filter="url(#shadowD3)"/>
+  <rect x="30" y="415" width="595" height="42" rx="12" fill="#B91C1C" fill-opacity="0.25"/>
+  <text x="55" y="442" font-size="16" font-weight="700" fill="#F87171">3. CANOPY HEATWAVE STRESS (0–100)</text>
+  <rect x="490" y="422" width="120" height="26" rx="4" fill="#EF4444" fill-opacity="0.2"/>
+  <text x="550" y="440" font-size="11" font-weight="700" fill="#F87171" text-anchor="middle">THERMAL ANOMALY</text>
+
+  <text x="55" y="482" font-size="13" font-weight="700" fill="#CBD5E1">Mathematical Formulation &amp; Input Telemetry:</text>
+  <text x="55" y="504" font-size="12" fill="#94A3B8">• DHT22 dry-bulb temperature sustained &gt; 38°C for &gt; 3 consecutive hours</text>
+  <text x="55" y="524" font-size="12" fill="#94A3B8">• Atmospheric Vapor Pressure Deficit (VPD = es - ea &gt; 2.5 kPa)</text>
+  <text x="55" y="544" font-size="12" fill="#94A3B8">• Crop phenology stage sensitivity (flowering / grain-filling critical threshold)</text>
+
+  <rect x="50" y="560" width="555" height="100" rx="8" fill="#0F172A" stroke="#334155"/>
+  <text x="65" y="584" font-size="12" font-weight="700" fill="#F87171">Autonomous Edge Interventions &amp; Farmer Action:</text>
+  <text x="65" y="604" font-size="12" fill="#E2E8F0">1. Schedule Shifting: Inhibits midday watering; schedules irrigation at 04:00 AM.</text>
+  <text x="65" y="624" font-size="12" fill="#E2E8F0">2. Canopy Cooling Pulse: Triggers short 3-minute overhead micro-sprinkler misting.</text>
+  <text x="65" y="644" font-size="12" fill="#E2E8F0">3. Flower Abortion Warning: Warns tomato/cotton growers of pollen sterility risks.</text>
+
+  <!-- 4. PATHOGEN & EPIDEMIC OUTBREAK -->
+  <rect x="655" y="415" width="595" height="260" rx="12" fill="#1E293B" stroke="#A855F7" stroke-width="2" filter="url(#shadowD3)"/>
+  <rect x="655" y="415" width="595" height="42" rx="12" fill="#7E22CE" fill-opacity="0.25"/>
+  <text x="680" y="442" font-size="16" font-weight="700" fill="#C084FC">4. DISEASE OUTBREAK EPIDEMIC INDEX (0–100)</text>
+  <rect x="1115" y="422" width="120" height="26" rx="4" fill="#A855F7" fill-opacity="0.2"/>
+  <text x="1175" y="440" font-size="11" font-weight="700" fill="#C084FC" text-anchor="middle">EPIDEMIC TRIAGE</text>
+
+  <text x="680" y="482" font-size="13" font-weight="700" fill="#CBD5E1">Mathematical Formulation &amp; Input Telemetry:</text>
+  <text x="680" y="504" font-size="12" fill="#94A3B8">• Sustained Relative Humidity (RH &gt; 85%) for &gt; 12 hours (leaf-wetness proxy)</text>
+  <text x="680" y="524" font-size="12" fill="#94A3B8">• Temperature trapezoid matching ICAR pathogen spore sporulation ranges</text>
+  <text x="680" y="544" font-size="12" fill="#94A3B8">• Targets: Wheat Yellow Rust (10-18°C), Rice Blast (20-28°C), Late Blight (12-22°C)</text>
+
+  <rect x="675" y="560" width="555" height="100" rx="8" fill="#0F172A" stroke="#334155"/>
+  <text x="690" y="584" font-size="12" font-weight="700" fill="#C084FC">Autonomous Edge Interventions &amp; Farmer Action:</text>
+  <text x="690" y="604" font-size="12" fill="#E2E8F0">1. Pre-Spore Spray Window: Identifies optimal 4-hour window before rain spreads spores.</text>
+  <text x="690" y="624" font-size="12" fill="#E2E8F0">2. Prophylactic Biopesticide: Advises Trichoderma / Neem spray before visible lesions.</text>
+  <text x="690" y="644" font-size="12" fill="#E2E8F0">3. KVK Escalation: Auto-packages temperature/RH history for district KVK scientist.</text>
+
+  <!-- BOTTOM ESCALATION STRIP -->
+  <rect x="30" y="695" width="1220" height="135" rx="12" fill="#0B1329" stroke="#334155" stroke-width="1.5"/>
+  <text x="60" y="725" font-size="14" font-weight="700" fill="#F8FAFC">DISASTER ESCALATION ARCHITECTURE — GUARANTEED WARNING DELIVERY WITHOUT INTERNET</text>
+  
+  <rect x="50" y="740" width="370" height="75" rx="6" fill="#1E293B" stroke="#334155"/>
+  <text x="65" y="762" font-size="12" font-weight="700" fill="#FBBF24">LEVEL 1: LOCAL FIELD ACTUATION</text>
+  <text x="65" y="782" font-size="11" fill="#CBD5E1">Autonomous pump veto, LED warning strobe, buzzer.</text>
+  <text x="65" y="798" font-size="11" fill="#34D399">Requires zero connectivity · Runs on internal battery.</text>
+
+  <rect x="455" y="740" width="370" height="75" rx="6" fill="#1E293B" stroke="#334155"/>
+  <text x="470" y="762" font-size="12" font-weight="700" fill="#38BDF8">LEVEL 2: FARMER TELEPHONY (SMS)</text>
+  <text x="470" y="782" font-size="11" fill="#CBD5E1">SIM800L sends Devanagari Hindi SMS to registered phone.</text>
+  <text x="470" y="798" font-size="11" fill="#38BDF8">Operates over 2G voice channel during 4G data blackouts.</text>
+
+  <rect x="860" y="740" width="370" height="75" rx="6" fill="#1E293B" stroke="#334155"/>
+  <text x="875" y="762" font-size="12" font-weight="700" fill="#C084FC">LEVEL 3: PANCHAYAT &amp; KVK DISPATCH</text>
+  <text x="875" y="782" font-size="11" fill="#CBD5E1">LoRa 868MHz packet relays hazard code to Village Gateway.</text>
+  <text x="875" y="798" font-size="11" fill="#C084FC">Escalates severe outbreaks to 18-Hub ICAR-KVK network.</text>
+</svg>

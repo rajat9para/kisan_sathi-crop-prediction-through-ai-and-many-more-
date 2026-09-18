@@ -1,8 +1,8 @@
 # Model Card: Kisaan Sathi ML & Computer Vision Engines
 
 **Document Version**: 1.0  
-**Target Submission**: Smart India Hackathon 2026  
-**Repository**: `rajat9para/kisan_sathi-crop-prediction-through-ai-and-many-more-`
+**Target Submission**: Smart India Hackathon 2026 (PS #26180 · Disaster Management · Qualcomm Inc)  
+**Repository**: `rajat9para/kisaan-sathi-sih2026`
 
 ---
 

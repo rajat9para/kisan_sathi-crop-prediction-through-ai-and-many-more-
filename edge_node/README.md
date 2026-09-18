@@ -1,12 +1,12 @@
-# Kisan Sathi 2.0 — Edge Node Hardware Specification & Wiring Guide
+# Kisaan Sathi 2.0 — Edge Node Hardware Specification & Wiring Guide
 
-**Targeting Smart India Hackathon (SIH 2026) Problem Statement #26180 (Agriculture, FoodTech & Rural Development)**
+**Targeting Smart India Hackathon (SIH 2026) Problem Statement #26180 (Disaster Management) · Qualcomm Inc**
 
 ---
 
 ## 1. Hardware Architecture: Raspberry Pi 4 Field-Deployable Station
 
-Kisan Sathi 2.0 is built on an accessible, reliable, and affordable embedded hardware stack designed for direct physical demonstration and field deployment:
+Kisaan Sathi 2.0 is built on an accessible, reliable, and affordable embedded hardware stack designed for direct physical demonstration and field deployment:
 - **Central SBC**: Raspberry Pi 4 Model B (4GB) running Linux, Python 3.11, and ONNX Runtime.
 - **Sensing Suite**: ADS1115 16-bit I2C ADC, Capacitive Soil Probe v1.2, DHT22 Microclimate, FC-37 Rain Conduction Sensor.
 - **Physical Actuation**: Galvanically isolated 5V Optocoupled Relay driving a 12V DC R385 Pump with a 15-minute fail-safe watchdog timer.
@@ -25,8 +25,8 @@ Kisan Sathi 2.0 is built on an accessible, reliable, and affordable embedded har
 | **Soil Moisture** | Capacitive Soil Moisture Sensor v1.2 | Analog (1.2V–3.0V) | Corrosion-resistant volumetric soil water fraction |
 | **ADC Converter** | ADS1115 16-Bit 4-Channel I2C ADC | I2C (Address `0x48`) | High-resolution digitization of analog moisture signal |
 | **Air Temp / Humidity** | DHT22 / AM2302 Sensor | Single-bus digital (1-Wire)| Ambient dry-bulb $T$ and $RH$ for $ET_0$ water budgeting |
-| **Rain Inhibitor** | FC-37 / YL-83 Raindrop Sensor Module | Digital Comparator (LM393) | Hardware pump inhibition during rainfall events |
-| **Relay Actuator** | 5V 1-Channel Relay Module (Optocoupler) | Active-LOW GPIO input | Galvanically isolated switching of 12V DC water pump |
+| **Rain Inhibitor** | FC-37 / YL-83 Raindrop Sensor Module | Digital Out (GPIO 27 / Pin 13) | Hardware pump inhibition during rainfall events |
+| **Relay Actuator** | 5V 1-Channel Relay Module (Optocoupler) | Active-LOW (GPIO 17 / Pin 11) | Galvanically isolated switching of 12V DC water pump |
 | **Pump Actuator** | 12V R385 Mini Diaphragm DC Water Pump | Switched 12V DC leads | Pressurizes demonstration drip irrigation distribution |
 | **Offline GSM/SMS** | SIM800L GPRS / GSM Module | UART0 @ 9600 baud, 8N1 | Regional language SMS dispatch without 4G/Wi-Fi |
 | **Long-Range RF** | Reyax RYLR896 LoRa SX1278 (868 MHz) | SPI0 Bus (`/dev/spidev0.0`)| Sub-GHz mesh telemetry packets across farm plots |
@@ -42,10 +42,10 @@ Kisan Sathi 2.0 is built on an accessible, reliable, and affordable embedded har
    I2C1 SCL (05) [05] [06] Ground (GND)
    GPIO 4 (DHT22)[07] [08] UART TX (GPIO 14 -> SIM800L RX)
           Ground [09] [10] UART RX (GPIO 15 <- SIM800L TX)
-         GPIO 17 [11] [12] GPIO 18 (Status LED)
-         GPIO 27 [13] [14] Ground
-         GPIO 22 [15] [16] GPIO 23 (5V Relay Pump Control)
-       3.3V Pwr  [17] [18] GPIO 24 (FC-37 Rain Detector)
+Relay In(GPIO 17)[11] [12] GPIO 18 (Status LED)
+FC-37 Rain(GPIO27)[13] [14] Ground
+         GPIO 22 [15] [16] GPIO 23 (Aux / Spare)
+       3.3V Pwr  [17] [18] GPIO 24 (Aux / Spare)
  SPI0 MOSI (10)  [19] [20] Ground
  SPI0 MISO (09)  [21] [22] GPIO 25 (LoRa Reset)
   SPI0 SCLK (11) [23] [24] SPI0 CE0 (LoRa NSS)

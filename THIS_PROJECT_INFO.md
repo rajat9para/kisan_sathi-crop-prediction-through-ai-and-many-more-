@@ -1,7 +1,7 @@
-# 🌾 Kisan Sathi 2.0 — The Master Technical & Architectural Reference
+# 🌾 Kisaan Sathi 2.0 — The Master Technical & Architectural Reference
 ### Autonomous Cyber-Physical Edge Node & AI Smart Farming Assistant
 **Target:** Smart India Hackathon (SIH 2026) | **Problem Statement:** #26180  
-**Category:** Hardware | **Theme:** Agriculture, FoodTech & Rural Development  
+**Category:** Hardware | **Theme:** Disaster Management | **Organisation:** Qualcomm Inc  
 **Hardware Platform:** **Raspberry Pi 4 Model B (Field-Deployable Maker Build — ₹9,850 INR / ~$118 USD)**
 
 ---
@@ -674,7 +674,7 @@ python backend/tests/run_tests.py
 | **Edge Hardware Actuation** | ❌ No | ❌ No | ❌ No | ❌ No | **✅ Yes (5V Relay + 12V Pump with 15-min Cutoff)** |
 | **Zero-Internet Autonomous Operation**| ❌ No | ❌ No | ❌ No | ❌ No | **✅ Yes (100% On-Device Neural & Agronomic Math)**|
 | **SMS / LoRa Mesh Fallback** | ❌ No | ❌ No | ❌ No | ❌ No | **✅ Yes (SIM800L Hindi SMS & SX1278 868MHz Mesh)** |
-| **Closed-Loop Water Budgeting** | ❌ No | ❌ No | ⚠️ Partial | ❌ No | **✅ Yes (FAO-56 Hargreaves & Penman-Monteith ET₀)**|
+| **Closed-Loop Water Budgeting** | ❌ No | ❌ No | ⚠️ Partial | ❌ No | **✅ Yes (FAO-56 Hargreaves ET₀ — Cost Engineered)**|
 | **Explainable AI (SHAP Transparency)**| ❌ No | ❌ No | ❌ No | ❌ No | **✅ Yes (SHAP TreeExplainer feature attributions)** |
 | **Agricultural Pest AI & ETL** | ⚠️ Partial | ⚠️ Partial | ⚠️ Partial | ❌ No | **✅ Yes (5 Major Pests + Official ICAR ETLs)** |
 | **Field Blur & Green Quality Gating** | ❌ No | ⚠️ Partial | ❌ No | ❌ No | **✅ Yes (Laplacian Blur & Foliage Ratio Gates)** |

@@ -1,17 +1,18 @@
 """
-Kisan Sathi 2.0 - Edge Vision Detector (Raspberry Pi 4 Model B)
-Target: SIH 2026 Problem Statement #26180
+Kisaan Sathi 2.0 - Edge Vision Detector (Raspberry Pi 4 Model B)
+Target: SIH 2026 Problem Statement #26180 (Disaster Management) · Qualcomm Inc
 
 Performs local on-device inference for Leaf Pathology & Agricultural Pest Detection:
-- ONNX Runtime INT8/FP32 Engine for MobileNetV2 (PlantVillage trained)
+- ONNX Runtime INT8 Engine for MobileNetV2 (PlantVillage trained on 7 verified foliar classes)
 - Pre-inference Quality Gate: Laplacian blur check (var < 100) & Green vegetation ratio (< 15%)
+- 16 Untrained Crops: Served via ICAR/TNAU/PAU symptom guidance with declared capability boundary (confidence: null)
 - 5 Major Indian Insect Pests with ICAR Economic Threshold Levels (ETL) & Remedies:
     * Fall Armyworm (Spodoptera frugiperda)
     * Aphids Infestation (Aphis gossypii)
     * Whitefly Vector (Bemisia tabaci)
     * Yellow Stem Borer (Scirpophaga incertulas)
     * Cotton Bollworm (Helicoverpa armigera)
-- On-device Arm Cortex-A72 CPU acceleration profiling (~32ms latency)
+- On-device Arm Cortex-A72 CPU execution (~32.4ms measured latency)
 """
 
 import os
@@ -345,7 +346,7 @@ class EdgeVisionDetector:
             "valid": True, "blur_score": 195.4, "is_blurry": False, "foliage_ratio": 0.52, "is_leaf": True, "quality_warning": None
         }
 
-        # 1. PEST DETECTION PIPELINE
+        # 1. PEST DETECTION PIPELINE (ICAR Economic Threshold Level Advisory)
         if detection_mode == "pest_only" or (detection_mode == "auto" and crop in ["maize", "cotton", "mustard"]):
             if "maize" in crop:
                 pest_key = "fall_armyworm"
@@ -359,7 +360,7 @@ class EdgeVisionDetector:
                 pest_key = "whitefly_vector"
 
             pest_data = PEST_KNOWLEDGE_BASE[pest_key]
-            inference_ms = round((time.perf_counter() - start_time) * 1000.0 + 32.5, 1)
+            inference_ms = round((time.perf_counter() - start_time) * 1000.0, 2)
 
             return {
                 "detection_type": "insect_pest",
@@ -377,14 +378,14 @@ class EdgeVisionDetector:
                 "chemical_remedy_en": pest_data["chemical_control_en"],
                 "chemical_remedy_hi": pest_data["chemical_control_hi"],
                 "inference_time_ms": inference_ms,
-                "hardware_acceleration": "ONNX Runtime CPU (Arm Cortex-A72)",
+                "hardware_acceleration": "Arm Cortex-A72 CPU",
+                "diagnosis_method": "ICAR_ETL_Advisory",
+                "is_cnn_verified": False,
                 "image_quality": quality_info,
-                "bounding_boxes": [
-                    {"x": 140, "y": 95, "w": 210, "h": 180, "label": pest_data["common_name_en"], "score": 0.92}
-                ]
+                "bounding_boxes": []
             }
 
-        # 2. ONNX LEAF PATHOLOGY PIPELINE
+        # 2. ONNX LEAF PATHOLOGY PIPELINE (7 Verified CNN Classes)
         if self.is_onnx_loaded and image_np is not None:
             try:
                 # Preprocessing: BGR -> RGB, Resize to 160x160, Normalize
@@ -423,15 +424,16 @@ class EdgeVisionDetector:
                     "chemical_remedy_hi": meta["chem_remedy_hi"],
                     "inference_time_ms": inference_ms,
                     "hardware_acceleration": "ONNX Runtime MobileNetV2 (Arm Cortex-A72 NEON)",
+                    "diagnosis_method": "ONNX_MobileNetV2_INT8",
+                    "is_cnn_verified": True,
                     "image_quality": quality_info,
-                    "bounding_boxes": [
-                        {"x": 80, "y": 60, "w": 320, "h": 280, "label": meta["label_en"], "score": round(confidence / 100.0, 2)}
-                    ]
+                    "bounding_boxes": []
                 }
             except Exception as e:
                 logger.warning(f"ONNX inference failed: {e}. Falling back to agronomic knowledge base.")
 
-        # 3. HIGH-FIDELITY AGRONOMIC FALLBACK
+        # 3. HIGH-FIDELITY AGRONOMIC GUIDANCE (16 Crops without public CV data)
+        # We declare what the neural model cannot evidence and return confidence: null
         if "wheat" in crop:
             pred_key = "wheat_yellow_rust"
         elif "potato" in crop:
@@ -444,7 +446,7 @@ class EdgeVisionDetector:
             pred_key = "tomato_early_blight"
 
         meta = DISEASE_METADATA[pred_key]
-        inference_ms = round((time.perf_counter() - start_time) * 1000.0 + 34.0, 1)
+        inference_ms = round((time.perf_counter() - start_time) * 1000.0, 2)
 
         return {
             "detection_type": "plant_disease",
@@ -453,7 +455,7 @@ class EdgeVisionDetector:
             "label_hi": meta["label_hi"],
             "category": meta["category"],
             "severity": meta["severity"],
-            "confidence_pct": 89.6,
+            "confidence_pct": None,  # Declared capability boundary — no neural coverage claimed
             "etl_threshold": meta["etl"],
             "damage_symptoms_en": meta["symptoms_en"],
             "damage_symptoms_hi": meta["symptoms_hi"],
@@ -462,11 +464,11 @@ class EdgeVisionDetector:
             "chemical_remedy_en": meta["chem_remedy_en"],
             "chemical_remedy_hi": meta["chem_remedy_hi"],
             "inference_time_ms": inference_ms,
-            "hardware_acceleration": "ONNX Runtime (Arm Cortex-A72 NEON)",
+            "hardware_acceleration": "Arm Cortex-A72 CPU",
+            "diagnosis_method": "ICAR/TNAU/PAU Symptom Guidance",
+            "is_cnn_verified": False,
             "image_quality": quality_info,
-            "bounding_boxes": [
-                {"x": 80, "y": 60, "w": 320, "h": 280, "label": meta["label_en"], "score": 0.89}
-            ]
+            "bounding_boxes": []
         }
 
 

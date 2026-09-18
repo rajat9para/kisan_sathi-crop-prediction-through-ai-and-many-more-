@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kisaan Sathi — SIH 2026 Official Presentation</title>
+  <style>
+    :root {
+      --bg: #070D1E;
+      --card-bg: #0F1A34;
+      --card-border: #233358;
+      --text: #F8FAFC;
+      --muted: #94A3B8;
+      --cyan: #38BDF8;
+      --green: #10B981;
+      --amber: #F59E0B;
+      --orange: #F97316;
+      --red: #EF4444;
+      --purple: #A855F7;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      overflow-x: hidden;
+    }
+
+    /* Top Nav */
+    header {
+      width: 100%;
+      max-width: 1400px;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(15, 26, 52, 0.7);
+      backdrop-filter: blur(8px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--text);
+    }
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-theme {
+      background: rgba(249, 115, 22, 0.15);
+      border: 1px solid var(--orange);
+      color: var(--orange);
+    }
+    .badge-ps {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid var(--cyan);
+      color: var(--cyan);
+    }
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn {
+      background: #1E293B;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn:hover {
+      background: var(--card-border);
+      border-color: var(--cyan);
+      color: var(--cyan);
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #0284C7, #0369A1);
+      border-color: #38BDF8;
+      font-weight: 600;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #0369A1, #075985);
+      color: #FFF;
+    }
+
+    /* Deck Viewport (16:9 Aspect Ratio) */
+    .deck-container {
+      width: 100%;
+      max-width: 1360px;
+      padding: 16px 20px;
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .slide-frame {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #0B132B;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      padding: 28px 36px;
+      display: none;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+    }
+    .slide.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    /* Slide Header */
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 12px;
+    }
+    .slide-title-area h2 {
+      font-size: 1.55rem;
+      font-weight: 700;
+      color: #FFF;
+      letter-spacing: -0.2px;
+    }
+    .slide-title-area p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+    .slide-badges {
+      display: flex;
+      gap: 8px;
+    }
+
+    /* Slide Body Grid */
+    .slide-content {
+      flex: 1;
+      display: grid;
+      gap: 16px;
+      overflow: hidden;
+    }
+
+    /* Slide 1 Styles */
+    .s1-container {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+    .s1-meta {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--cyan);
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+    .s1-hero {
+      margin-top: 8px;
+    }
+    .s1-hero h1 {
+      font-size: 2.8rem;
+      font-weight: 800;
+      color: #FFF;
+      line-height: 1.1;
+    }
+    .s1-hero h3 {
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: var(--green);
+      margin-top: 6px;
+    }
+    .s1-theme-lens {
+      background: rgba(249, 115, 22, 0.12);
+      border-left: 4px solid var(--orange);
+      padding: 10px 16px;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+    .s1-theme-lens h4 {
+      color: var(--orange);
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .s1-theme-lens p {
+      color: #E2E8F0;
+      font-size: 0.88rem;
+      margin-top: 2px;
+    }
+    .s1-hook {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 12px 18px;
+      border-radius: 8px;
+      margin-top: 10px;
+    }
+    .s1-hook-label {
+      font-size: 0.75rem;
+      color: var(--cyan);
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .s1-hook-text {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #FFF;
+      font-style: italic;
+    }
+    .s1-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .s1-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .s1-card h5 {
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+    .s1-card p {
+      font-size: 0.78rem;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    /* Common Card */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+    }
+    .card h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .card ul {
+      list-style: none;
+    }
+    .card li {
+      font-size: 0.82rem;
+      line-height: 1.45;
+      margin-bottom: 6px;
+      color: #E2E8F0;
+    }
+    .card li strong {
+      color: #FFF;
+    }
+
+    /* Table Styles */
+    table.matrix {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+    }
+    table.matrix th {
+      background: #1A284A;
+      color: var(--cyan);
+      text-align: left;
+      padding: 8px 10px;
+      font-weight: 700;
+      border: 1px solid var(--card-border);
+    }
+    table.matrix td {
+      padding: 6px 10px;
+      border: 1px solid var(--card-border);
+      color: #CBD5E1;
+    }
+    table.matrix tr:nth-child(even) {
+      background: rgba(15, 26, 52, 0.4);
+    }
+    table.matrix td.metric {
+      color: var(--green);
+      font-weight: 600;
+    }
+
+    /* Image / Diagram Container */
+    .diagram-frame {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #080E22;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      overflow: hidden;
+      padding: 6px;
+    }
+    .diagram-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* Navigation Bar */
+    footer {
+      width: 100%;
+      max-width: 1400px;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--card-border);
+      background: rgba(15, 26, 52, 0.7);
+    }
+    .controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .counter {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--muted);
+      min-width: 90px;
+      text-align: center;
+    }
+    .key-hints {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    kbd {
+      background: #1E293B;
+      border: 1px solid #334155;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: inherit;
+      color: var(--cyan);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="brand">
+      <span class="brand-title">🌾 Kisaan Sathi — SIH 2026</span>
+      <span class="badge badge-theme">Theme: Disaster Management</span>
+      <span class="badge badge-ps">Qualcomm Inc · PS #26180</span>
+    </div>
+    <div class="header-actions">
+      <a href="Kisaan_Sathi_SIH2026_Official_Presentation.pptx" class="btn btn-primary" download>
+        📥 Download PPTX Deck (608 KB)
+      </a>
+      <button class="btn" onclick="toggleFullscreen()">⛶ Fullscreen</button>
+    </div>
+  </header>
+
+  <!-- Presentation Viewport -->
+  <main class="deck-container">
+    <div class="slide-frame" id="slideFrame">
+
+      <!-- ========================================== -->
+      <!-- SLIDE 1: TITLE SLIDE -->
+      <!-- ========================================== -->
+      <section class="slide active" id="slide-1">
+        <div class="s1-container">
+          <div class="s1-meta">
+            SMART INDIA HACKATHON 2026 · HARDWARE EDITION · PROBLEM STATEMENT #26180 · QUALCOMM INC
+          </div>
+
+          <div class="s1-hero">
+            <h1>Kisaan Sathi (किसान साथी)</h1>
+            <h3>Field-Deployable Cyber-Physical Node & AI Smart Farming Assistant</h3>
+          </div>
+
+          <div class="s1-theme-lens">
+            <h4>Official SIH Theme: Disaster Management</h4>
+            <p>Evaluated through the lens of climate hazard resilience: autonomous early detection of drought, flood, heatwave & pest epidemics.</p>
+          </div>
+
+          <div class="s1-hook">
+            <div class="s1-hook-label">The 10-Second Executive Hook</div>
+            <div class="s1-hook-text">
+              "A ₹9,850 solar-powered field node that detects crop disease, pest, nutrient and water stress on-device in 32 ms — and keeps warning the farmer when the network is gone."
+            </div>
+          </div>
+
+          <div class="s1-grid">
+            <div class="s1-card" style="border-color: var(--green);">
+              <h5 style="color: var(--green);">₹9,850 Physical Node</h5>
+              <p>100% commodity off-the-shelf BOM<br>20W PV + 12V 7Ah VRLA Battery<br>48-hr zero-sun autonomy · IP65</p>
+            </div>
+            <div class="s1-card" style="border-color: var(--purple);">
+              <h5 style="color: var(--purple);">32.4 ms Edge AI</h5>
+              <p>MobileNetV2 INT8 on Cortex-A72<br>7 CNN classes @ 95.87% val acc<br>16 ICAR guidance · 5 ETL pests</p>
+            </div>
+            <div class="s1-card" style="border-color: var(--orange);">
+              <h5 style="color: var(--orange);">Disaster Resilience</h5>
+              <p>Drought, flood & heatwave indices<br>FAO-56 Hargreaves ETc water balance<br>Pre-emptive pump control & alerts</p>
+            </div>
+            <div class="s1-card" style="border-color: var(--cyan);">
+              <h5 style="color: var(--cyan);">Offline Fail-Safe</h5>
+              <p>SIM800L Devanagari SMS fallback<br>LoRa 868 MHz village mesh<br>Opto active-LOW relay + HW watchdog</p>
+            </div>
+          </div>
+
+          <div style="text-align: center; font-size: 0.8rem; color: var(--muted); margin-top: 6px;">
+            Team TechBuilders · Autonomous Edge Cyber-Physical System · SIH 2026 Grand Finale Defense
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SLIDE 2: PROPOSED SOLUTION & PS MAPPING -->
+      <!-- ========================================== -->
+      <section class="slide" id="slide-2">
+        <div class="slide-header">
+          <div class="slide-title-area">
+            <h2>Proposed Solution & Problem Statement Alignment</h2>
+            <p>End-to-End Cyber-Physical Architecture mapped directly to Qualcomm PS #26180 requirements</p>
+          </div>
+          <div class="slide-badges">
+            <span class="badge badge-theme">Disaster Management</span>
+            <span class="badge badge-ps">PS #26180</span>
+          </div>
+        </div>
+
+        <div class="slide-content" style="grid-template-columns: 1fr 1.1fr;">
+          <!-- Left Column -->
+          <div style="display: flex; flex-direction: column; gap: 12px; height: 100%;">
+            <div class="card" style="flex: 1.2;">
+              <h4 style="color: var(--cyan);">1. Detailed Solution Architecture</h4>
+              <ul>
+                <li><strong>• Edge Sensing:</strong> Capacitive soil moisture via 16-bit ADS1115 ADC, DHT22 (temp/humidity), FC-37 rain plate, Pi Camera V2. 3-min duty cycle to SQLite.</li>
+                <li><strong>• Leaf Pathology:</strong> MobileNetV2 INT8 ONNX (32.4 ms on Cortex-A72). 7 verified CNN classes at 95.87% val acc; 16 unverified crops routed to verified ICAR symptom guidance.</li>
+                <li><strong>• Nutrient Analysis:</strong> NPK/pH sensing + Soil Health Card OCR mapped to XGBoost + SHAP explaining nutrient deficiency magnitude in 11 Indian languages.</li>
+                <li><strong>• Water Balance:</strong> FAO-56 Hargreaves ET₀ from local Tmax/Tmin, crop Kc curve, soil-water deficit converted to litres and exact pump runtime.</li>
+                <li><strong>• Disaster Hazards:</strong> Drought, flood, heatwave & outbreak indices (0–100) combining local telemetry and Open-Meteo ECMWF forecasts.</li>
+                <li><strong>• Degrading Delivery:</strong> Web/Flutter Dashboard → SIM800L Devanagari SMS → LoRa 868 MHz mesh → Local buzzer/pump actuation when isolated.</li>
+              </ul>
+            </div>
+            <div class="card" style="flex: 1; border-color: var(--green);">
+              <h4 style="color: var(--green);">2. Innovation & Key Differentiators</h4>
+              <ul>
+                <li><strong>• Acts, not just advises:</strong> Optocoupled relay terminates on 12V pump with 15-min hardware watchdog and rain lockout.</li>
+                <li><strong>• Explainability reaches farmer:</strong> SHAP attribution translated into spoken native audio in 11 languages with local KVK agronomist contact.</li>
+                <li><strong>• Declared capability boundary:</strong> Where unverified, returns confidence: null + ICAR guidance instead of fabricated neural hallucination.</li>
+                <li><strong>• ₹9,850 Offline-Native:</strong> Engineered for marginal smallholders with zero cloud dependence and 48h zero-sun battery autonomy.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Right Column: Alignment Matrix -->
+          <div class="card" style="height: 100%;">
+            <h4 style="color: var(--amber);">Problem Statement Alignment Matrix (PS #26180)</h4>
+            <table class="matrix">
+              <thead>
+                <tr>
+                  <th style="width: 32%;">PS Requirement</th>
+                  <th style="width: 44%;">Implementation Mechanism</th>
+                  <th style="width: 24%;">Evidenced Metric</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Detect crop diseases early</strong></td>
+                  <td>MobileNetV2 INT8 on leaf imagery on RPi Cortex-A72</td>
+                  <td class="metric">32.4 ms / 95.87% val acc</td>
+                </tr>
+                <tr>
+                  <td><strong>Detect pests early</strong></td>
+                  <td>ETL-threshold advisory with bio/chemical dosing per ICAR</td>
+                  <td class="metric">5 Major Indian Pests</td>
+                </tr>
+                <tr>
+                  <td><strong>Detect nutrient deficiencies</strong></td>
+                  <td>NPK/pH sensing + Soil Health Card OCR → XGBoost + SHAP</td>
+                  <td class="metric">7 Features · 11 Langs</td>
+                </tr>
+                <tr>
+                  <td><strong>Detect irrigation needs</strong></td>
+                  <td>FAO-56 Hargreaves ETc water balance → relay pump control</td>
+                  <td class="metric">Liters/m² → Pump sec</td>
+                </tr>
+                <tr>
+                  <td><strong>Disaster resilience (drought, flood, heatwave)</strong></td>
+                  <td>4 graded hazard indices (0–100) with pre-emptive actions</td>
+                  <td class="metric">Sensor + ECMWF Forecast</td>
+                </tr>
+                <tr>
+                  <td><strong>Real-time on-device intelligence</strong></td>
+                  <td>Full closed loop executes on Raspberry Pi with 0 cloud dependency</td>
+                  <td class="metric">100% Offline Autonomous</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SLIDE 3: TECHNICAL APPROACH -->
+      <!-- ========================================== -->
+      <section class="slide" id="slide-3">
+        <div class="slide-header">
+          <div class="slide-title-area">
+            <h2>Technical Approach & System Architecture</h2>
+            <p>Hardware wiring, 4 local AI inference engines, cyber-physical actuation, and telemetry fail-safes</p>
+          </div>
+          <div class="slide-badges">
+            <span class="badge badge-theme">Disaster Management</span>
+            <span class="badge badge-ps">PS #26180</span>
+          </div>
+        </div>
+
+        <div class="slide-content" style="display: flex; flex-direction: column; gap: 10px;">
+          <!-- 4-Line Tech Strip -->
+          <div class="card" style="padding: 8px 14px;">
+            <p style="font-size: 0.8rem; line-height: 1.45;">
+              <strong style="color: var(--cyan);">Hardware:</strong> Raspberry Pi 4B (4 GB) · Pi Camera V2 · Capacitive soil probe · ADS1115 16-bit ADC · DHT22 · FC-37 rain plate · 5V opto relay → 12V R385 pump · SIM800L GSM · RYLR896 LoRa 868 MHz · 20W PV + 12V 7Ah VRLA<br>
+              <strong style="color: var(--purple);">Edge AI:</strong> PyTorch → ONNX Runtime INT8 · MobileNetV2 (32.4 ms) · OpenCV · XGBoost · SHAP TreeExplainer · scikit-learn<br>
+              <strong style="color: var(--green);">Agronomy:</strong> FAO-56 Hargreaves ET₀ · crop coefficient Kc · soil-water deficit · ICAR / TNAU / PAU extension guidelines<br>
+              <strong style="color: #CBD5E1;">Software:</strong> FastAPI · SQLite (edge) · Supabase PostgreSQL (cloud) · Flutter · PWA · systemd · SoilGrids v2 · Open-Meteo · Sentinel-2 · Agmarknet
+            </p>
+          </div>
+
+          <!-- D1 and D2 Split -->
+          <div style="flex: 1; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; min-height: 0;">
+            <div class="diagram-frame">
+              <img src="D1_hardware_block_diagram_v2.svg" alt="D1: Hardware Block Diagram">
+            </div>
+            <div class="diagram-frame">
+              <img src="D2_edge_decision_loop_v2.svg" alt="D2: Edge Decision Loop">
+            </div>
+          </div>
+
+          <!-- Bottom Caption Strip -->
+          <div style="background: #080E20; border: 1px solid var(--card-border); padding: 6px 14px; border-radius: 6px; text-align: center; font-size: 0.78rem; font-weight: 700; color: var(--amber);">
+            TOTAL NODE COST: ₹9,850 (~$118) · POWER DRAW: 59.5 Wh/day · 48-HR ZERO-SUN AUTONOMY · IP65 ENCLOSURE (-10°C to +60°C) · GPIO 17 RELAY / GPIO 27 RAIN
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SLIDE 4: FEASIBILITY & RISK MITIGATION -->
+      <!-- ========================================== -->
+      <section class="slide" id="slide-4">
+        <div class="slide-header">
+          <div class="slide-title-area">
+            <h2>Feasibility, Viability & Risk Mitigation</h2>
+            <p>Demonstrated hardware-software readiness, identified failure modes, and defence-in-depth safeguards</p>
+          </div>
+          <div class="slide-badges">
+            <span class="badge badge-theme">Disaster Management</span>
+            <span class="badge badge-ps">PS #26180</span>
+          </div>
+        </div>
+
+        <div class="slide-content" style="grid-template-columns: repeat(3, 1fr); gap: 14px;">
+          <!-- Col 1: Feasibility -->
+          <div class="card" style="border-color: var(--green);">
+            <h4 style="color: var(--green);">1. Feasibility & Readiness</h4>
+            <ul>
+              <li><strong>• Built, Not Proposed:</strong> Runs today as an autonomous systemd service (kisan-edge.service); 32.4 ms benchmark, confusion matrices and BOM are committed repository artefacts.</li>
+              <li><strong>• Commodity Supply Chain:</strong> All 12 BOM items sourced off-the-shelf from Indian electronics distributors. Zero custom silicon, zero import lead times.</li>
+              <li><strong>• Power Budget Closes:</strong> 59.5 Wh/day consumption → 74.4 Wh/day with conversion; 4.0 peak-sun hours requires 18.6 W. 20W PV + 12V 7Ah battery provides 48h zero-sun autonomy.</li>
+              <li><strong>• Latency Closes:</strong> 32.4 ms per frame on Pi's Cortex-A72 CPU — zero GPU required, zero cloud round-trip delay.</li>
+              <li><strong>• Team Competence:</strong> Python, PyTorch, FastAPI, Flutter in hand; clean GPIO hardware layer under 1,000 lines.</li>
+            </ul>
+          </div>
+
+          <!-- Col 2: Risks -->
+          <div class="card" style="border-color: var(--red);">
+            <h4 style="color: var(--red);">2. Potential Challenges & Risks</h4>
+            <ul>
+              <li><strong>• Sensor Drift & Salinity:</strong> Capacitive probes drift with soil salinity and temperature; uncalibrated probes produce incorrect irrigation.</li>
+              <li><strong>• Training-Data Gaps:</strong> No verified public leaf dataset exists for wheat rust, rice blast, or cotton blight at Indian field quality.</li>
+              <li><strong>• Actuation Hazards:</strong> A stuck relay floods fields, depletes groundwater, and burns pump motors.</li>
+              <li><strong>• GSM Network Sunset:</strong> SIM800L operates on 2G; 2G sunset is an eventual transition risk in some telecom circles.</li>
+              <li><strong>• Farmer Trust & Literacy:</strong> Unexplained instructions from an anonymous plastic box in a field will be rejected by farmers.</li>
+              <li><strong>• Non-Stationary Weather:</strong> Static models degrade as climate patterns and pest migration windows shift across seasons.</li>
+            </ul>
+          </div>
+
+          <!-- Col 3: Mitigation -->
+          <div class="card" style="border-color: var(--cyan);">
+            <h4 style="color: var(--cyan);">3. Defence-in-Depth Mitigation</h4>
+            <ul>
+              <li><strong>• Two-Point Calibration:</strong> Air-dry and saturated-wet thresholds stored in SQLite; readings outside 1.2–3.0V rejected automatically.</li>
+              <li><strong>• Declared Boundary:</strong> Untrained crops return ICAR symptom guidance with confidence: null; field photos queue for model refresh.</li>
+              <li><strong>• Triple Actuation Guard:</strong> Opto-isolated active-LOW relay (GPIO 17) + 15-min HW watchdog cutoff + FC-37 rain plate (GPIO 27) physical veto.</li>
+              <li><strong>• Three-Tier Comms Fallback:</strong> GSM SMS (Devanagari) → LoRa 868 MHz → Local buzzer/LED. LTE-CAT1 modem is a drop-in UART replacement.</li>
+              <li><strong>• Explainable Voice (11 Langs):</strong> Every alert gives physical reason + confidence + direct verified ICAR-KVK scientist contact phone line.</li>
+              <li><strong>• Store-and-Forward Sync:</strong> Zero data lost offline; telemetry and diagnostic outcomes sync when backhaul reconnects.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SLIDE 5: IMPACT & DISASTER RESILIENCE -->
+      <!-- ========================================== -->
+      <section class="slide" id="slide-5">
+        <div class="slide-header">
+          <div class="slide-title-area">
+            <h2>Impact, Benefits & Disaster Resilience Engine</h2>
+            <p>Quantifiable agronomic, economic, environmental impact backed by multi-hazard early warning</p>
+          </div>
+          <div class="slide-badges">
+            <span class="badge badge-theme">Disaster Management</span>
+            <span class="badge badge-ps">PS #26180</span>
+          </div>
+        </div>
+
+        <div class="slide-content" style="grid-template-columns: 0.9fr 1.1fr; gap: 14px;">
+          <!-- Left Column -->
+          <div style="display: flex; flex-direction: column; gap: 12px; height: 100%;">
+            <div class="card" style="flex: 1.2; border-color: var(--amber);">
+              <h4 style="color: var(--amber);">1. Target Audience Impact (Marginal Farmers)</h4>
+              <ul>
+                <li><strong>• Earlier Detection (48h):</strong> Blight and rust are treatable in first 48h. 32 ms on-device diagnosis shifts decision from expert visit to instant triage.</li>
+                <li><strong>• Water Applied to Demand:</strong> FAO-56 Hargreaves ETc scheduling cuts wasteful fixed-interval flood irrigation by 25–40%.</li>
+                <li><strong>• Hazards Seen Before Arrival:</strong> Drought, flood, heatwave & outbreak indices give lead time for pre-emptive irrigation or early spray windows.</li>
+                <li><strong>• Survives Network Blackouts:</strong> GSM SMS and LoRa 868 MHz ensure critical disaster warnings reach farmers when cell towers fail.</li>
+                <li><strong>• A Reason, Not an Order:</strong> SHAP attribution in 11 Indian languages plus verified ICAR-KVK contact empowers farmer trust.</li>
+              </ul>
+            </div>
+            <div class="card" style="flex: 1; border-color: var(--green);">
+              <h4 style="color: var(--green);">2. Multi-Dimensional Benefits</h4>
+              <ul>
+                <li><strong>• Social:</strong> Voice-first advisory in 11 languages; reaches marginal farmers without smartphones or data connectivity.</li>
+                <li><strong>• Economic:</strong> Reduces chemical & diesel pump costs; prevents crop loss; ₹9,850 node accessible to FPOs without subsidies.</li>
+                <li><strong>• Environmental:</strong> Rain-aware pump scheduling preserves groundwater; targeted spray windows reduce aquifer runoff.</li>
+                <li><strong>• Technological:</strong> Proves quantized CNNs + explainable agronomy run on a ₹4,200 SBC; direct migration path to Qualcomm NPU.</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Right Column: D3 -->
+          <div class="diagram-frame">
+            <img src="D3_disaster_resilience_engine_v2.svg" alt="D3: Disaster Resilience Engine">
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================== -->
+      <!-- SLIDE 6: RESEARCH, EVIDENCE & DEFENSE -->
+      <!-- ========================================== -->
+      <section class="slide" id="slide-6">
+        <div class="slide-header">
+          <div class="slide-title-area">
+            <h2>Research, Empirical Evidence & Defense Dossier</h2>
+            <p>Scientific citations, capability boundary, benchmark rigor, and verbatim data honesty commitment</p>
+          </div>
+          <div class="slide-badges">
+            <span class="badge badge-theme">Disaster Management</span>
+            <span class="badge badge-ps">PS #26180</span>
+          </div>
+        </div>
+
+        <div class="slide-content" style="display: flex; flex-direction: column; gap: 12px;">
+          <!-- Top Area: D4 Diagram -->
+          <div class="diagram-frame" style="flex: 1.5; min-height: 0;">
+            <img src="D4_validation_and_capability_panel_v2.svg" alt="D4: Validation & Capability Panel">
+          </div>
+
+          <!-- Bottom Split: Citations + Honesty -->
+          <div style="flex: 1; display: grid; grid-template-columns: 1.2fr 1fr; gap: 12px; min-height: 0;">
+            <div class="card">
+              <h4 style="color: var(--cyan);">Peer-Reviewed Agronomic & ML Foundations</h4>
+              <ul style="font-size: 0.78rem;">
+                <li>• <strong>FAO Irrigation Paper 56:</strong> Allen et al. (1998) [Hargreaves ET₀, Kc water balance]</li>
+                <li>• <strong>PlantVillage:</strong> Hughes & Salathé (CC-BY-SA) [4,200 verified images across 7 CNN classes]</li>
+                <li>• <strong>MobileNetV2:</strong> Sandler et al., CVPR 2018 [Inverted Residuals & Linear Bottlenecks]</li>
+                <li>• <strong>SHAP:</strong> Lundberg & Lee, NeurIPS 2017 [A Unified Approach to Interpreting Model Predictions]</li>
+                <li>• <strong>ISRIC SoilGrids v2.0 & Open-Meteo:</strong> 250m global soil layers · ECMWF 7-day weather forecast</li>
+                <li>• <strong>ICAR / TNAU / PAU Guidelines:</strong> Extension triage, ETL thresholds, bio/chemical dosing</li>
+              </ul>
+            </div>
+
+            <div class="card" style="border-color: var(--green); background: rgba(16, 185, 129, 0.05);">
+              <h4 style="color: var(--green);">Verbatim Data Honesty Statement</h4>
+              <p style="font-size: 0.82rem; font-style: italic; color: #FFF; line-height: 1.45; margin-bottom: 8px;">
+                "Every API response carries an explicit source field. Where a live feed is unavailable the system degrades to a clearly-labelled cached or estimated value. It never presents simulated data as verified data. Confidence scores are raw softmax outputs — never floored, clamped, or invented."
+              </p>
+              <p style="font-size: 0.78rem; font-weight: 700; color: var(--amber);">
+                Core DNA: edge-first (32.4 ms) · offline-first (GSM → LoRa) · closed-loop (sense → pump) · explainable (11 langs) · bounded.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <footer>
+    <div class="controls">
+      <button class="btn" onclick="prevSlide()">◀ Previous</button>
+      <span class="counter" id="slideCounter">Slide 1 of 6</span>
+      <button class="btn" onclick="nextSlide()">Next ▶</button>
+    </div>
+    <div class="key-hints">
+      Navigate with <kbd>←</kbd> <kbd>→</kbd> or <kbd>Space</kbd> · Press <kbd>F</kbd> for Fullscreen
+    </div>
+  </footer>
+
+  <script>
+    let currentSlide = 1;
+    const totalSlides = 6;
+
+    function showSlide(index) {
+      if (index < 1) index = 1;
+      if (index > totalSlides) index = totalSlides;
+      currentSlide = index;
+
+      for (let i = 1; i <= totalSlides; i++) {
+        const el = document.getElementById(`slide-${i}`);
+        if (el) {
+          if (i === currentSlide) {
+            el.classList.add('active');
+          } else {
+            el.classList.remove('active');
+          }
+        }
+      }
+
+      document.getElementById('slideCounter').textContent = `Slide ${currentSlide} of ${totalSlides}`;
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        showSlide(currentSlide - 1);
+      }
+    }
+
+    function nextSlide() {
+      if (currentSlide < totalSlides) {
+        showSlide(currentSlide + 1);
+      }
+    }
+
+    function toggleFullscreen() {
+      const elem = document.getElementById('slideFrame');
+      if (!document.fullscreenElement) {
+        elem.requestFullscreen().catch(err => {
+          alert(`Error attempting to enable fullscreen: ${err.message}`);
+        });
+      } else {
+        document.exitFullscreen();
+      }
+    }
+
+    // Keyboard navigation
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') {
+        e.preventDefault();
+        nextSlide();
+      } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        e.preventDefault();
+        prevSlide();
+      } else if (e.key.toLowerCase() === 'f') {
+        toggleFullscreen();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,6 +1,6 @@
-# 🏗️ Kisaan_Sathi — Project Architecture & Repository Structure
+# 🏗️ Kisaan Sathi — Project Architecture & Repository Structure
 
-**Smart India Hackathon 2026 • Clean-repo reference (post-cleanup v2.0)**
+**Smart India Hackathon 2026 • PS #26180 • Theme: Disaster Management • Qualcomm Inc (Hardware Edition)**
 
 ---
 
